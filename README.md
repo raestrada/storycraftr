@@ -31,26 +31,26 @@ With StoryCraftr, you'll never feel stuck again. Let AI guide your creative proc
 ### Installation
 
 1. **Clone the repository**:
-    @@```bash
+    ```bash
     git clone https://github.com/your-repo/storycraftr.git
     cd storycraftr
-    ```@@
+    ```
 
 2. **Install dependencies using Poetry**:
-    @@```bash
+    ```bash
     poetry install
-    ```@@
+    ```
 
 3. **Create a `.env` file** to store your OpenAI API key:
-    @@```bash
+    ```bash
     touch .env
     echo "OPENAI_API_KEY=your-openai-api-key" >> .env
-    ```@@
+    ```
 
 4. **Run the CLI**:
-    @@```bash
+    ```bash
     poetry run storycraftr --help
-    ```@@
+    ```
 
 ## Usage
 
@@ -58,38 +58,38 @@ StoryCraftr allows you to create, update, and manage every aspect of your book t
 
 ### Worldbuilding
 
-@@```bash
+```bash
 poetry run storycraftr my-book worldbuilding geography "Describe the geography of a futuristic dystopia" en
-```@@
+```
 
 ### Outline
 
-@@```bash
+```bash
 poetry run storycraftr my-book outline general_outline "Outline a sci-fi thriller where humanity battles AI overlords" en
-```@@
+```
 
 ### Chapters
 
-@@```bash
+```bash
 poetry run storycraftr my-book chapters chapter "Write chapter one of a space opera" en 1
-```@@
+```
 
 ### Updating Knowledge
 
 If you've made changes to your book's structure, you can update the agent's knowledge with:
 
-@@```bash
+```bash
 poetry run storycraftr my-book update
-```@@
+```
 
 ## Contributing
 
 We welcome contributions of all kinds! Whether you’re a developer, writer, or simply interested in improving the tool, you can help. Here’s how you can contribute:
 
 1. **Fork the repository** and create your branch:
-    @@```bash
+    ```bash
     git checkout -b feature/YourFeature
-    ```@@
+    ```
 
 2. **Make your changes**, ensuring all tests pass.
 
