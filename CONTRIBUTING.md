@@ -42,12 +42,35 @@ If there are no formal tests in place, please test your changes to the best of y
 
 ### 6. Commit Your Changes
 
-Commit your changes with a descriptive message:
+Use Semantic Commit Messages to make your changes clearer and more organized. The format is:
 
 ```bash
-git add .
-git commit -m "Add feature X to enhance StoryCraftr"
+<type>(<scope>): <description>
 ```
+
+- **Type**: Describes the kind of change. For example: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
+- **Scope**: The part of the project the change affects (optional). For example: `worldbuilding`, `outline`, `chapters`.
+- **Description**: A brief explanation of the change.
+
+Examples:
+
+- Adding a new feature:  
+    ```bash
+    git commit -m "feat(worldbuilding): add new geography prompt handling"
+    ```
+  
+- Fixing a bug:  
+    ```bash
+    git commit -m "fix(outline): correct plot points generation bug"
+    ```
+
+- Updating documentation:  
+    ```bash
+    git commit -m "docs: update README with new installation instructions"
+    ```
+
+Make sure to commit often with meaningful messages to keep track of your changes effectively.
+
 
 ### 7. Push Your Changes
 
