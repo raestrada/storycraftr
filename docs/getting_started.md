@@ -1,6 +1,6 @@
 # Getting Started with StoryCraftr 📚✨
 
-**StoryCraftr** is a CLI tool designed to help you write your book using AI. Inspired by the writing techniques of [Brandon Sanderson's Laws of Magic and Writing](https://www.brandonsanderson.com/the-law-of-writing), this guide will walk you through creating a story from scratch. Whether you're outlining, building worlds, or writing chapters, StoryCraftr can assist you every step of the way.
+**StoryCraftr** is a CLI tool designed to help you write your book using AI. Inspired by the writing techniques of [Brandon Sanderson's Laws of Magic and Writing](https://www.brandonsanderson.com/pages/writing-advice), this guide will walk you through creating a story from scratch. Whether you're outlining, building worlds, or writing chapters, StoryCraftr can assist you every step of the way.
 
 Sanderson emphasizes strong **structure** and **rules for storytelling**, which we will follow throughout this guide. 
 
@@ -136,7 +136,7 @@ If you initialized your book with alternate languages, you can translate the con
 
 ## Learn More About Writing
 
-The ideas in this tool are heavily inspired by [Brandon Sanderson’s Laws of Magic and Writing](https://www.brandonsanderson.com/the-law-of-writing). StoryCraftr is designed to help you implement these concepts while crafting well-structured stories with strong character arcs and consistent plot development.
+The ideas in this tool are heavily inspired by [Brandon Sanderson’s Laws of Magic and Writing](https://www.brandonsanderson.com/pages/writing-advice). StoryCraftr is designed to help you implement these concepts while crafting well-structured stories with strong character arcs and consistent plot development.
 
 ---
 
