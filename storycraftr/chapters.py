@@ -41,22 +41,44 @@ def generate_chapter(book_name, prompt, chapter_number):
     save_to_markdown(book_name, chapter_file, f"Chapter {chapter_number}", chapter_content)
     return chapter_content
 
-# Function to generate the cover page
 def generate_cover(book_name, prompt):
-    """Generate the cover page for the book."""
+    """
+    Generate a professional book cover in markdown format using the book's metadata 
+    and a prompt for additional guidance.
+    """
+    # Obtener los datos del archivo de configuración
+    config = get_config(book_name)
+    language = config.primary_language
+    title = config.book_name
+    author = config.default_author
+    genre = config.genre
+    alternate_languages = ', '.join(config.alternate_languages)
+
+    # Crear o obtener el asistente
     assistant = create_or_get_assistant(book_name, book_name)
     thread = get_thread()
 
-    # Generate the cover content
+    # Prompt para generar la portada completa en markdown, incluyendo todos los datos relevantes
+    prompt_content = (
+        f"Create a professional book cover in markdown format for the book titled '{title}'. "
+        f"Include the title, author (which is '{author}'), genre ('{genre}'), "
+        f"and alternate languages ('{alternate_languages}'). Use this information to format a typical "
+        f"book cover with a detailed description. Use this prompt as additional context: {prompt}. "
+        f"Write the content in {language}."
+    )
+
+    # Generar el contenido completo de la portada
     cover_content = create_message(
         thread_id=thread.id,
-        content=f"Generate a detailed description for the cover of the book based on this prompt: {prompt}. Write it in {get_config(book_name).primary_language}.",
+        content=prompt_content,
         assistant=assistant
     )
 
-    # Save to markdown
+    # Guardar el contenido en el archivo markdown
     save_to_markdown(book_name, "cover.md", "Cover", cover_content)
+
     return cover_content
+
 
 # Function to generate the back cover page
 def generate_back_cover(book_name, prompt):
