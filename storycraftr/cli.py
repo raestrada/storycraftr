@@ -155,7 +155,6 @@ def geography(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_geography(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Geography generated successfully.", style="bold green")
 
 @worldbuilding.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -166,7 +165,6 @@ def history(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_history(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] History generated successfully.", style="bold green")
 
 @worldbuilding.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -177,7 +175,6 @@ def culture(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_culture(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Culture generated successfully.", style="bold green")
 
 @worldbuilding.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -188,7 +185,6 @@ def magic_system(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_magic_system(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Magic system generated successfully.", style="bold green")
 
 @worldbuilding.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -199,7 +195,6 @@ def technology(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_technology(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Technology generated successfully.", style="bold green")
 
 # CLI for outline
 @cli.group()
@@ -216,7 +211,6 @@ def general_outline(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_general_outline(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] General outline generated successfully.", style="bold green")
 
 @outline.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -227,7 +221,6 @@ def character_summary(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_character_summary(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Character summary generated successfully.", style="bold green")
 
 @outline.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -238,7 +231,6 @@ def plot_points(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_plot_points(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Plot points generated successfully.", style="bold green")
 
 @outline.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -249,7 +241,6 @@ def chapter_synopsis(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_chapter_synopsis(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Chapter synopsis generated successfully.", style="bold green")
 
 # CLI for chapters
 @cli.group()
@@ -267,7 +258,6 @@ def chapter(chapter_number, prompt):
         book_name = os.getcwd()
     load_config(book_name)
     generate_chapter(book_name, chapter_number, prompt)
-    console.print(f"[bold green]✔[/bold green] Chapter {chapter_number} generated successfully.", style="bold green")
 
 @chapters.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -278,7 +268,6 @@ def cover(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_cover(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Cover generated successfully.", style="bold green")
 
 @chapters.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -289,7 +278,6 @@ def back_cover(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_back_cover(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Back cover generated successfully.", style="bold green")
 
 @chapters.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
@@ -300,7 +288,6 @@ def epilogue(prompt, book_name=None):
         book_name = os.getcwd()
     load_config(book_name)
     generate_epilogue(book_name, prompt)
-    console.print(f"[bold green]✔[/bold green] Epilogue generated successfully.", style="bold green")
 
 
 if __name__ == "__main__":
