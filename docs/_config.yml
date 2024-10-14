@@ -1,0 +1,39 @@
+# Configuración básica de Jekyll
+title: StoryCraftr Documentation
+description: Documentation for StoryCraftr - Your AI-powered Book Creation Assistant
+baseurl: "" # Para GitHub Pages, si tu sitio está en la raíz del repositorio
+url: "https://storycraftr.app" # Tu dominio
+
+# Configuración de Markdown y conversión
+markdown: kramdown
+theme: minima # Tema sencillo que puedes personalizar
+plugins:
+  - jekyll-feed
+
+# Archivos y carpetas a incluir
+include:
+  - _docs
+
+# Archivos y carpetas a excluir
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+
+# Opciones de kramdown para Markdown
+kramdown:
+  input: GFM
+  syntax_highlighter_opts:
+    block:
+      line_numbers: true
+
+# Personalización del estilo
+sass:
+  sass_dir: _sass
+  style: compressed
+
+# Navegación personalizada
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:path/
