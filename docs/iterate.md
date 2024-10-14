@@ -15,13 +15,13 @@ For example, if you've already generated a chapter synopsis and run the command 
 Over time, as you develop your story, you might want to check for consistency in character names. This command will **scan all chapters** for character names and either fix inconsistencies or make recommendations.
 
 ```bash
-storycraftr iterate check-names "Check character names for consistency." es
+storycraftr iterate check-names "Check character names for consistency."
 ```
 
 To update or fix a character name across the entire book:
 
 ```bash
-storycraftr iterate fix-name "Update character 'Santi' to 'Santiago' throughout the book." es
+storycraftr iterate fix-name "Update character 'Santi' to 'Santiago' throughout the book."
 ```
 
 ### 2. Refine Character Motivation
@@ -29,7 +29,7 @@ storycraftr iterate fix-name "Update character 'Santi' to 'Santiago' throughout 
 Characters need strong motivations, and sometimes these evolve as you write. This command will **refine character motivations** throughout the book, ensuring consistency and depth.
 
 ```bash
-storycraftr iterate refine-motivation "Refine the motivations of 'Elena' in a story about rebellion against gods." es
+storycraftr iterate refine-motivation "Refine the motivations of 'Elena' in a story about rebellion against gods."
 ```
 
 ### 3. Strengthen Story Argument
@@ -37,7 +37,7 @@ storycraftr iterate refine-motivation "Refine the motivations of 'Elena' in a st
 The core argument or theme of your story can sometimes become diluted. This command will **reiterate and strengthen the argument or theme** across the book to ensure it is clear and compelling.
 
 ```bash
-storycraftr iterate strengthen-argument "Ensure the argument of rebellion against divine control is clear." es
+storycraftr iterate strengthen-argument "Ensure the argument of rebellion against divine control is clear."
 ```
 
 ### 4. Insert Chapters and Adjust Numbering
@@ -45,7 +45,7 @@ storycraftr iterate strengthen-argument "Ensure the argument of rebellion agains
 Sometimes, you may need to insert a chapter between two existing ones. This command will **insert a new chapter** and automatically **adjust the numbering** of all subsequent chapters.
 
 ```bash
-storycraftr iterate insert-chapter "Insert a new chapter between chapters 3 and 4." es 3
+storycraftr iterate insert-chapter "Insert a new chapter between chapters 3 and 4." 3
 ```
 
 ### 5. Split a Chapter
@@ -53,7 +53,7 @@ storycraftr iterate insert-chapter "Insert a new chapter between chapters 3 and 
 If a chapter becomes too long or covers too many topics, you can **split it into two separate chapters**. This command will split the specified chapter and adjust the numbering of all subsequent chapters.
 
 ```bash
-storycraftr iterate split-chapter "Split chapter 5 into two chapters." es 5
+storycraftr iterate split-chapter "Split chapter 5 into two chapters." 5
 ```
 
 ### 6. Add Flashbacks
@@ -61,7 +61,7 @@ storycraftr iterate split-chapter "Split chapter 5 into two chapters." es 5
 Flashbacks are a great way to add depth to a character’s backstory. This command lets you **add a flashback scene** between two chapters, ensuring it integrates seamlessly with the surrounding narrative.
 
 ```bash
-storycraftr iterate add-flashback "Add a flashback between chapters 6 and 7." es 6
+storycraftr iterate add-flashback "Add a flashback between chapters 6 and 7." 6
 ```
 
 ### 7. Update Plot Points
@@ -69,7 +69,7 @@ storycraftr iterate add-flashback "Add a flashback between chapters 6 and 7." es
 Plot points are critical to maintaining tension and momentum in your story. Use this command to **update or refine key plot points** across the story, making sure they align with the latest developments in the book.
 
 ```bash
-storycraftr iterate update-plot-points "Refine the plot points around the rebellion’s climax." es
+storycraftr iterate update-plot-points "Refine the plot points around the rebellion’s climax."
 ```
 
 ### 8. Consistency Check Across All Files
@@ -77,7 +77,7 @@ storycraftr iterate update-plot-points "Refine the plot points around the rebell
 Before completing your book, it's important to check for consistency across all files. This command will **review the entire structure** to ensure character arcs, motivations, plot points, and even worldbuilding elements are aligned.
 
 ```bash
-storycraftr iterate check-consistency "Ensure consistency of character arcs and motivations throughout the story." es
+storycraftr iterate check-consistency "Ensure consistency of character arcs and motivations throughout the story."
 ```
 
 ## Iterating Efficiently
