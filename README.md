@@ -54,25 +54,29 @@ With StoryCraftr, you'll never feel stuck again. Let AI guide your creative proc
 
 ## Usage
 
-StoryCraftr allows you to create, update, and manage every aspect of your book through simple CLI commands. Here are some examples:
+### Initialize a new book project
 
-### Worldbuilding
+To initialize a new book project with custom configuration, use the `init` command. The `book_name` is required, and you can specify the primary language, alternate languages, author, genre, and behavior file.
 
-```bash
-poetry run storycraftr my-book worldbuilding geography "Describe the geography of a futuristic dystopia" en
-```
+#### Example:
 
-### Outline
+@@bash
+poetry run storycraftr init "La purga de los dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "default.txt"
+@@
 
-```bash
-poetry run storycraftr my-book outline general_outline "Outline a sci-fi thriller where humanity battles AI overlords" en
-```
+This will create the project structure for the book "La purga de los dioses" with the specified configuration and behavior.
 
-### Chapters
+### Generate Worldbuilding Content
 
-```bash
-poetry run storycraftr my-book chapters chapter "Write chapter one of a space opera" en 1
-```
+The `worldbuilding` group allows you to generate different aspects of the world, such as geography, history, culture, and more. Below is an example of generating geography details.
+
+#### Example:
+
+@@bash
+poetry run storycraftr worldbuilding geography "Describe the mountain range in the northern region"
+@@
+
+This will generate the geography content based on the prompt provided.
 
 ### Updating Knowledge
 
