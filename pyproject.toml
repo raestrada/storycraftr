@@ -22,7 +22,8 @@ pytest = "^6.2.4"
 storycraftr = "storycraftr.cli:cli"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
+pytest = "^6.2.4"
+ipdb = "^0.13.13"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

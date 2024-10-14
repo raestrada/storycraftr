@@ -62,7 +62,7 @@ def create_or_get_assistant(name, book_name):
         instructions=instructions,
         name=name,
         tools=[{"type": "code_interpreter"}, {"type": "file_search"}],
-        model="gpt-4-turbo",
+        model="gpt-4o",
     )
 
     # Associate the assistant with the vector store
@@ -78,55 +78,50 @@ def create_or_get_assistant(name, book_name):
 import os
 import time
 
+import os
+import time
+
 # Function to create a message in a thread and handle async processing
 def create_message(thread_id, content, assistant, file_path=None):
     """
-    Create a message in the thread and process it asynchronously.
+    Create a message in the thread and process it asynchronously using OpenAI completions.
     
     Parameters:
         thread_id (str): The ID of the thread where the message will be created.
-        content (str): The content of the message.
+        content (str): The content of the prompt for improving or generating text.
         assistant (object): The assistant object with an ID.
-        file_path (str, optional): The path to a file to attach as an attachment. Defaults to None.
+        file_path (str, optional): The path to a file to improve or generate content. Defaults to None.
     
     Returns:
-        str: The text content of the last message returned by the assistant.
+        str: The text content generated or improved by the assistant.
     """
-    # Prepare the message payload
-    message_payload = {
-        "thread_id": thread_id,
-        "role": "user",
-        "content": content
-    }
-
-    # Check if a file path is provided and the file exists
+    # Prepare the base prompt
     if file_path and os.path.exists(file_path):
-        with open(file_path, 'rb') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             file_content = f.read()
-            # Add the attachment to the message payload
-            message_payload["attachments"] = [{"name": os.path.basename(file_path), "data": file_content}]
-    
-    # Create the message in the thread
-    client.beta.threads.messages.create(**message_payload)
+            # Append the file content to the prompt asking for improvement
+            prompt = f"{content}\n\nHere is the existing content to improve:\n{file_content}"
+    else:
+        # If no file, use the original prompt for generating new content
+        prompt = content
 
-    # Start the assistant run
-    run = client.beta.threads.runs.create(
-        thread_id=thread_id,
-        assistant_id=assistant.id
+    # Send the prompt to OpenAI completions API
+    response = client.chat.completions.create(
+        model="gpt-4o",  # Adjust model as needed
+        messages=[{"role": "user", "content": prompt}]
     )
 
-    # Wait until the run is finished
-    while run.status == "queued" or run.status == "in_progress":
-        run = client.beta.threads.runs.retrieve(
-            thread_id=thread_id,
-            run_id=run.id,
-        )
-        time.sleep(0.5)  # Wait before checking the run status again
+    # Retrieve the completion result (generated or improved content)
+    generated_content = response.choices[0].message.content
 
-    # Retrieve the list of messages in the thread and return the last message content
-    messages = client.beta.threads.messages.list(thread_id=thread_id)
+    # If a file path is provided, save the result to the file
+    if file_path:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(generated_content)
     
-    return messages.data[-1].content[0].text.value
+    # Return the generated content
+    return generated_content
+
 
 
 # Function to get a new thread
