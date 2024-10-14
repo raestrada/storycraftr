@@ -83,7 +83,7 @@ This will generate the geography content based on the prompt provided.
 If you've made changes to your book's structure, you can update the agent's knowledge with:
 
 ```bash
-poetry run storycraftr my-book update
+poetry run storycraftr update
 ```
 
 ## Contributing
