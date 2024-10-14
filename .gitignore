@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 La purga de los dioses
+.DS_Store
