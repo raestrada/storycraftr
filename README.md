@@ -60,9 +60,9 @@ To initialize a new book project with custom configuration, use the `init` comma
 
 #### Example:
 
-@@bash
+````bash
 poetry run storycraftr init "La purga de los dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "default.txt"
-@@
+````
 
 This will create the project structure for the book "La purga de los dioses" with the specified configuration and behavior.
 
@@ -72,9 +72,9 @@ The `worldbuilding` group allows you to generate different aspects of the world,
 
 #### Example:
 
-@@bash
+````bash
 poetry run storycraftr worldbuilding geography "Describe the mountain range in the northern region"
-@@
+````
 
 This will generate the geography content based on the prompt provided.
 
