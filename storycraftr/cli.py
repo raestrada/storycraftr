@@ -25,9 +25,21 @@ from rich.console import Console
 
 console = Console()
 
-# Function to check if the structure is initialized
+def verify_book_path(book_name=None):
+    """Verify if the book path is valid and contains storycraftr.json."""
+    if not book_name:
+        book_name = os.getcwd()  # Use the current directory if --book-name is not provided
+    storycraftr_file = os.path.join(book_name, 'storycraftr.json')
+
+    if not os.path.exists(storycraftr_file):
+        raise click.ClickException(f"The file storycraftr.json was not found in the path: {book_name}")
+
+    return book_name
+
 def is_initialized(book_name):
-    return os.path.exists(book_name) and os.path.exists(os.path.join(book_name, 'chapters'))
+    """Check if the book structure is already initialized."""
+    storycraftr_file = os.path.join(book_name, 'storycraftr.json')
+    return os.path.exists(storycraftr_file)
 
 # Function to show error if project is not initialized
 def project_not_initialized_error(book_name):
@@ -36,9 +48,10 @@ def project_not_initialized_error(book_name):
 
 # Function to create the folder structure and config file
 def init_structure(book_name, primary_language, alternate_languages, default_author, genre):
+    # Show initialization start
+    console.print(f"[bold blue]Initializing book structure: {book_name}[/bold blue]")
     
-
-    # Iterate over the list and create each file
+    # Iterate over the list and create each file, showing progress
     for file in storycraftr.templates.folder.files_to_create:
         # Build the full file path
         file_path = os.path.join(book_name, file['folder'], file['filename'])
@@ -49,11 +62,11 @@ def init_structure(book_name, primary_language, alternate_languages, default_aut
         # Write the content to the file
         with open(file_path, 'w') as f:
             f.write(file['content'])
+        
+        # Log the created file
+        console.log(f"[green]File created:[/green] {file_path}")
 
-
-
-    
-    # Create the config.json file
+    # Create the storycraftr.json file
     config_data = {
         "book_name": book_name,
         "primary_language": primary_language,
@@ -62,16 +75,20 @@ def init_structure(book_name, primary_language, alternate_languages, default_aut
         "genre": genre
     }
     
-    config_file = os.path.join(book_name, 'config.json')
+    config_file = os.path.join(book_name, 'storycraftr.json')
     with open(config_file, 'w') as f:
         json.dump(config_data, f, indent=4)
+
+    # Log configuration file creation
+    console.print(f"[green]Configuration file created:[/green] {config_file}", style="green")
     
-    console.print(f"[bold green]✔[/bold green] Project '[bold]{book_name}[/bold]' initialized successfully with configuration.", style="bold green")
+    # Confirm completion
+    console.print(f"[bold green]✔[/bold green] Project '[bold]{book_name}[/bold]' initialized successfully.", style="bold green")
 
 
 # Function to load the configuration file
 def load_config(book_name):
-    config_file = os.path.join(book_name, 'config.json')
+    config_file = os.path.join(book_name, 'storycraftr.json')
     if os.path.exists(config_file):
         with open(config_file, 'r') as f:
             return json.load(f)
@@ -104,118 +121,173 @@ cli.add_command(init)
 
 # CLI for worldbuilding
 @cli.group()
-@click.argument('book_name')
-def worldbuilding(book_name):
+@click.pass_context
+def worldbuilding():
     """Manage worldbuilding aspects of the book."""
     pass
 
 @worldbuilding.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def geography(book_name, prompt):
+@click.pass_context
+def geography(prompt):
     """Generate geography details for the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_geography(book_name, prompt)
 
 @worldbuilding.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def history(book_name, prompt):
+@click.pass_context
+def history(prompt):
     """Generate history details for the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_history(book_name, prompt)
 
 @worldbuilding.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def culture(book_name, prompt):
+@click.pass_context
+def culture(prompt):
     """Generate culture details for the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_culture(book_name, prompt)
 
 @worldbuilding.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def magic_system(book_name, prompt):
+@click.pass_context
+def magic_system(prompt):
     """Generate magic or science system details for the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_magic_system(book_name, prompt)
 
 @worldbuilding.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def technology(book_name, prompt):
+@click.pass_context
+def technology(prompt):
     """Generate technology details for the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_technology(book_name, prompt)
-
 
 # CLI for outline
 @cli.group()
-@click.argument('book_name')
-def outline(book_name):
+@click.pass_context
+def outline():
     """Manage outline aspects of the book."""
     pass
 
 @outline.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def general_outline(book_name, prompt):
+@click.pass_context
+def general_outline(prompt):
     """Generate the general outline of the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_general_outline(book_name, prompt)
 
 @outline.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def character_summary(book_name, prompt):
+@click.pass_context
+def character_summary(prompt):
     """Generate the character summary of the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_character_summary(book_name, prompt)
 
 @outline.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def plot_points(book_name, prompt):
+@click.pass_context
+def plot_points(prompt):
     """Generate the main plot points of the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_plot_points(book_name, prompt)
 
 @outline.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def chapter_synopsis(book_name, prompt):
+@click.pass_context
+def chapter_synopsis(prompt):
     """Generate the chapter-by-chapter synopsis of the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_chapter_synopsis(book_name, prompt)
-
 
 # CLI for chapters
 @cli.group()
-@click.argument('book_name')
-def chapters(book_name):
+@click.pass_context
+def chapters():
     """Manage chapters of the book."""
     pass
 
 @chapters.command()
-@click.argument('prompt')
 @click.argument('chapter_number', type=int)
-@click.argument('book_name')
-def chapter(book_name, prompt, chapter_number):
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
+@click.argument('prompt')
+@click.pass_context
+def chapter(chapter_number, prompt):
     """Generate a new chapter for the book."""
-    generate_chapter(book_name, prompt, chapter_number)
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
+    generate_chapter(book_name, chapter_number, prompt)
 
 @chapters.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def cover(book_name, prompt):
+@click.pass_context
+def cover(prompt):
     """Generate the cover of the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_cover(book_name, prompt)
 
 @chapters.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def back_cover(book_name, prompt):
+@click.pass_context
+def back_cover(prompt):
     """Generate the back cover of the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_back_cover(book_name, prompt)
 
 @chapters.command()
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.argument('book_name')
-def epilogue(book_name, prompt):
+@click.pass_context
+def epilogue(prompt):
     """Generate the epilogue of the book."""
+    if not book_name:
+        book_name = os.getcwd()
+    load_config(book_name)
     generate_epilogue(book_name, prompt)
+
+# Add your specific generation functions here
+def generate_geography(book_name, prompt):
+    print(f"Generating geography for book: {book_name} with prompt: {prompt}")
+
 
 if __name__ == "__main__":
     cli()

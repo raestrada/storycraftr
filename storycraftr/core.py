@@ -24,12 +24,12 @@ def load_book_config(json_file_path):
         )
     return book_config
 
-# Function that receives the book directory and loads the config.json file
+# Function that receives the book directory and loads the storycraftr.json file
 def get_config(book_name):
-    # Generate the full path to the config.json file inside the book_name directory
-    config_path = os.path.join(book_name, 'config.json')
+    # Generate the full path to the storycraftr.json file inside the book_name directory
+    config_path = os.path.join(book_name, 'storycraftr.json')
     
-    # Check if the config.json file exists
+    # Check if the storycraftr.json file exists
     if os.path.exists(config_path):
         # Load and return the configuration using load_book_config
         return load_book_config(config_path)
