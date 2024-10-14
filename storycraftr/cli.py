@@ -1,6 +1,7 @@
 import os
 import json
 import click
+import storycraftr.templates.folder
 from storycraftr.worldbuilding import (
     generate_geography,
     generate_history,
@@ -35,29 +36,22 @@ def project_not_initialized_error(book_name):
 
 # Function to create the folder structure and config file
 def init_structure(book_name, primary_language, alternate_languages, default_author, genre):
-    # Create the main directories
-    directories = [
-        os.path.join(book_name, 'outline'),
-        os.path.join(book_name, 'worldbuilding'),
-        os.path.join(book_name, 'characters'),
-        os.path.join(book_name, 'chapters')
-    ]
     
-    for directory in directories:
-        os.makedirs(directory, exist_ok=True)
 
-    # Create the default files
-    with open(os.path.join(book_name, 'chapters', 'chapter-1.md'), 'w') as f:
-        f.write(f"# Chapter 1\n\nYour story starts here in {primary_language}.")
-    
-    with open(os.path.join(book_name, 'chapters', 'cover.md'), 'w') as f:
-        f.write("# Cover\n\nYour cover description here.")
-    
-    with open(os.path.join(book_name, 'chapters', 'back-cover.md'), 'w') as f:
-        f.write("# Back Cover\n\nYour back cover synopsis here.")
-    
-    with open(os.path.join(book_name, 'chapters', 'epilogue.md'), 'w') as f:
-        f.write("# Epilogue\n\nYour epilogue here.")
+    # Iterate over the list and create each file
+    for file in storycraftr.templates.folder.files_to_create:
+        # Build the full file path
+        file_path = os.path.join(book_name, file['folder'], file['filename'])
+
+        # Ensure the directory exists
+        os.makedirs(os.path.join(book_name, file['folder']), exist_ok=True)
+
+        # Write the content to the file
+        with open(file_path, 'w') as f:
+            f.write(file['content'])
+
+
+
     
     # Create the config.json file
     config_data = {
@@ -117,43 +111,38 @@ def worldbuilding(book_name):
 
 @worldbuilding.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def geography(book_name, prompt, language):
+def geography(book_name, prompt):
     """Generate geography details for the book."""
-    generate_geography(book_name, prompt, language)
+    generate_geography(book_name, prompt)
 
 @worldbuilding.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def history(book_name, prompt, language):
+def history(book_name, prompt):
     """Generate history details for the book."""
-    generate_history(book_name, prompt, language)
+    generate_history(book_name, prompt)
 
 @worldbuilding.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def culture(book_name, prompt, language):
+def culture(book_name, prompt):
     """Generate culture details for the book."""
-    generate_culture(book_name, prompt, language)
+    generate_culture(book_name, prompt)
 
 @worldbuilding.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def magic_system(book_name, prompt, language):
+def magic_system(book_name, prompt):
     """Generate magic or science system details for the book."""
-    generate_magic_system(book_name, prompt, language)
+    generate_magic_system(book_name, prompt)
 
 @worldbuilding.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def technology(book_name, prompt, language):
+def technology(book_name, prompt):
     """Generate technology details for the book."""
-    generate_technology(book_name, prompt, language)
+    generate_technology(book_name, prompt)
 
 
 # CLI for outline
@@ -165,35 +154,31 @@ def outline(book_name):
 
 @outline.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def general_outline(book_name, prompt, language):
+def general_outline(book_name, prompt):
     """Generate the general outline of the book."""
-    generate_general_outline(book_name, prompt, language)
+    generate_general_outline(book_name, prompt)
 
 @outline.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def character_summary(book_name, prompt, language):
+def character_summary(book_name, prompt):
     """Generate the character summary of the book."""
-    generate_character_summary(book_name, prompt, language)
+    generate_character_summary(book_name, prompt)
 
 @outline.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def plot_points(book_name, prompt, language):
+def plot_points(book_name, prompt):
     """Generate the main plot points of the book."""
-    generate_plot_points(book_name, prompt, language)
+    generate_plot_points(book_name, prompt)
 
 @outline.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def chapter_synopsis(book_name, prompt, language):
+def chapter_synopsis(book_name, prompt):
     """Generate the chapter-by-chapter synopsis of the book."""
-    generate_chapter_synopsis(book_name, prompt, language)
+    generate_chapter_synopsis(book_name, prompt)
 
 
 # CLI for chapters
@@ -205,36 +190,32 @@ def chapters(book_name):
 
 @chapters.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('chapter_number', type=int)
 @click.argument('book_name')
-def chapter(book_name, prompt, language, chapter_number):
+def chapter(book_name, prompt, chapter_number):
     """Generate a new chapter for the book."""
-    generate_chapter(book_name, prompt, language, chapter_number)
+    generate_chapter(book_name, prompt, chapter_number)
 
 @chapters.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def cover(book_name, prompt, language):
+def cover(book_name, prompt):
     """Generate the cover of the book."""
-    generate_cover(book_name, prompt, language)
+    generate_cover(book_name, prompt)
 
 @chapters.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def back_cover(book_name, prompt, language):
+def back_cover(book_name, prompt):
     """Generate the back cover of the book."""
-    generate_back_cover(book_name, prompt, language)
+    generate_back_cover(book_name, prompt)
 
 @chapters.command()
 @click.argument('prompt')
-@click.argument('language', default='en')
 @click.argument('book_name')
-def epilogue(book_name, prompt, language):
+def epilogue(book_name, prompt):
     """Generate the epilogue of the book."""
-    generate_epilogue(book_name, prompt, language)
+    generate_epilogue(book_name, prompt)
 
 if __name__ == "__main__":
     cli()

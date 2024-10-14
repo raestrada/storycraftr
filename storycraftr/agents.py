@@ -75,30 +75,59 @@ def create_or_get_assistant(name, book_name):
 
     return assistant
 
-# Function to create a message in a thread and handle async processing
-def create_message(thread_id, content, assistant):
-    """Create a message in the thread and process it asynchronously."""
-    client.beta.threads.messages.create(
-        thread_id=thread_id,
-        role="user",
-        content=content
-    )
+import os
+import time
 
+# Function to create a message in a thread and handle async processing
+def create_message(thread_id, content, assistant, file_path=None):
+    """
+    Create a message in the thread and process it asynchronously.
+    
+    Parameters:
+        thread_id (str): The ID of the thread where the message will be created.
+        content (str): The content of the message.
+        assistant (object): The assistant object with an ID.
+        file_path (str, optional): The path to a file to attach as an attachment. Defaults to None.
+    
+    Returns:
+        str: The text content of the last message returned by the assistant.
+    """
+    # Prepare the message payload
+    message_payload = {
+        "thread_id": thread_id,
+        "role": "user",
+        "content": content
+    }
+
+    # Check if a file path is provided and the file exists
+    if file_path and os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            file_content = f.read()
+            # Add the attachment to the message payload
+            message_payload["attachments"] = [{"name": os.path.basename(file_path), "data": file_content}]
+    
+    # Create the message in the thread
+    client.beta.threads.messages.create(**message_payload)
+
+    # Start the assistant run
     run = client.beta.threads.runs.create(
         thread_id=thread_id,
         assistant_id=assistant.id
     )
 
+    # Wait until the run is finished
     while run.status == "queued" or run.status == "in_progress":
         run = client.beta.threads.runs.retrieve(
             thread_id=thread_id,
             run_id=run.id,
         )
-        time.sleep(0.5)
+        time.sleep(0.5)  # Wait before checking the run status again
 
+    # Retrieve the list of messages in the thread and return the last message content
     messages = client.beta.threads.messages.list(thread_id=thread_id)
-
+    
     return messages.data[-1].content[0].text.value
+
 
 # Function to get a new thread
 def get_thread():

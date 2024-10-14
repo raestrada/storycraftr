@@ -13,6 +13,7 @@ click = "8.1"      # Especificando la versión de Click
 markdown = "3.7"   # Especificando la versión de Markdown
 pandoc = "2.4"     # Especificando la versión de Pandoc
 rich = "^13.9.2"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
