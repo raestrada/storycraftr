@@ -1,8 +1,11 @@
-# StoryCraftr - Your AI-powered Book Creation Assistant 📚🤖
+# ![StoryCraftr Logo](https://res.cloudinary.com/dyknhuvxt/image/upload/f_auto,q_auto/ofhhkf6f7bryfgvbxxwc) StoryCraftr - Your AI-powered Book Creation Assistant 📚🤖
 
-Welcome to **StoryCraftr**, the open-source project designed to revolutionize how books are written. With the power of AI and a streamlined command-line interface (CLI), StoryCraftr helps you craft your story, manage worldbuilding, structure your book, and generate chapters — all while keeping you in full control.
+Welcome to [**StoryCraftr**](https://storycraftr.homepage.com), the open-source project designed to revolutionize how books are written. With the power of AI and a streamlined command-line interface (CLI), StoryCraftr helps you craft your story, manage worldbuilding, structure your book, and generate chapters — all while keeping you in full control.
+
+_Coming soon!_ The first alpha version is on its way, but it's not quite usable yet. Stay tuned!
 
 If you're passionate about writing, coding, or both, we invite you to collaborate with us on making StoryCraftr the ultimate AI writing assistant! 🚀
+
 
 ## Why StoryCraftr?
 
