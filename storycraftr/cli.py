@@ -121,7 +121,6 @@ cli.add_command(init)
 
 # CLI for worldbuilding
 @cli.group()
-@click.pass_context
 def worldbuilding():
     """Manage worldbuilding aspects of the book."""
     pass
@@ -129,8 +128,7 @@ def worldbuilding():
 @worldbuilding.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def geography(prompt):
+def geography(prompt, book_name=None):
     """Generate geography details for the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -140,8 +138,7 @@ def geography(prompt):
 @worldbuilding.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def history(prompt):
+def history(prompt, book_name=None):
     """Generate history details for the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -151,8 +148,7 @@ def history(prompt):
 @worldbuilding.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def culture(prompt):
+def culture(prompt, book_name=None):
     """Generate culture details for the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -162,8 +158,7 @@ def culture(prompt):
 @worldbuilding.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def magic_system(prompt):
+def magic_system(prompt, book_name=None):
     """Generate magic or science system details for the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -173,8 +168,7 @@ def magic_system(prompt):
 @worldbuilding.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def technology(prompt):
+def technology(prompt, book_name=None):
     """Generate technology details for the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -183,7 +177,6 @@ def technology(prompt):
 
 # CLI for outline
 @cli.group()
-@click.pass_context
 def outline():
     """Manage outline aspects of the book."""
     pass
@@ -191,8 +184,7 @@ def outline():
 @outline.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def general_outline(prompt):
+def general_outline(prompt, book_name=None):
     """Generate the general outline of the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -202,8 +194,7 @@ def general_outline(prompt):
 @outline.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def character_summary(prompt):
+def character_summary(prompt, book_name=None):
     """Generate the character summary of the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -213,8 +204,7 @@ def character_summary(prompt):
 @outline.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def plot_points(prompt):
+def plot_points(prompt, book_name=None):
     """Generate the main plot points of the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -224,8 +214,7 @@ def plot_points(prompt):
 @outline.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def chapter_synopsis(prompt):
+def chapter_synopsis(prompt, book_name=None):
     """Generate the chapter-by-chapter synopsis of the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -234,7 +223,6 @@ def chapter_synopsis(prompt):
 
 # CLI for chapters
 @cli.group()
-@click.pass_context
 def chapters():
     """Manage chapters of the book."""
     pass
@@ -243,7 +231,6 @@ def chapters():
 @click.argument('chapter_number', type=int)
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
 def chapter(chapter_number, prompt):
     """Generate a new chapter for the book."""
     if not book_name:
@@ -254,8 +241,7 @@ def chapter(chapter_number, prompt):
 @chapters.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def cover(prompt):
+def cover(prompt, book_name=None):
     """Generate the cover of the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -265,8 +251,7 @@ def cover(prompt):
 @chapters.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def back_cover(prompt):
+def back_cover(prompt, book_name=None):
     """Generate the back cover of the book."""
     if not book_name:
         book_name = os.getcwd()
@@ -276,17 +261,12 @@ def back_cover(prompt):
 @chapters.command()
 @click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
-@click.pass_context
-def epilogue(prompt):
+def epilogue(prompt, book_name=None):
     """Generate the epilogue of the book."""
     if not book_name:
         book_name = os.getcwd()
     load_config(book_name)
     generate_epilogue(book_name, prompt)
-
-# Add your specific generation functions here
-def generate_geography(book_name, prompt):
-    print(f"Generating geography for book: {book_name} with prompt: {prompt}")
 
 
 if __name__ == "__main__":
