@@ -1,19 +1,10 @@
 import os
 from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message, update_agent_files
 from storycraftr.utils.core import get_config
+from storycraftr.utils.markdown import save_to_markdown
 from rich.console import Console
 
 console = Console()
-
-# Function to save content to a markdown file
-def save_to_markdown(book_name, file_name, header, content):
-    """Save the generated content to the specified markdown file."""
-    file_path = os.path.join(book_name, 'chapters', file_name)
-    console.print(f"[bold blue]Saving content to {file_path}...[/bold blue]")  # Progress message
-    with open(file_path, 'w') as f:
-        f.write(f"# {header}\n\n{content}")
-    console.print(f"[bold green]Content saved successfully to {file_path}[/bold green]")  # Success message
-    return file_path  # Return the path for potential reuse
 
 # Function to generate a new chapter based on a prompt
 def generate_chapter(book_name, prompt, chapter_number):

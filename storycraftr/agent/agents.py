@@ -20,7 +20,8 @@ def load_markdown_files(book_name):
     return md_files
 
 # Function to delete an existing assistant
-def delete_assistant(name):
+def delete_assistant(book_name):
+    name = book_name.split("/")[-1]
     console.print(f"[bold blue]Checking if assistant '{name}' exists for deletion...[/bold blue]")  # Progress message
     assistants = client.beta.assistants.list()
     for assistant in assistants.data:

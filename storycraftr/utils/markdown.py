@@ -1,16 +1,17 @@
 import os
+from rich.console import Console
+
+console = Console()
 
 # Function to save content to a markdown file
-def save_to_markdown(book_name, folder_name, file_name, header, content):
+def save_to_markdown(book_name, file_name, header, content):
     """Save the generated content to the specified markdown file."""
-    directory = os.path.join(book_name, folder_name)
-    os.makedirs(directory, exist_ok=True)  # Ensure the directory exists
-
-    file_path = os.path.join(directory, file_name)
+    file_path = os.path.join(book_name, 'outline', file_name)
+    console.print(f"[bold blue]Saving content to {file_path}...[/bold blue]")  # Progress message
     with open(file_path, 'w') as f:
         f.write(f"# {header}\n\n{content}")
-    
-    print(f"Saved content to {file_path}")
+    console.print(f"[bold green]Content saved successfully to {file_path}[/bold green]")  # Success message
+    return file_path  # Return the path for reuse
 
 # Function to append content to an existing markdown file
 def append_to_markdown(book_name, folder_name, file_name, content):

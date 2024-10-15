@@ -1,6 +1,9 @@
 import os
 import json
 from typing import NamedTuple
+from rich.console import Console
+
+console = Console()
 
 # Define the structure for the book using NamedTuple
 class BookConfig(NamedTuple):
@@ -52,3 +55,13 @@ def file_has_more_than_three_lines(file_path):
             if i > 3:
                 return True
     return False
+
+def load_config(book_name):
+    """Load the configuration file."""
+    config_file = os.path.join(book_name, 'storycraftr.json')
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            return json.load(f)
+    else:
+        console.print(f"[bold red]The file storycraftr.json was not found in the path: {book_name}[/bold red]")
+        return None
