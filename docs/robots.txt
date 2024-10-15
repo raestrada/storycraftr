@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://storycraftr.app/sitemap.xml
