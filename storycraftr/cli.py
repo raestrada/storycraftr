@@ -11,9 +11,9 @@ from storycraftr.cmd.iterate import iterate
 console = Console()
 
 
-def load_open_ai_key():
+def load_openai_api_key():
     # Path to the API key file
-    api_key_file = os.path.expanduser("~/.storycraftr/open_ai_key.txt")
+    api_key_file = os.path.expanduser("~/.storycraftr/openai_api_key.txt")
 
     # Check if the file exists
     if os.path.exists(api_key_file):
@@ -22,14 +22,14 @@ def load_open_ai_key():
             api_key = file.read().strip()  # Strip any whitespace or newlines
 
         # Set the API key as an environment variable
-        os.environ["OPEN_AI_KEY"] = api_key
-        console.print("[green]OPEN_AI_KEY has been successfully loaded.[/green]")
+        os.environ["OPENAI_API_KEY"] = api_key
+        console.print("[green]OPENAI_API_KEY has been successfully loaded.[/green]")
     else:
         console.print(f"[red]The file {api_key_file} does not exist.[/red]")
 
 
 # Run the function
-load_open_ai_key()
+load_openai_api_key()
 
 
 def verify_book_path(book_name=None):

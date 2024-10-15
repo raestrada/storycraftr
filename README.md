@@ -19,11 +19,11 @@ pipx install git+https://github.com/raestrada/storycraftr.git@v0.1.1
 
 ### Important: Before using StoryCraftr, make sure to set your OpenAI API key:
 
-Store the key in a text file located at ~/.storycraftr/open_ai_key.txt for convenience.
+Store the key in a text file located at ~/.storycraftr/openai_api_key.txt for convenience.
 
 ```bash
 mkdir -p ~/.storycraftr/
-echo "your-openai-api-key" > ~/.storycraftr/open_ai_key.txt
+echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
 ```
 
 ## Quick Examples
