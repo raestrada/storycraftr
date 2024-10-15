@@ -11,15 +11,16 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.1.0
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.1.1
 ```
 
 ### Important: Before running the `storycraftr` command
 
-Due to a known issue in version `v0.1.0`, you need to set your OpenAI API key before executing any `storycraftr` commands. Make sure to run the following command in the terminal where you will be using **StoryCraftr**:
+Store the key in a text file located at ~/.storycraftr/open_api_key.txt for convenience.
 
 ```bash
-export OPENAI_API_KEY=your-openai-api-key
+mkdir -p ~/.storycraftr/
+echo "your-openai-api-key" > ~/.storycraftr/open_api_key.txt
 ```
 
 Once installed and the API key is set, you can run the tool using the command `storycraftr`.

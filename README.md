@@ -14,13 +14,16 @@ You can find the release notes for version `v0.1.0` [here](https://github.com/ra
 You can install the current version of **StoryCraftr** via `pipx` using the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.1.0
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.1.1
 ```
 
 ### Important: Before using StoryCraftr, make sure to set your OpenAI API key:
 
+Store the key in a text file located at ~/.storycraftr/open_api_key.txt for convenience.
+
 ```bash
-export OPENAI_API_KEY=your-openai-api-key
+mkdir -p ~/.storycraftr/
+echo "your-openai-api-key" > ~/.storycraftr/open_api_key.txt
 ```
 
 ## Quick Examples
