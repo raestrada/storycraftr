@@ -9,6 +9,7 @@ markdown: kramdown
 theme: minima # Tema sencillo que puedes personalizar
 plugins:
   - jekyll-feed
+  - jekyll-sitemap
 
 # Archivos y carpetas a incluir
 include:
