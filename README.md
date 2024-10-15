@@ -5,9 +5,9 @@
 
 Welcome to [**StoryCraftr**](https://storycraftr.app), the open-source project designed to revolutionize how books are written. With the power of AI and a streamlined command-line interface (CLI), StoryCraftr helps you craft your story, manage worldbuilding, structure your book, and generate chapters — all while keeping you in full control.
 
-## Release Notes v0.1.0
+## Release Notes v0.1.1
 
-You can find the release notes for version `v0.1.0` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.1.0).
+You can find the release notes for version `v0.1.1` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.1.1).
 
 ## Installation
 
