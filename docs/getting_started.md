@@ -6,13 +6,24 @@ Sanderson emphasizes strong **structure** and **rules for storytelling**, which 
 
 ## Step 1: Install StoryCraftr
 
-First, install **StoryCraftr** using Homebrew from the project's hosted tap:
+First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a tool to help you install and run Python applications in isolated environments. It works on most platforms, including macOS, Linux, and Windows. Using `pipx` ensures that **StoryCraftr** runs in its own virtual environment, keeping your system's Python installation clean.
+
+To install **StoryCraftr**, run the following command:
 
 ```bash
-brew install raestrada/tap/storycraftr
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.1.0
 ```
 
-Once installed, you can run the tool using the command `storycraftr`.
+### Important: Before running the `storycraftr` command
+
+Due to a known issue in version `v0.1.0`, you need to set your OpenAI API key before executing any `storycraftr` commands. Make sure to run the following command in the terminal where you will be using **StoryCraftr**:
+
+```bash
+export OPENAI_API_KEY=your-openai-api-key
+```
+
+Once installed and the API key is set, you can run the tool using the command `storycraftr`.
+
 
 ## Step 2: Initialize Your Book Project
 
@@ -31,89 +42,84 @@ In Sanderson's writing methodology, having a clear starting point and preparatio
 
 3. **Initialize the book**: Clear **genre** and **structure** definition aligns with Sanderson’s emphasis on creating consistent rules for your world and plot ([Sanderson's First Law](https://www.brandonsanderson.com/sandersons-first-law/)).  
     ```bash
-    storycraftr init "La Purga de los Dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "default.txt"
+    storycraftr init "La purga de los dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt"
     ```
 
 ## Step 3: Generate the Outline
 
 According to Sanderson, **strong outlines** provide the scaffolding for a story, ensuring that it remains structured and engaging throughout. Let's build the outline for **La Purga de los Dioses**.
 
-1. **Chapter-by-Chapter Synopsis**: This follows Sanderson's advice on **progressive complications**—setting up expectations and slowly building tension ([Sanderson's Second Law](https://www.brandonsanderson.com/sandersons-second-law/)).  
+1. **General Outline**:  
     ```bash
-    storycraftr outline chapter_synopsis "Outline each chapter of a dystopian society where gods are purged from human memory.
+    storycraftr outline general-outline "Summarize the overall plot of a dystopian science fiction where advanced technology, resembling magic, has led to the fall of humanity’s elite and the rise of a manipulative villain who seeks to destroy both the ruling class and the workers."
     ```
 
-2. **Character Summary**: Strong characters are the core of a compelling story. This is consistent with Sanderson's approach to creating well-rounded characters and conflict ([Sanderson's First Law](https://www.brandonsanderson.com/sandersons-first-law/)).  
+2. **Character Summary**:  
     ```bash
-    storycraftr outline character_summary "Summarize the main characters of a story where humanity rebels against divine control.
+    storycraftr outline character-summary "Summarize the character of Zevid, a villainous mastermind who seeks to destroy both the ruling elite and the workers in a dystopian world where advanced technology mimics magic."
     ```
 
-3. **General Outline**: A good general outline ensures that your story remains on course and your magic or technology systems are **consistent with the internal rules** ([Sanderson's First Law](https://www.brandonsanderson.com/sandersons-first-law/)).  
+3. **Plot Points**:  
     ```bash
-    storycraftr outline general_outline "Summarize the overall plot of a science fiction where gods no longer rule humanity.
+    storycraftr outline plot-points "Identify the key plot points of a dystopian novel where a villain manipulates both the elite and the workers to achieve ultimate control in a world where advanced technology mimics magic."
     ```
 
-4. **Plot Points**: Identifying major plot points is crucial to creating meaningful **progression** and **revelation**, a principle Sanderson emphasizes in creating impactful stories ([Sanderson's Second Law](https://www.brandonsanderson.com/sandersons-second-law/)).  
+4. **Chapter-by-Chapter Synopsis**:  
     ```bash
-    storycraftr outline plot_points "List the key plot points for a sci-fi rebellion against the gods.
+    storycraftr outline chapter-synopsis "Outline each chapter of a dystopian society where an ancient elite class, ruling with advanced biotechnology that mimics magic, manipulates both workers and warriors. The protagonist, Zevid, aims to destroy both factions through manipulation, eventually leading to his own version of 'The Purge.'"
     ```
 
 ## Step 4: Build Your World
 
 Sanderson’s [Laws of Magic](https://www.brandonsanderson.com/sandersons-first-law/) stress the importance of **rules** and **limitations** in a story's world. Here, we will develop a solid world for **La Purga de los Dioses**.
 
-1. **Culture**: Establishing the cultural background of the world brings depth and richness to the setting, following Sanderson's idea that **limitations are more interesting than powers** ([Sanderson's Second Law](https://www.brandonsanderson.com/sandersons-second-law/)).  
+1. **History**:  
     ```bash
-    storycraftr worldbuilding culture "Describe the culture of a futuristic world where religion and faith have been outlawed.
+    storycraftr worldbuilding history "Describe the history of a dystopian world where advanced biotechnology and nanotechnology are perceived as magic, leading to a society where an elite class rules and manipulates both workers and technology to maintain control."
     ```
 
-2. **Geography**: Geography plays a key role in worldbuilding, establishing settings that shape the characters and their journey, in line with Sanderson’s focus on **setting limitations** that challenge characters.  
+2. **Geography**:  
     ```bash
-    storycraftr worldbuilding geography "Describe the geography of a dystopian city controlled by technology after the fall of the gods.
+    storycraftr worldbuilding geography "Describe the geography of a dystopian world where advanced biotechnology and nanotechnology are seen as magic. Focus on how the elite families control key regions, and the remnants of the world that survived the Purge."
     ```
 
-3. **History**: Sanderson advises **creating internal consistency** in your world's history to enrich the present and future of your story.  
+3. **Culture**:  
     ```bash
-    storycraftr worldbuilding history "Outline the history leading to the rebellion against the gods.
+    storycraftr worldbuilding culture "Describe the culture of a dystopian society where the elite use advanced biotechnology to maintain power, and the workers live under the illusion that this technology is magic. Focus on how the elite families have developed their own rituals, and how the workers perceive their rulers."
     ```
 
-4. **Magic System**: This will follow Sanderson’s **First Law**: "An author's ability to solve conflict with magic is directly proportional to how well the reader understands the magic." Defining rules early is crucial.  
+4. **Technology**:  
     ```bash
-    storycraftr worldbuilding magic_system "Describe the technology that replaced divine powers in the society.
+    storycraftr worldbuilding technology "Describe the technology of a dystopian world where advanced biotechnology and nanotechnology are perceived as magic. Focus on the elite's use of this technology for immortality, enhanced abilities, and control over the workers, who are unaware of its true nature."
     ```
 
-5. **Technology**: In line with Sanderson's advice on **restrictions**, the advanced technology in your world should have defined limits that drive the plot forward.  
+5. **Magic System**:  
     ```bash
-    storycraftr worldbuilding technology "Describe the advanced technology that shapes everyday life in a post-divine world.
+    storycraftr worldbuilding magic-system "Describe the magic system in a dystopian world where advanced biotechnology and nanotechnology are mistaken for magic. Explain how the elite families use this 'magic' to control the population, and how the workers have developed their own beliefs around it."
     ```
 
 ## Step 5: Write Your Chapters
 
 With a well-outlined story and a detailed world, we can now generate the chapters of **La Purga de los Dioses**. Sanderson’s principles of **progression** and **consistent conflict resolution** will guide us as we write.
 
-1. **Generate the Cover**:  
+1. **Generate Chapter 1**:  
     ```bash
-    storycraftr chapters cover "Design a cover for a science fiction novel about the fall of the gods.
+    storycraftr chapters chapter 1 "Write Chapter 1 based on the synopsis provided: Zevid is in the final stages of his grand plan. As the rebellion rages outside, he prepares to infiltrate the Dark Tower, the center of the elites' control over biotechnology. The rebellion he orchestrated serves as a distraction while he pursues his true goal of seizing the power within the tower."
     ```
 
-2. **Generate the Back Cover**:  
+2. **Generate Chapter 2**:  
     ```bash
-    storycraftr chapters back_cover "Write a synopsis for the back cover of a sci-fi story where gods no longer exist.
+    storycraftr chapters chapter 2 "Write Chapter 2 based on the synopsis provided: Zevid continues to manipulate the false hero leading the workers. While the workers believe they are liberating themselves from the elite, Zevid uses their blind trust to further his own ends."
     ```
 
-3. **Generate Chapter 1**: Starting strong with **character conflict** and **tension** is key to grabbing the reader’s attention.  
+3. **Generate the Cover**:  
     ```bash
-    storycraftr chapters chapter "Write the first chapter where the rebellion against the gods begins. 1
+    storycraftr chapters cover "Generate a cover text for the novel 'The Purge of the Gods' where a villain manipulates both the elite and the workers in a dystopian world of advanced technology disguised as magic."
     ```
 
-4. **Continue writing additional chapters**: Follow Sanderson’s advice on **gradually increasing stakes** and building toward the climax.  
+4. **Generate the Back Cover**:  
     ```bash
-    storycraftr chapters chapter "Write the second chapter where the protagonist learns about the secret of the gods. 2
-    ```
-
-5. **Generate the Epilogue**: Wrap up with **meaningful resolution** to tie together the themes and the characters' journey ([Sanderson's Third Law](https://www.brandonsanderson.com/sandersons-third-law/)).  
-    ```bash
-    storycraftr chapters epilogue "Write the epilogue where humanity starts rebuilding after the fall of the gods.
+    storycraftr chapters back-cover "Generate a back-cover text for 'The Purge of the Gods,' a dystopian novel where advanced biotechnology is seen as magic, and a cunning villain manipulates both the elite and the workers to achieve ultimate control."
     ```
 
 ## Step 6: Publish Your Book

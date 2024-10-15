@@ -19,6 +19,7 @@
             background-color: #4A90E2;
             color: #fff;
             padding: 1em 0;
+            position: relative;
         }
 
         nav {
@@ -35,6 +36,23 @@
         }
 
         nav a:hover {
+            text-decoration: underline;
+        }
+
+        .release-link {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 0.9em;
+        }
+
+        .release-link a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .release-link a:hover {
             text-decoration: underline;
         }
 
@@ -98,11 +116,24 @@
             margin-top: 2em;
             border-radius: 5px;
         }
+
+        .coming-soon code {
+            display: block;
+            margin-top: 0.5em;
+            padding: 0.5em;
+            background-color: #fff6cc;
+            color: #333;
+            border-radius: 5px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
 
     <header>
+        <div class="release-link">
+            <a href="https://github.com/raestrada/storycraftr/releases/tag/v0.1.0">Release Notes v0.1.0</a>
+        </div>
         <nav>
             <a href="getting_started.html">Getting Started</a>
             <a href="iterate.html">Iterating Your Book</a>
@@ -115,6 +146,8 @@
     <section>
         <div class="coming-soon">
             🚧 Coming Soon - StoryCraftr is in development. Stay tuned for the Alpha release! 🚀
+            <br>Install the current version:
+            <code>pipx install git+https://github.com/raestrada/storycraftr.git@v0.1.0</code>
         </div>
     </section>
 
