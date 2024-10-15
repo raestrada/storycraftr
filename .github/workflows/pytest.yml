@@ -1,0 +1,34 @@
+name: Run Tests with Poetry and Pytest
+
+on:
+  push:
+    branches:
+      - '**'  # Ejecutar en todas las ramas
+  pull_request:
+    branches:
+      - '**'  # Ejecutar en todos los PRs, independientemente de la rama
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Run tests
+        run: poetry run pytest
