@@ -1,0 +1,43 @@
+repos:
+  # Black para formateo de código
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        name: black
+        language_version: python3
+
+  # Detectar vulnerabilidades y análisis de código
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        name: Detect common security issues in Python code
+        args: ["-s", "B101"]  # Ignorar warnings por assert (opcional)
+
+  # Detectar secretos en el código
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        name: Detectar secretos
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      # Check for debugger imports and py37+ breakpoint() calls
+      - id: debug-statements
+
+  # Evitar blobs grandes
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=500"]  # Puedes ajustar el tamaño máximo en KB
+
+  # Evitar links simbólicos
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-symlinks
+        name: Detect symbolic links
