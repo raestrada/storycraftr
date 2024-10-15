@@ -24,5 +24,6 @@ storycraftr chapters chapter 2 "Write Chapter 2 based on the synopsis provided: 
 
 storycraftr chapters cover "Generate a cover text for the novel 'The Purge of the Gods' where a villain manipulates both the elite and the workers in a dystopian world of advanced technology disguised as magic."
 
-storycraftr chapters cover "Generate a cover text for the novel 'The Purge of the Gods' where a villain manipulates both the elite and the workers in a dystopian world of advanced technology disguised as magic."
+storycraftr chapters back-cover "Generate a back-cover text for 'The Purge of the Gods,' a dystopian novel where advanced biotechnology is seen as magic, and a cunning villain manipulates both the elite and the workers to achieve ultimate control."
+
 
