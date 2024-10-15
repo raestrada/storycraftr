@@ -31,7 +31,8 @@ def delete_assistant(name):
             break
 
 # Function to create or get an assistant
-def create_or_get_assistant(name, book_name):
+def create_or_get_assistant(book_name):
+    name = book_name.split("/")[-1]
     console.print(f"[bold blue]Searching for existing assistant '{name}'...[/bold blue]")  # Progress message
     assistant = None
     assistants = client.beta.assistants.list()
@@ -153,19 +154,7 @@ def get_thread():
 
 # Function to update the assistant's knowledge with new files
 def update_agent_files(book_name, assistant):
-    """Update the assistant with new Markdown files from the book."""
-    console.print(f"[bold blue]Updating assistant '{assistant.name}' with new files from '{book_name}'...[/bold blue]")  # Progress message
-    md_files = load_markdown_files(book_name)
-
-    file_streams = [open(file_path, "rb") for file_path in md_files]
-
-    file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
-        vector_store_id=assistant.vector_store_ids[0],  # Assuming the first vector store is associated
-        files=file_streams
-    )
-
-    while file_batch.status == "queued" or file_batch.status == "in_progress":
-        console.print(f"[bold yellow]{file_batch.status}...[/bold yellow]")  # Progress message
-        time.sleep(1)
+    delete_assistant(book_name)
+    create_or_get_assistant(book_name)
 
     console.print(f"[bold green]Files updated successfully in assistant '{assistant.name}'.[/bold green]")  # Success message

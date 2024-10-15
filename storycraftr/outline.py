@@ -1,5 +1,5 @@
 import os
-from storycraftr.agents import create_or_get_assistant, get_thread, create_message
+from storycraftr.agents import create_or_get_assistant, get_thread, create_message, update_agent_files
 from storycraftr.core import get_config, file_has_more_than_three_lines
 from rich.console import Console
 
@@ -20,7 +20,7 @@ def generate_general_outline(book_name, prompt):
     """Generate the general outline of the book."""
     console.print("[bold blue]Generating general outline...[/bold blue]")  # Progress message
     language = get_config(book_name).primary_language
-    assistant = create_or_get_assistant(book_name, book_name)
+    assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
     # File path for the general outline
@@ -48,6 +48,7 @@ def generate_general_outline(book_name, prompt):
     # Save to markdown
     save_to_markdown(book_name, "general_outline.md", "General Outline", general_outline_content)
     console.print("[bold green]✔ General outline generated successfully[/bold green]")  # Success message
+    update_agent_files(book_name, assistant)
     return general_outline_content
 
 # Function to generate the character summary of the book
@@ -55,7 +56,7 @@ def generate_character_summary(book_name, prompt):
     """Generate the character summary for the book."""
     console.print("[bold blue]Generating character summary...[/bold blue]")  # Progress message
     language = get_config(book_name).primary_language
-    assistant = create_or_get_assistant(book_name, book_name)
+    assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
     # File path for the character summary
@@ -83,6 +84,7 @@ def generate_character_summary(book_name, prompt):
     # Save to markdown
     save_to_markdown(book_name, "character_summary.md", "Character Summary", character_summary_content)
     console.print("[bold green]✔ Character summary generated successfully[/bold green]")  # Success message
+    update_agent_files(book_name, assistant)
     return character_summary_content
 
 # Function to generate the main plot points of the book
@@ -90,7 +92,7 @@ def generate_plot_points(book_name, prompt):
     """Generate the main plot points for the book."""
     console.print("[bold blue]Generating main plot points...[/bold blue]")  # Progress message
     language = get_config(book_name).primary_language
-    assistant = create_or_get_assistant(book_name, book_name)
+    assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
     # File path for the plot points
@@ -118,6 +120,7 @@ def generate_plot_points(book_name, prompt):
     # Save to markdown
     save_to_markdown(book_name, "plot_points.md", "Main Plot Points", plot_points_content)
     console.print("[bold green]✔ Main plot points generated successfully[/bold green]")  # Success message
+    update_agent_files(book_name, assistant)
     return plot_points_content
 
 # Function to generate the chapter-by-chapter synopsis of the book
@@ -125,7 +128,7 @@ def generate_chapter_synopsis(book_name, prompt):
     """Generate the chapter-by-chapter synopsis for the book."""
     console.print("[bold blue]Generating chapter-by-chapter synopsis...[/bold blue]")  # Progress message
     language = get_config(book_name).primary_language
-    assistant = create_or_get_assistant(book_name, book_name)
+    assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
     # File path for the chapter synopsis
@@ -153,4 +156,5 @@ def generate_chapter_synopsis(book_name, prompt):
     # Save to markdown
     save_to_markdown(book_name, "chapter_synopsis.md", "Chapter Synopsis", chapter_synopsis_content)
     console.print("[bold green]✔ Chapter-by-chapter synopsis generated successfully[/bold green]")  # Success message
+    update_agent_files(book_name, assistant)
     return chapter_synopsis_content

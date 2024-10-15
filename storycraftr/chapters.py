@@ -1,5 +1,5 @@
 import os
-from storycraftr.agents import create_or_get_assistant, get_thread, create_message
+from storycraftr.agents import create_or_get_assistant, get_thread, create_message, update_agent_files
 from storycraftr.core import get_config
 from rich.console import Console
 
@@ -19,7 +19,7 @@ def save_to_markdown(book_name, file_name, header, content):
 def generate_chapter(book_name, prompt, chapter_number):
     """Generate a new chapter based on a prompt."""
     console.print(f"[bold blue]Generating chapter {chapter_number}...[/bold blue]")  # Progress message
-    assistant = create_or_get_assistant(book_name, book_name)
+    assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
     # Prepare the chapter file path
@@ -48,6 +48,7 @@ def generate_chapter(book_name, prompt, chapter_number):
     # Save the updated chapter content to markdown
     save_to_markdown(book_name, chapter_file, f"Chapter {chapter_number}", chapter_content)
     console.print(f"[bold green]✔ Chapter {chapter_number} generated successfully[/bold green]")  # Success message
+    update_agent_files(book_name, assistant)
     return chapter_content
 
 def generate_cover(book_name, prompt):
@@ -65,7 +66,7 @@ def generate_cover(book_name, prompt):
     alternate_languages = ', '.join(config.alternate_languages)
 
     # Crear o obtener el asistente
-    assistant = create_or_get_assistant(book_name, book_name)
+    assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
     # Prompt para generar la portada completa en markdown, incluyendo todos los datos relevantes
@@ -88,6 +89,7 @@ def generate_cover(book_name, prompt):
     save_to_markdown(book_name, "cover.md", "Cover", cover_content)
     console.print("[bold green]✔ Cover generated successfully[/bold green]")  # Success message
 
+    update_agent_files(book_name, assistant)
     return cover_content
 
 
@@ -95,7 +97,7 @@ def generate_cover(book_name, prompt):
 def generate_back_cover(book_name, prompt):
     """Generate the back cover page for the book."""
     console.print("[bold blue]Generating back cover...[/bold blue]")  # Progress message
-    assistant = create_or_get_assistant(book_name, book_name)
+    assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
     # Generate the back cover content
@@ -108,13 +110,14 @@ def generate_back_cover(book_name, prompt):
     # Save to markdown
     save_to_markdown(book_name, "back_cover.md", "Back Cover", back_cover_content)
     console.print("[bold green]✔ Back cover generated successfully[/bold green]")  # Success message
+    update_agent_files(book_name, assistant)
     return back_cover_content
 
 # Function to generate the epilogue of the book
 def generate_epilogue(book_name, prompt):
     """Generate the epilogue for the book."""
     console.print("[bold blue]Generating epilogue...[/bold blue]")  # Progress message
-    assistant = create_or_get_assistant(book_name, book_name)
+    assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
     # Prepare the epilogue file path
@@ -142,4 +145,5 @@ def generate_epilogue(book_name, prompt):
     # Save the updated epilogue content to markdown
     save_to_markdown(book_name, "epilogue.md", "Epilogue", epilogue_content)
     console.print("[bold green]✔ Epilogue generated successfully[/bold green]")  # Success message
+    update_agent_files(book_name, assistant)
     return epilogue_content
