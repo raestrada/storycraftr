@@ -5,21 +5,21 @@ from storycraftr.agent.outline import (
     generate_general_outline, generate_character_summary, 
     generate_plot_points, generate_chapter_synopsis, save_to_markdown
 )
-from storycraftr.utils.core import get_config, file_has_more_than_three_lines
+from storycraftr.utils.core import load_book_config, file_has_more_than_three_lines
 
 # Test for generate_general_outline
 @patch("storycraftr.outline.create_message")
 @patch("storycraftr.outline.get_thread")
 @patch("storycraftr.outline.create_or_get_assistant")
-@patch("storycraftr.outline.get_config")
+@patch("storycraftr.outline.load_book_config")
 @patch("storycraftr.outline.file_has_more_than_three_lines")
 @patch("os.path.exists")
 @patch("storycraftr.outline.save_to_markdown")
-def test_generate_general_outline(mock_save, mock_exists, mock_file_lines, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_general_outline(mock_save, mock_exists, mock_file_lines, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = False
     mock_file_lines.return_value = False
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated General Outline Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"
@@ -41,15 +41,15 @@ def test_generate_general_outline(mock_save, mock_exists, mock_file_lines, mock_
 @patch("storycraftr.outline.create_message")
 @patch("storycraftr.outline.get_thread")
 @patch("storycraftr.outline.create_or_get_assistant")
-@patch("storycraftr.outline.get_config")
+@patch("storycraftr.outline.load_book_config")
 @patch("storycraftr.outline.file_has_more_than_three_lines")
 @patch("os.path.exists")
 @patch("storycraftr.outline.save_to_markdown")
-def test_generate_character_summary(mock_save, mock_exists, mock_file_lines, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_character_summary(mock_save, mock_exists, mock_file_lines, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = True
     mock_file_lines.return_value = True
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Character Summary Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"
@@ -73,15 +73,15 @@ def test_generate_character_summary(mock_save, mock_exists, mock_file_lines, moc
 @patch("storycraftr.outline.create_message")
 @patch("storycraftr.outline.get_thread")
 @patch("storycraftr.outline.create_or_get_assistant")
-@patch("storycraftr.outline.get_config")
+@patch("storycraftr.outline.load_book_config")
 @patch("storycraftr.outline.file_has_more_than_three_lines")
 @patch("os.path.exists")
 @patch("storycraftr.outline.save_to_markdown")
-def test_generate_plot_points(mock_save, mock_exists, mock_file_lines, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_plot_points(mock_save, mock_exists, mock_file_lines, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = False
     mock_file_lines.return_value = False
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Plot Points Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"
@@ -103,15 +103,15 @@ def test_generate_plot_points(mock_save, mock_exists, mock_file_lines, mock_get_
 @patch("storycraftr.outline.create_message")
 @patch("storycraftr.outline.get_thread")
 @patch("storycraftr.outline.create_or_get_assistant")
-@patch("storycraftr.outline.get_config")
+@patch("storycraftr.outline.load_book_config")
 @patch("storycraftr.outline.file_has_more_than_three_lines")
 @patch("os.path.exists")
 @patch("storycraftr.outline.save_to_markdown")
-def test_generate_chapter_synopsis(mock_save, mock_exists, mock_file_lines, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_chapter_synopsis(mock_save, mock_exists, mock_file_lines, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = True
     mock_file_lines.return_value = True
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Chapter Synopsis Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"

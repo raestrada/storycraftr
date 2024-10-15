@@ -5,22 +5,22 @@ from storycraftr.agent.worldbuilding import (
     generate_geography, generate_history, generate_culture, 
     generate_magic_system, generate_technology, save_to_markdown
 )
-from storycraftr.utils.core import get_config, file_has_more_than_three_lines
+from storycraftr.utils.core import load_book_config, file_has_more_than_three_lines
 
 
 # Test for generate_geography
 @patch("storycraftr.worldbuilding.create_message")
 @patch("storycraftr.worldbuilding.get_thread")
 @patch("storycraftr.worldbuilding.create_or_get_assistant")
-@patch("storycraftr.worldbuilding.get_config")
+@patch("storycraftr.worldbuilding.load_book_config")
 @patch("storycraftr.worldbuilding.file_has_more_than_three_lines")
 @patch("os.path.exists")
 @patch("storycraftr.worldbuilding.save_to_markdown")
-def test_generate_geography(mock_save, mock_exists, mock_file_lines, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_geography(mock_save, mock_exists, mock_file_lines, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = False
     mock_file_lines.return_value = False
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Geography Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"
@@ -42,15 +42,15 @@ def test_generate_geography(mock_save, mock_exists, mock_file_lines, mock_get_co
 @patch("storycraftr.worldbuilding.create_message")
 @patch("storycraftr.worldbuilding.get_thread")
 @patch("storycraftr.worldbuilding.create_or_get_assistant")
-@patch("storycraftr.worldbuilding.get_config")
+@patch("storycraftr.worldbuilding.load_book_config")
 @patch("storycraftr.worldbuilding.file_has_more_than_three_lines")
 @patch("os.path.exists")
 @patch("storycraftr.worldbuilding.save_to_markdown")
-def test_generate_history(mock_save, mock_exists, mock_file_lines, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_history(mock_save, mock_exists, mock_file_lines, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = True
     mock_file_lines.return_value = True
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated History Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"
@@ -74,15 +74,15 @@ def test_generate_history(mock_save, mock_exists, mock_file_lines, mock_get_conf
 @patch("storycraftr.worldbuilding.create_message")
 @patch("storycraftr.worldbuilding.get_thread")
 @patch("storycraftr.worldbuilding.create_or_get_assistant")
-@patch("storycraftr.worldbuilding.get_config")
+@patch("storycraftr.worldbuilding.load_book_config")
 @patch("storycraftr.worldbuilding.file_has_more_than_three_lines")
 @patch("os.path.exists")
 @patch("storycraftr.worldbuilding.save_to_markdown")
-def test_generate_culture(mock_save, mock_exists, mock_file_lines, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_culture(mock_save, mock_exists, mock_file_lines, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = False
     mock_file_lines.return_value = False
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Culture Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"
@@ -104,15 +104,15 @@ def test_generate_culture(mock_save, mock_exists, mock_file_lines, mock_get_conf
 @patch("storycraftr.worldbuilding.create_message")
 @patch("storycraftr.worldbuilding.get_thread")
 @patch("storycraftr.worldbuilding.create_or_get_assistant")
-@patch("storycraftr.worldbuilding.get_config")
+@patch("storycraftr.worldbuilding.load_book_config")
 @patch("storycraftr.worldbuilding.file_has_more_than_three_lines")
 @patch("os.path.exists")
 @patch("storycraftr.worldbuilding.save_to_markdown")
-def test_generate_magic_system(mock_save, mock_exists, mock_file_lines, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_magic_system(mock_save, mock_exists, mock_file_lines, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = True
     mock_file_lines.return_value = True
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Magic System Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"
@@ -136,15 +136,15 @@ def test_generate_magic_system(mock_save, mock_exists, mock_file_lines, mock_get
 @patch("storycraftr.worldbuilding.create_message")
 @patch("storycraftr.worldbuilding.get_thread")
 @patch("storycraftr.worldbuilding.create_or_get_assistant")
-@patch("storycraftr.worldbuilding.get_config")
+@patch("storycraftr.worldbuilding.load_book_config")
 @patch("storycraftr.worldbuilding.file_has_more_than_three_lines")
 @patch("os.path.exists")
 @patch("storycraftr.worldbuilding.save_to_markdown")
-def test_generate_technology(mock_save, mock_exists, mock_file_lines, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_technology(mock_save, mock_exists, mock_file_lines, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = False
     mock_file_lines.return_value = False
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Technology Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"

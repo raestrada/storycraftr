@@ -2,20 +2,20 @@ import os
 import pytest
 from unittest.mock import patch, MagicMock
 from storycraftr.agent.agents import create_message, create_or_get_assistant, get_thread
-from storycraftr.utils.core import get_config
+from storycraftr.utils.core import load_book_config
 from storycraftr.agent.chapters import generate_chapter, generate_cover, generate_back_cover, generate_epilogue, save_to_markdown
 
 # Test for generate_chapter
 @patch("storycraftr.chapters.create_message")
 @patch("storycraftr.chapters.get_thread")
 @patch("storycraftr.chapters.create_or_get_assistant")
-@patch("storycraftr.chapters.get_config")
+@patch("storycraftr.chapters.load_book_config")
 @patch("os.path.exists")
 @patch("storycraftr.chapters.save_to_markdown")
-def test_generate_chapter(mock_save, mock_exists, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_chapter(mock_save, mock_exists, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = False
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Chapter Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"
@@ -37,11 +37,11 @@ def test_generate_chapter(mock_save, mock_exists, mock_get_config, mock_assistan
 @patch("storycraftr.chapters.create_message")
 @patch("storycraftr.chapters.get_thread")
 @patch("storycraftr.chapters.create_or_get_assistant")
-@patch("storycraftr.chapters.get_config")
+@patch("storycraftr.chapters.load_book_config")
 @patch("storycraftr.chapters.save_to_markdown")
-def test_generate_cover(mock_save, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_cover(mock_save, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
-    mock_get_config.return_value = MagicMock(
+    mock_load_book_config.return_value = MagicMock(
         primary_language="en", 
         book_name="My Book", 
         default_author="Author Name", 
@@ -75,11 +75,11 @@ def test_generate_cover(mock_save, mock_get_config, mock_assistant, mock_thread,
 @patch("storycraftr.chapters.create_message")
 @patch("storycraftr.chapters.get_thread")
 @patch("storycraftr.chapters.create_or_get_assistant")
-@patch("storycraftr.chapters.get_config")
+@patch("storycraftr.chapters.load_book_config")
 @patch("storycraftr.chapters.save_to_markdown")
-def test_generate_back_cover(mock_save, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_back_cover(mock_save, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Back Cover Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"
@@ -100,13 +100,13 @@ def test_generate_back_cover(mock_save, mock_get_config, mock_assistant, mock_th
 @patch("storycraftr.chapters.create_message")
 @patch("storycraftr.chapters.get_thread")
 @patch("storycraftr.chapters.create_or_get_assistant")
-@patch("storycraftr.chapters.get_config")
+@patch("storycraftr.chapters.load_book_config")
 @patch("os.path.exists")
 @patch("storycraftr.chapters.save_to_markdown")
-def test_generate_epilogue(mock_save, mock_exists, mock_get_config, mock_assistant, mock_thread, mock_message):
+def test_generate_epilogue(mock_save, mock_exists, mock_load_book_config, mock_assistant, mock_thread, mock_message):
     # Mocks
     mock_exists.return_value = False
-    mock_get_config.return_value = MagicMock(primary_language="en")
+    mock_load_book_config.return_value = MagicMock(primary_language="en")
     mock_message.return_value = "Generated Epilogue Content"
     mock_thread.return_value.id = "thread_id"
     mock_assistant.return_value = "assistant_object"

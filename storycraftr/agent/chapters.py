@@ -1,7 +1,15 @@
 import os
 from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message, update_agent_files
-from storycraftr.utils.core import get_config
+from storycraftr.utils.core import load_book_config, load_book_config
 from storycraftr.utils.markdown import save_to_markdown
+from storycraftr.prompts.chapters import (
+    CHAPTER_PROMPT_NEW,
+    CHAPTER_PROMPT_REFINE,
+    COVER_PROMPT,
+    BACK_COVER_PROMPT,
+    EPILOGUE_PROMPT_NEW,
+    EPILOGUE_PROMPT_REFINE
+)
 from rich.console import Console
 
 console = Console()
@@ -20,7 +28,7 @@ def generate_chapter(book_name, prompt, chapter_number):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path):
         console.print(f"[yellow]Existing chapter found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached chapter file as a reference to evolve and improve the content based on this prompt: {prompt}. Write it in {get_config(book_name).primary_language}."
+        content = CHAPTER_PROMPT_REFINE.format(prompt=prompt, language=load_book_config(book_name).primary_language)
         chapter_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -29,7 +37,7 @@ def generate_chapter(book_name, prompt, chapter_number):
         )
     else:
         console.print("[yellow]No existing chapter found. Generating new content...[/yellow]")  # Progress message
-        content = f"Write a detailed chapter for the following book premise: {prompt}. Write it in {get_config(book_name).primary_language}."
+        content = CHAPTER_PROMPT_NEW.format(prompt=prompt, language=load_book_config(book_name).primary_language)
         chapter_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -48,41 +56,31 @@ def generate_cover(book_name, prompt):
     and a prompt for additional guidance.
     """
     console.print("[bold blue]Generating book cover...[/bold blue]")  # Progress message
-    # Obtener los datos del archivo de configuración
-    config = get_config(book_name)
-    language = config.primary_language
-    title = config.book_name
-    author = config.default_author
-    genre = config.genre
-    alternate_languages = ', '.join(config.alternate_languages)
-
-    # Crear o obtener el asistente
+    config = load_book_config(book_name)
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
-    # Prompt para generar la portada completa en markdown, incluyendo todos los datos relevantes
-    prompt_content = (
-        f"Create a professional book cover in markdown format for the book titled '{title}'. "
-        f"Include the title, author (which is '{author}'), genre ('{genre}'), "
-        f"and alternate languages ('{alternate_languages}'). Use this information to format a typical "
-        f"book cover with a detailed description. Use this prompt as additional context: {prompt}. "
-        f"Write the content in {language}."
+    # Generate the cover content
+    prompt_content = COVER_PROMPT.format(
+        title=config.book_name,
+        author=config.default_author,
+        genre=config.genre,
+        alternate_languages=', '.join(config.alternate_languages),
+        prompt=prompt,
+        language=config.primary_language
     )
 
-    # Generar el contenido completo de la portada
     cover_content = create_message(
         thread_id=thread.id,
         content=prompt_content,
         assistant=assistant
     )
 
-    # Guardar el contenido en el archivo markdown
+    # Save the cover content to markdown
     save_to_markdown(book_name, "cover.md", "Cover", cover_content)
     console.print("[bold green]✔ Cover generated successfully[/bold green]")  # Success message
-
     update_agent_files(book_name, assistant)
     return cover_content
-
 
 # Function to generate the back cover page
 def generate_back_cover(book_name, prompt):
@@ -94,7 +92,7 @@ def generate_back_cover(book_name, prompt):
     # Generate the back cover content
     back_cover_content = create_message(
         thread_id=thread.id,
-        content=f"Generate a detailed synopsis for the back cover of the book based on this prompt: {prompt}. Write it in {get_config(book_name).primary_language}.",
+        content=BACK_COVER_PROMPT.format(prompt=prompt, language=load_book_config(book_name).primary_language),
         assistant=assistant
     )
 
@@ -117,7 +115,7 @@ def generate_epilogue(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path):
         console.print(f"[yellow]Existing epilogue found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached epilogue file as a reference to evolve and improve the content based on this prompt: {prompt}. Write it in {get_config(book_name).primary_language}."
+        content = EPILOGUE_PROMPT_REFINE.format(prompt=prompt, language=load_book_config(book_name).primary_language)
         epilogue_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -126,7 +124,7 @@ def generate_epilogue(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing epilogue found. Generating new content...[/yellow]")  # Progress message
-        content = f"Generate the epilogue for the book based on this prompt: {prompt}. Write it in {get_config(book_name).primary_language}."
+        content = EPILOGUE_PROMPT_NEW.format(prompt=prompt, language=load_book_config(book_name).primary_language)
         epilogue_content = create_message(
             thread_id=thread.id,
             content=content,

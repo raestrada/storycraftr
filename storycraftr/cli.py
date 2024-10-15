@@ -81,16 +81,6 @@ def init_structure(book_name, primary_language, alternate_languages, default_aut
     # Confirm completion
     console.print(f"[bold green]✔[/bold green] Project '[bold]{book_name}[/bold]' initialized successfully.", style="bold green")
 
-# Function to load the configuration file
-def load_config(book_name):
-    config_file = os.path.join(book_name, 'storycraftr.json')
-    if os.path.exists(config_file):
-        with open(config_file, 'r') as f:
-            return json.load(f)
-    else:
-        project_not_initialized_error(book_name)
-        return None
-
 @click.group()
 def cli():
     """StoryCraftr CLI - A tool to help you write books using OpenAI."""

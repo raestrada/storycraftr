@@ -1,7 +1,19 @@
 import os
 from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message, update_agent_files
-from storycraftr.utils.core import get_config, file_has_more_than_three_lines
+from storycraftr.utils.core import load_book_config, file_has_more_than_three_lines
 from storycraftr.utils.markdown import save_to_markdown
+from storycraftr.prompts.worldbuilding import (
+    GEOGRAPHY_PROMPT_NEW,
+    GEOGRAPHY_PROMPT_REFINE,
+    HISTORY_PROMPT_NEW,
+    HISTORY_PROMPT_REFINE,
+    CULTURE_PROMPT_NEW,
+    CULTURE_PROMPT_REFINE,
+    MAGIC_SYSTEM_PROMPT_NEW,
+    MAGIC_SYSTEM_PROMPT_REFINE,
+    TECHNOLOGY_PROMPT_NEW,
+    TECHNOLOGY_PROMPT_REFINE
+)
 from rich.console import Console
 
 console = Console()
@@ -10,7 +22,7 @@ console = Console()
 def generate_geography(book_name, prompt):
     """Generate the geography details for the book."""
     console.print("[bold blue]Generating geography...[/bold blue]")  # Progress message
-    language = get_config(book_name).primary_language
+    language = load_book_config(book_name).primary_language
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
@@ -20,7 +32,7 @@ def generate_geography(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Existing geography found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached geography file to evolve the content based on this prompt: {prompt}. Write it in {language}."
+        content = GEOGRAPHY_PROMPT_REFINE.format(prompt=prompt, language=language)
         geography_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -29,7 +41,7 @@ def generate_geography(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing geography found. Generating new content...[/yellow]")  # Progress message
-        content = f"Generate the geography details for the book's world based on this prompt: {prompt}. Write it in {language}."
+        content = GEOGRAPHY_PROMPT_NEW.format(prompt=prompt, language=language)
         geography_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -46,7 +58,7 @@ def generate_geography(book_name, prompt):
 def generate_history(book_name, prompt):
     """Generate the history details for the book."""
     console.print("[bold blue]Generating history...[/bold blue]")  # Progress message
-    language = get_config(book_name).primary_language
+    language = load_book_config(book_name).primary_language
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
@@ -56,7 +68,7 @@ def generate_history(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Existing history found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached history file to evolve the content based on this prompt: {prompt}. Write it in {language}."
+        content = HISTORY_PROMPT_REFINE.format(prompt=prompt, language=language)
         history_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -65,7 +77,7 @@ def generate_history(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing history found. Generating new content...[/yellow]")  # Progress message
-        content = f"Generate the history details for the book's world based on this prompt: {prompt}. Write it in {language}."
+        content = HISTORY_PROMPT_NEW.format(prompt=prompt, language=language)
         history_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -82,7 +94,7 @@ def generate_history(book_name, prompt):
 def generate_culture(book_name, prompt):
     """Generate the culture details for the book."""
     console.print("[bold blue]Generating culture...[/bold blue]")  # Progress message
-    language = get_config(book_name).primary_language
+    language = load_book_config(book_name).primary_language
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
@@ -92,7 +104,7 @@ def generate_culture(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Existing culture found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached culture file to evolve the content based on this prompt: {prompt}. Write it in {language}."
+        content = CULTURE_PROMPT_REFINE.format(prompt=prompt, language=language)
         culture_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -101,7 +113,7 @@ def generate_culture(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing culture found. Generating new content...[/yellow]")  # Progress message
-        content = f"Generate the culture details for the book's world based on this prompt: {prompt}. Write it in {language}."
+        content = CULTURE_PROMPT_NEW.format(prompt=prompt, language=language)
         culture_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -118,7 +130,7 @@ def generate_culture(book_name, prompt):
 def generate_magic_system(book_name, prompt):
     """Generate the magic/science system for the book."""
     console.print("[bold blue]Generating magic/science system...[/bold blue]")  # Progress message
-    language = get_config(book_name).primary_language
+    language = load_book_config(book_name).primary_language
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
@@ -128,7 +140,7 @@ def generate_magic_system(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Existing magic/science system found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached magic/science system file to evolve the content based on this prompt: {prompt}. Write it in {language}."
+        content = MAGIC_SYSTEM_PROMPT_REFINE.format(prompt=prompt, language=language)
         magic_system_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -137,7 +149,7 @@ def generate_magic_system(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing magic/science system found. Generating new content...[/yellow]")  # Progress message
-        content = f"Generate the magic/science system for the book's world based on this prompt: {prompt}. Write it in {language}."
+        content = MAGIC_SYSTEM_PROMPT_NEW.format(prompt=prompt, language=language)
         magic_system_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -154,7 +166,7 @@ def generate_magic_system(book_name, prompt):
 def generate_technology(book_name, prompt):
     """Generate the technology details for the book."""
     console.print("[bold blue]Generating technology...[/bold blue]")  # Progress message
-    language = get_config(book_name).primary_language
+    language = load_book_config(book_name).primary_language
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
@@ -164,7 +176,7 @@ def generate_technology(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Existing technology file found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached technology file to evolve the content based on this prompt: {prompt}. Write it in {language}."
+        content = TECHNOLOGY_PROMPT_REFINE.format(prompt=prompt, language=language)
         technology_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -173,7 +185,7 @@ def generate_technology(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing technology found. Generating new content...[/yellow]")  # Progress message
-        content = f"Generate the technology details for the book's world based on this prompt: {prompt}. Write it in {language}."
+        content = TECHNOLOGY_PROMPT_NEW.format(prompt=prompt, language=language)
         technology_content = create_message(
             thread_id=thread.id,
             content=content,

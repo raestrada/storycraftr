@@ -1,7 +1,18 @@
 import os
+from storycraftr.utils.core import load_book_config
 from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message, update_agent_files
-from storycraftr.utils.core import get_config, file_has_more_than_three_lines
+from storycraftr.utils.core import load_book_config,file_has_more_than_three_lines
 from storycraftr.utils.markdown import save_to_markdown
+from storycraftr.prompts.outline import (
+    GENERAL_OUTLINE_PROMPT_NEW,
+    GENERAL_OUTLINE_PROMPT_REFINE,
+    CHARACTER_SUMMARY_PROMPT_NEW,
+    CHARACTER_SUMMARY_PROMPT_REFINE,
+    PLOT_POINTS_PROMPT_NEW,
+    PLOT_POINTS_PROMPT_REFINE,
+    CHAPTER_SYNOPSIS_PROMPT_NEW,
+    CHAPTER_SYNOPSIS_PROMPT_REFINE
+)
 from rich.console import Console
 
 console = Console()
@@ -10,7 +21,7 @@ console = Console()
 def generate_general_outline(book_name, prompt):
     """Generate the general outline of the book."""
     console.print("[bold blue]Generating general outline...[/bold blue]")  # Progress message
-    language = get_config(book_name).primary_language
+    language = load_book_config(book_name).primary_language
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
@@ -20,7 +31,7 @@ def generate_general_outline(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Existing general outline found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached general outline file to evolve the content based on this prompt: {prompt}. Write it in {language}."
+        content = GENERAL_OUTLINE_PROMPT_REFINE.format(prompt=prompt, language=language)
         general_outline_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -29,7 +40,7 @@ def generate_general_outline(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing general outline found. Generating a new one...[/yellow]")  # Progress message
-        content = f"Create a general outline for a book based on this prompt: {prompt}. Write it in {language}."
+        content = GENERAL_OUTLINE_PROMPT_NEW.format(prompt=prompt, language=language)
         general_outline_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -46,7 +57,7 @@ def generate_general_outline(book_name, prompt):
 def generate_character_summary(book_name, prompt):
     """Generate the character summary for the book."""
     console.print("[bold blue]Generating character summary...[/bold blue]")  # Progress message
-    language = get_config(book_name).primary_language
+    language = load_book_config(book_name).primary_language
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
@@ -56,7 +67,7 @@ def generate_character_summary(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Existing character summary found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached character summary file to evolve the content based on this prompt: {prompt}. Write it in {language}."
+        content = CHARACTER_SUMMARY_PROMPT_REFINE.format(prompt=prompt, language=language)
         character_summary_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -65,7 +76,7 @@ def generate_character_summary(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing character summary found. Generating a new one...[/yellow]")  # Progress message
-        content = f"Generate a character summary for the book based on this prompt: {prompt}. Write it in {language}."
+        content = CHARACTER_SUMMARY_PROMPT_NEW.format(prompt=prompt, language=language)
         character_summary_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -82,7 +93,7 @@ def generate_character_summary(book_name, prompt):
 def generate_plot_points(book_name, prompt):
     """Generate the main plot points for the book."""
     console.print("[bold blue]Generating main plot points...[/bold blue]")  # Progress message
-    language = get_config(book_name).primary_language
+    language = load_book_config(book_name).primary_language
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
@@ -92,7 +103,7 @@ def generate_plot_points(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Existing plot points found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached plot points file to evolve the content based on this prompt: {prompt}. Write it in {language}."
+        content = PLOT_POINTS_PROMPT_REFINE.format(prompt=prompt, language=language)
         plot_points_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -101,7 +112,7 @@ def generate_plot_points(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing plot points found. Generating new ones...[/yellow]")  # Progress message
-        content = f"Generate the main plot points for the book based on this prompt: {prompt}. Write it in {language}."
+        content = PLOT_POINTS_PROMPT_NEW.format(prompt=prompt, language=language)
         plot_points_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -118,7 +129,7 @@ def generate_plot_points(book_name, prompt):
 def generate_chapter_synopsis(book_name, prompt):
     """Generate the chapter-by-chapter synopsis for the book."""
     console.print("[bold blue]Generating chapter-by-chapter synopsis...[/bold blue]")  # Progress message
-    language = get_config(book_name).primary_language
+    language = load_book_config(book_name).primary_language
     assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
@@ -128,7 +139,7 @@ def generate_chapter_synopsis(book_name, prompt):
     # Check if the file exists and pass it as an attachment
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Existing chapter synopsis found at {file_path}. Attaching for further refinement...[/yellow]")  # Progress message
-        content = f"Use the attached chapter-by-chapter synopsis file to evolve the content based on this prompt: {prompt}. Write it in {language}."
+        content = CHAPTER_SYNOPSIS_PROMPT_REFINE.format(prompt=prompt, language=language)
         chapter_synopsis_content = create_message(
             thread_id=thread.id,
             content=content,
@@ -137,7 +148,7 @@ def generate_chapter_synopsis(book_name, prompt):
         )
     else:
         console.print("[yellow]No existing chapter synopsis found. Generating a new one...[/yellow]")  # Progress message
-        content = f"Generate a chapter-by-chapter synopsis for the book based on this prompt: {prompt}. Write it in {language}."
+        content = CHAPTER_SYNOPSIS_PROMPT_NEW.format(prompt=prompt, language=language)
         chapter_synopsis_content = create_message(
             thread_id=thread.id,
             content=content,

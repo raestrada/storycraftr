@@ -1,5 +1,6 @@
 import os
 import click
+from storycraftr.utils.core import load_book_config
 from storycraftr.agent.worldbuilding import (
     generate_geography,
     generate_history,
@@ -24,6 +25,9 @@ def geography(prompt, book_name=None):
     if not book_name:
         book_name = os.getcwd()
 
+    if not load_book_config(book_name):
+        return None
+        
     generate_geography(book_name, prompt)
 
 @worldbuilding.command()
@@ -34,6 +38,9 @@ def history(prompt, book_name=None):
     if not book_name:
         book_name = os.getcwd()
 
+    if not load_book_config(book_name):
+        return None
+        
     generate_history(book_name, prompt)
 
 @worldbuilding.command()
@@ -44,6 +51,9 @@ def culture(prompt, book_name=None):
     if not book_name:
         book_name = os.getcwd()
 
+    if not load_book_config(book_name):
+        return None
+        
     generate_culture(book_name, prompt)
 
 @worldbuilding.command()
@@ -54,6 +64,9 @@ def magic_system(prompt, book_name=None):
     if not book_name:
         book_name = os.getcwd()
 
+    if not load_book_config(book_name):
+        return None
+        
     generate_magic_system(book_name, prompt)
 
 @worldbuilding.command()
@@ -64,4 +77,7 @@ def technology(prompt, book_name=None):
     if not book_name:
         book_name = os.getcwd()
 
+    if not load_book_config(book_name):
+        return None
+        
     generate_technology(book_name, prompt)
