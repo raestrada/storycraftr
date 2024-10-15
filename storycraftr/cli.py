@@ -11,6 +11,27 @@ from storycraftr.cmd.iterate import iterate
 console = Console()
 
 
+def load_open_api_key():
+    # Path to the API key file
+    api_key_file = os.path.expanduser("~/.storycraftr/open_api_key.txt")
+
+    # Check if the file exists
+    if os.path.exists(api_key_file):
+        # Read the content of the file
+        with open(api_key_file, "r") as file:
+            api_key = file.read().strip()  # Strip any whitespace or newlines
+
+        # Set the API key as an environment variable
+        os.environ["OPEN_API_KEY"] = api_key
+        console.print("[green]OPEN_API_KEY has been successfully loaded.[/green]")
+    else:
+        console.print(f"[red]The file {api_key_file} does not exist.[/red]")
+
+
+# Run the function
+load_open_api_key()
+
+
 def verify_book_path(book_name=None):
     """Verify if the book path is valid and contains storycraftr.json."""
     if not book_name:
