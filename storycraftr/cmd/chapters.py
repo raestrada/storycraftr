@@ -18,8 +18,8 @@ def chapters():
 
 @chapters.command()
 @click.argument('chapter_number', type=int)
-@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 @click.argument('prompt')
+@click.option('--book-name', type=click.Path(), help='Path to the book directory')
 def chapter(chapter_number, prompt, book_name=None):
     """Generate a new chapter for the book."""
     if not book_name:

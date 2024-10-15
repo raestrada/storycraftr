@@ -31,7 +31,7 @@ def project_not_initialized_error(book_name):
     console.print(f"[bold red]✖[/bold red] Project '[bold]{book_name}[/bold]' is not initialized. "
                   f"Run '[bold]storycraftr init {book_name}[/bold]' first.", style="bold red")
 
-def init_structure(book_name, primary_language, alternate_languages, default_author, genre, behavior_content):
+def init_structure(book_name, license, primary_language, alternate_languages, default_author, genre, behavior_content):
     # Show initialization start
     console.print(f"[bold blue]Initializing book structure: {book_name}[/bold blue]")
     
@@ -56,7 +56,8 @@ def init_structure(book_name, primary_language, alternate_languages, default_aut
         "primary_language": primary_language,
         "alternate_languages": alternate_languages,
         "default_author": default_author,
-        "genre": genre
+        "genre": genre,
+        "license": license
     }
     
     config_file = os.path.join(book_name, 'storycraftr.json')
@@ -88,12 +89,13 @@ def cli():
 
 @click.command()
 @click.argument("book_name")
+@click.option("--license", default="CC BY-NC-SA", help="Define the type of Creative Commons license to use. Options include 'CC BY', 'CC BY-SA', 'CC BY-ND', 'CC BY-NC', 'CC BY-NC-SA', 'CC BY-NC-ND'. The default is 'CC BY-NC-SA'.")
 @click.option("--primary-language", default="en", help="The primary language for the book (default: 'en').")
 @click.option("--alternate-languages", default="", help="Comma-separated list of alternate languages (e.g., 'es,fr').")
 @click.option("--author", default="Author Name", help="The default author of the book.")
 @click.option("--genre", default="fantasy", help="The genre of the book (default: 'fantasy').")
 @click.option("--behavior", help="Behavior content, either as a string or a path to a file.")
-def init(book_name, primary_language, alternate_languages, author, genre, behavior):
+def init(book_name, license, primary_language, alternate_languages, author, genre, behavior):
     """Initialize the book structure with relevant configuration and behavior content."""
     if not is_initialized(book_name):
         alternate_languages_list = [lang.strip() for lang in alternate_languages.split(',')] if alternate_languages else []
@@ -105,7 +107,7 @@ def init(book_name, primary_language, alternate_languages, author, genre, behavi
         else:
             behavior_content = behavior  # Si no es un archivo, asumimos que es un string
         
-        init_structure(book_name, primary_language, alternate_languages_list, author, genre, behavior_content)
+        init_structure(book_name, license, primary_language, alternate_languages_list, author, genre, behavior_content)
     else:
         console.print(f"[bold yellow]⚠[/bold yellow] Project '[bold]{book_name}[/bold]' is already initialized.", style="yellow")
 

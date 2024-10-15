@@ -12,6 +12,7 @@ class BookConfig(NamedTuple):
     alternate_languages: list
     default_author: str
     genre: str
+    license: str
 
 # Function to load the JSON file and convert it into a BookConfig object
 def load_book_config(book_name):
@@ -24,7 +25,8 @@ def load_book_config(book_name):
                 primary_language=data['primary_language'],
                 alternate_languages=data['alternate_languages'],
                 default_author=data['default_author'],
-                genre=data['genre']
+                genre=data['genre'],
+                license=data['license']
             )
     except FileNotFoundError or NotADirectoryError:
         console.print(f"[bold red]⚠[/bold red] Folder '[bold]{book_name}[/bold]' is not a storycraftr project.", style="red")

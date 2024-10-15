@@ -9,11 +9,19 @@ Use the attached chapter file as a reference to evolve and improve the content b
 """
 
 COVER_PROMPT = """
-Create a professional book cover in markdown format for the book titled '{title}'. Include the title, author ('{author}'), genre ('{genre}'), and alternate languages ('{alternate_languages}'). Use this prompt as additional context: {prompt}. Write the content in {language}.
+Create a professional book cover in markdown format for the book titled '{title}'. 
+Include the title, author ('{author}').
+The cover reference a image that I would request later. Reference the image.
+STRICTLY Return only the cover markdown limited only to what should be printed.
+Use this prompt as additional context: {prompt}. Write the content in {language}.
 """
 
 BACK_COVER_PROMPT = """
 Generate a detailed synopsis for the back cover of the book based on this prompt: {prompt}. Write it in {language}.
+Include the title, author ('{author}'), genre ('{genre}'), and alternate languages ('{alternate_languages}').
+Return only the back cover markdown.
+Include de license of type {license} with its description like a professional book.
+Use this prompt as additional context: {prompt}. Write the content in {language}.
 """
 
 EPILOGUE_PROMPT_NEW = """
