@@ -4,6 +4,7 @@ import time
 from dotenv import load_dotenv
 from openai import OpenAI
 from rich.console import Console
+from rich.progress import Progress
 
 load_dotenv()
 
@@ -84,17 +85,18 @@ def create_or_get_assistant(name, book_name):
 # Function to create a message in a thread and handle async processing
 def create_message(thread_id, content, assistant, file_path=None):
     """
-    Create a message in the thread and process it asynchronously using OpenAI completions.
+    Create a message in the thread and process it asynchronously.
     
     Parameters:
         thread_id (str): The ID of the thread where the message will be created.
-        content (str): The content of the prompt for improving or generating text.
+        content (str): The content of the message.
         assistant (object): The assistant object with an ID.
-        file_path (str, optional): The path to a file to improve or generate content. Defaults to None.
+        file_path (str, optional): The path to a file to attach as an attachment. Defaults to None.
     
     Returns:
-        str: The text content generated or improved by the assistant.
+        str: The text content of the last message returned by the assistant.
     """
+
     console.print(f"[bold blue]Creating message in thread {thread_id}...[/bold blue]")  # Progress message
 
     # Prepare the base prompt
@@ -103,32 +105,46 @@ def create_message(thread_id, content, assistant, file_path=None):
         with open(file_path, 'r', encoding='utf-8') as f:
             file_content = f.read()
             # Append the file content to the prompt asking for improvement
-            prompt = f"{content}\n\nHere is the existing content to improve:\n{file_content}"
+            content = f"{content}\n\nHere is the existing content to improve:\n{file_content}"
     else:
         console.print(f"[bold blue]Using provided prompt to generate new content...[/bold blue]")  # Progress message
-        # If no file, use the original prompt for generating new content
-        prompt = content
 
-    # Send the prompt to OpenAI completions API
-    console.print("[bold blue]Sending prompt to OpenAI API...[/bold blue]")  # Progress message
-    response = client.chat.completions.create(
-        model="gpt-4o",  # Adjust model as needed
-        messages=[{"role": "user", "content": prompt}]
+      # Prepare the message payload
+    message_payload = {
+        "thread_id": thread_id,
+        "role": "user",
+        "content": content
+    }
+
+    # Create the message in the thread
+    client.beta.threads.messages.create(**message_payload)
+
+    # Start the assistant run
+    run = client.beta.threads.runs.create(
+        thread_id=thread_id,
+        assistant_id=assistant.id
     )
+    console.print("[bold blue]Sending prompt to OpenAI API...[/bold blue]")  # Progress message
 
-    # Retrieve the completion result (generated or improved content)
-    generated_content = response.choices[0].message.content
+    with Progress() as progress:
+        task = progress.add_task("[cyan]Waiting run to finalize...", total=50)
+
+        # Simular el ciclo de espera del estado
+        while run.status == "queued" or run.status == "in_progress":
+            run = client.beta.threads.runs.retrieve(
+                thread_id=thread_id,
+                run_id=run.id,
+            )
+            # Simular progreso de la barra (puedes ajustar la lógica según tu caso)
+            progress.update(task, advance=1)
+            time.sleep(0.5)  # Esperar antes de volver a comprobar el estado del run
+
     console.print(f"[bold green]Generated content received.[/bold green]")  # Success message
 
-    # If a file path is provided, save the result to the file
-    if file_path:
-        console.print(f"[bold blue]Saving generated content to {file_path}...[/bold blue]")  # Progress message
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(generated_content)
-        console.print(f"[bold green]Content saved successfully to {file_path}.[/bold green]")  # Success message
+    # Retrieve the list of messages in the thread and return the last message content
+    messages = client.beta.threads.messages.list(thread_id=thread_id)
     
-    # Return the generated content
-    return generated_content
+    return messages.data[0].content[0].text.value
 
 # Function to get a new thread
 def get_thread():
