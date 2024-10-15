@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 openai = "1.51.2"  # Especificando la versión de OpenAI
 click = "8.1"      # Especificando la versión de Click
 markdown = "3.7"   # Especificando la versión de Markdown
@@ -24,6 +24,7 @@ storycraftr = "storycraftr.cli:cli"
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.2.4"
 ipdb = "^0.13.13"
+black = "^24.10.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -33,3 +34,5 @@ build-backend = "poetry.core.masonry.api"
 testpaths = [
     "tests"
 ]
+line-length = 88
+target-version = ['py39']

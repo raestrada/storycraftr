@@ -4,23 +4,22 @@ from rich.progress import Progress
 
 console = Console()
 
+
 def summarize_content(assistant, original_prompt):
     """
     Summarizes the prompt or content to reduce input size, generating a new thread for the summary step.
     """
     thread = get_thread()  # Generar un nuevo thread
     content = f"Summarize the following prompt to make it more concise:\n\nPrompt:\n{original_prompt}"
-    
+
     # Log de inicio
     console.print("[cyan]Summarizing the prompt...[/cyan]")
-    
+
     # Enviar el mensaje a través del asistente y obtener la respuesta
     summary_response = create_message(
-        thread_id=thread.id,
-        content=content,
-        assistant=assistant
+        thread_id=thread.id, content=content, assistant=assistant
     )
-    
+
     if summary_response:
         console.print("[green]Summary completed successfully.[/green]")
         return summary_response
@@ -28,29 +27,29 @@ def summarize_content(assistant, original_prompt):
         console.print("[red]Error summarizing prompt.[/red]")
         return ""
 
+
 def optimize_query_with_summary(assistant, summarized_prompt):
     """
     Uses the summarized prompt to optimize it for a better response, generating a new thread for optimization.
     """
     thread = get_thread()  # Generar un nuevo thread
     content = f"Using the following summarized prompt, optimize it for the best result:\n\nSummarized Prompt: {summarized_prompt}"
-    
+
     # Log de inicio
     console.print("[cyan]Optimizing the summarized prompt...[/cyan]")
-    
+
     # Enviar el mensaje a través del asistente
     optimized_response = create_message(
-        thread_id=thread.id,
-        content=content,
-        assistant=assistant
+        thread_id=thread.id, content=content, assistant=assistant
     )
-    
+
     if optimized_response:
         console.print("[green]Optimization completed successfully.[/green]")
         return optimized_response
     else:
         console.print("[red]Error optimizing the query.[/red]")
         return ""
+
 
 def final_query(assistant, optimized_prompt):
     """
@@ -61,19 +60,18 @@ def final_query(assistant, optimized_prompt):
 
     # Log de inicio
     console.print("[cyan]Executing the final query...[/cyan]")
-    
+
     final_response = create_message(
-        thread_id=thread.id,
-        content=content,
-        assistant=assistant
+        thread_id=thread.id, content=content, assistant=assistant
     )
-    
+
     if final_response:
         console.print("[green]Final query executed successfully.[/green]")
         return final_response
     else:
         console.print("[red]Error in the final query.[/red]")
         return ""
+
 
 def handle_failed_prompt(assistant, original_prompt):
     """
@@ -102,6 +100,7 @@ def handle_failed_prompt(assistant, original_prompt):
 
     return final_response
 
+
 # Ejemplo de uso
 if __name__ == "__main__":
     from storycraftr.agent.agents import create_or_get_assistant
@@ -109,7 +108,7 @@ if __name__ == "__main__":
     assistant = create_or_get_assistant()  # Obtener o crear el asistente
 
     original_prompt = "What are the key points of this content related to X?"
-    
+
     result = handle_failed_prompt(assistant, original_prompt)
 
     if result:

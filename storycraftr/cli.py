@@ -10,43 +10,62 @@ from storycraftr.cmd.iterate import iterate
 
 console = Console()
 
+
 def verify_book_path(book_name=None):
     """Verify if the book path is valid and contains storycraftr.json."""
     if not book_name:
-        book_name = os.getcwd()  # Use the current directory if --book-name is not provided
-    storycraftr_file = os.path.join(book_name, 'storycraftr.json')
+        book_name = (
+            os.getcwd()
+        )  # Use the current directory if --book-name is not provided
+    storycraftr_file = os.path.join(book_name, "storycraftr.json")
 
     if not os.path.exists(storycraftr_file):
-        raise click.ClickException(f"The file storycraftr.json was not found in the path: {book_name}")
+        raise click.ClickException(
+            f"The file storycraftr.json was not found in the path: {book_name}"
+        )
 
     return book_name
 
+
 def is_initialized(book_name):
     """Check if the book structure is already initialized."""
-    storycraftr_file = os.path.join(book_name, 'storycraftr.json')
+    storycraftr_file = os.path.join(book_name, "storycraftr.json")
     return os.path.exists(storycraftr_file)
+
 
 # Function to show error if project is not initialized
 def project_not_initialized_error(book_name):
-    console.print(f"[bold red]✖[/bold red] Project '[bold]{book_name}[/bold]' is not initialized. "
-                  f"Run '[bold]storycraftr init {book_name}[/bold]' first.", style="bold red")
+    console.print(
+        f"[bold red]✖[/bold red] Project '[bold]{book_name}[/bold]' is not initialized. "
+        f"Run '[bold]storycraftr init {book_name}[/bold]' first.",
+        style="bold red",
+    )
 
-def init_structure(book_name, license, primary_language, alternate_languages, default_author, genre, behavior_content):
+
+def init_structure(
+    book_name,
+    license,
+    primary_language,
+    alternate_languages,
+    default_author,
+    genre,
+    behavior_content,
+):
     # Show initialization start
     console.print(f"[bold blue]Initializing book structure: {book_name}[/bold blue]")
-    
+
     # Iterate over the list and create each file, showing progress
     for file in storycraftr.templates.folder.files_to_create:
         # Build the full file path
-        file_path = os.path.join(book_name, file['folder'], file['filename'])
+        file_path = os.path.join(book_name, file["folder"], file["filename"])
 
         # Ensure the directory exists
-        os.makedirs(os.path.join(book_name, file['folder']), exist_ok=True)
+        os.makedirs(os.path.join(book_name, file["folder"]), exist_ok=True)
 
         # Write the content to the file
-        with open(file_path, 'w') as f:
-            f.write(file['content'])
-        
+        with open(file_path, "w") as f:
+            f.write(file["content"])
+
         # Log the created file
         console.log(f"[green]File created:[/green] {file_path}")
 
@@ -57,59 +76,104 @@ def init_structure(book_name, license, primary_language, alternate_languages, de
         "alternate_languages": alternate_languages,
         "default_author": default_author,
         "genre": genre,
-        "license": license
+        "license": license,
     }
-    
-    config_file = os.path.join(book_name, 'storycraftr.json')
-    with open(config_file, 'w') as f:
+
+    config_file = os.path.join(book_name, "storycraftr.json")
+    with open(config_file, "w") as f:
         json.dump(config_data, f, indent=4)
 
     # Log configuration file creation
-    console.print(f"[green]Configuration file created:[/green] {config_file}", style="green")
+    console.print(
+        f"[green]Configuration file created:[/green] {config_file}", style="green"
+    )
 
     # Create 'behaviors' folder inside the root book_name directory
-    behaviors_dir = os.path.join(book_name, 'behaviors')
+    behaviors_dir = os.path.join(book_name, "behaviors")
     os.makedirs(behaviors_dir, exist_ok=True)
-    
+
     # Create the default.txt file inside the 'behaviors' folder with the behavior content
-    behavior_file = os.path.join(behaviors_dir, 'default.txt')
-    with open(behavior_file, 'w') as f:
+    behavior_file = os.path.join(behaviors_dir, "default.txt")
+    with open(behavior_file, "w") as f:
         f.write(behavior_content)
 
     # Log behavior file creation
-    console.print(f"[green]Behavior file created:[/green] {behavior_file}", style="green")
-    
+    console.print(
+        f"[green]Behavior file created:[/green] {behavior_file}", style="green"
+    )
+
     # Confirm completion
-    console.print(f"[bold green]✔[/bold green] Project '[bold]{book_name}[/bold]' initialized successfully.", style="bold green")
+    console.print(
+        f"[bold green]✔[/bold green] Project '[bold]{book_name}[/bold]' initialized successfully.",
+        style="bold green",
+    )
+
 
 @click.group()
 def cli():
     """StoryCraftr CLI - A tool to help you write books using OpenAI."""
     pass
 
+
 @click.command()
 @click.argument("book_name")
-@click.option("--license", default="CC BY-NC-SA", help="Define the type of Creative Commons license to use. Options include 'CC BY', 'CC BY-SA', 'CC BY-ND', 'CC BY-NC', 'CC BY-NC-SA', 'CC BY-NC-ND'. The default is 'CC BY-NC-SA'.")
-@click.option("--primary-language", default="en", help="The primary language for the book (default: 'en').")
-@click.option("--alternate-languages", default="", help="Comma-separated list of alternate languages (e.g., 'es,fr').")
+@click.option(
+    "--license",
+    default="CC BY-NC-SA",
+    help="Define the type of Creative Commons license to use. Options include 'CC BY', 'CC BY-SA', 'CC BY-ND', 'CC BY-NC', 'CC BY-NC-SA', 'CC BY-NC-ND'. The default is 'CC BY-NC-SA'.",
+)
+@click.option(
+    "--primary-language",
+    default="en",
+    help="The primary language for the book (default: 'en').",
+)
+@click.option(
+    "--alternate-languages",
+    default="",
+    help="Comma-separated list of alternate languages (e.g., 'es,fr').",
+)
 @click.option("--author", default="Author Name", help="The default author of the book.")
-@click.option("--genre", default="fantasy", help="The genre of the book (default: 'fantasy').")
-@click.option("--behavior", help="Behavior content, either as a string or a path to a file.")
-def init(book_name, license, primary_language, alternate_languages, author, genre, behavior):
+@click.option(
+    "--genre", default="fantasy", help="The genre of the book (default: 'fantasy')."
+)
+@click.option(
+    "--behavior", help="Behavior content, either as a string or a path to a file."
+)
+def init(
+    book_name, license, primary_language, alternate_languages, author, genre, behavior
+):
     """Initialize the book structure with relevant configuration and behavior content."""
     if not is_initialized(book_name):
-        alternate_languages_list = [lang.strip() for lang in alternate_languages.split(',')] if alternate_languages else []
-        
+        alternate_languages_list = (
+            [lang.strip() for lang in alternate_languages.split(",")]
+            if alternate_languages
+            else []
+        )
+
         # Verificamos si el contenido de behavior es un archivo o un string directo
         if os.path.isfile(behavior):
-            with open(behavior, 'r') as f:
+            with open(behavior, "r") as f:
                 behavior_content = f.read()
         else:
-            behavior_content = behavior  # Si no es un archivo, asumimos que es un string
-        
-        init_structure(book_name, license, primary_language, alternate_languages_list, author, genre, behavior_content)
+            behavior_content = (
+                behavior  # Si no es un archivo, asumimos que es un string
+            )
+
+        init_structure(
+            book_name,
+            license,
+            primary_language,
+            alternate_languages_list,
+            author,
+            genre,
+            behavior_content,
+        )
     else:
-        console.print(f"[bold yellow]⚠[/bold yellow] Project '[bold]{book_name}[/bold]' is already initialized.", style="yellow")
+        console.print(
+            f"[bold yellow]⚠[/bold yellow] Project '[bold]{book_name}[/bold]' is already initialized.",
+            style="yellow",
+        )
+
 
 cli.add_command(init)
 
