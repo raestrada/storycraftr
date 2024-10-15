@@ -1,6 +1,6 @@
 import os
-from storycraftr.agents import create_or_get_assistant, get_thread, create_message, update_agent_files
-from storycraftr.core import get_config
+from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message, update_agent_files
+from storycraftr.utils.core import get_config
 from rich.console import Console
 
 console = Console()

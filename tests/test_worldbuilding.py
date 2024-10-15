@@ -1,11 +1,11 @@
 import os
 import pytest
 from unittest.mock import patch, MagicMock
-from storycraftr.worldbuilding import (
+from storycraftr.agent.worldbuilding import (
     generate_geography, generate_history, generate_culture, 
     generate_magic_system, generate_technology, save_to_markdown
 )
-from storycraftr.core import get_config, file_has_more_than_three_lines
+from storycraftr.utils.core import get_config, file_has_more_than_three_lines
 
 
 # Test for generate_geography

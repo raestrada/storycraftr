@@ -1,9 +1,9 @@
 import os
 import pytest
 from unittest.mock import patch, MagicMock
-from storycraftr.agents import create_message, create_or_get_assistant, get_thread
-from storycraftr.core import get_config
-from storycraftr.chapters import generate_chapter, generate_cover, generate_back_cover, generate_epilogue, save_to_markdown
+from storycraftr.agent.agents import create_message, create_or_get_assistant, get_thread
+from storycraftr.utils.core import get_config
+from storycraftr.agent.chapters import generate_chapter, generate_cover, generate_back_cover, generate_epilogue, save_to_markdown
 
 # Test for generate_chapter
 @patch("storycraftr.chapters.create_message")

@@ -1,11 +1,11 @@
 import os
 import pytest
 from unittest.mock import patch, MagicMock
-from storycraftr.outline import (
+from storycraftr.agent.outline import (
     generate_general_outline, generate_character_summary, 
     generate_plot_points, generate_chapter_synopsis, save_to_markdown
 )
-from storycraftr.core import get_config, file_has_more_than_three_lines
+from storycraftr.utils.core import get_config, file_has_more_than_three_lines
 
 # Test for generate_general_outline
 @patch("storycraftr.outline.create_message")
