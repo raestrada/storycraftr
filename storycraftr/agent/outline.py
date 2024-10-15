@@ -48,7 +48,7 @@ def generate_general_outline(book_name, prompt):
         )
 
     # Save to markdown
-    save_to_markdown(book_name, "general_outline.md", "General Outline", general_outline_content)
+    save_to_markdown(book_name, "outline/general_outline.md", "General Outline", general_outline_content)
     console.print("[bold green]✔ General outline generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return general_outline_content
@@ -84,7 +84,7 @@ def generate_character_summary(book_name, prompt):
         )
 
     # Save to markdown
-    save_to_markdown(book_name, "character_summary.md", "Character Summary", character_summary_content)
+    save_to_markdown(book_name, "outline/character_summary.md", "Character Summary", character_summary_content)
     console.print("[bold green]✔ Character summary generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return character_summary_content
@@ -120,7 +120,7 @@ def generate_plot_points(book_name, prompt):
         )
 
     # Save to markdown
-    save_to_markdown(book_name, "plot_points.md", "Main Plot Points", plot_points_content)
+    save_to_markdown(book_name, "outline/plot_points.md", "Main Plot Points", plot_points_content)
     console.print("[bold green]✔ Main plot points generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return plot_points_content
@@ -156,7 +156,7 @@ def generate_chapter_synopsis(book_name, prompt):
         )
 
     # Save to markdown
-    save_to_markdown(book_name, "chapter_synopsis.md", "Chapter Synopsis", chapter_synopsis_content)
+    save_to_markdown(book_name, "outline/chapter_synopsis.md", "Chapter Synopsis", chapter_synopsis_content)
     console.print("[bold green]✔ Chapter-by-chapter synopsis generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return chapter_synopsis_content

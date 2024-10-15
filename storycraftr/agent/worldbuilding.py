@@ -49,7 +49,7 @@ def generate_geography(book_name, prompt):
         )
 
     # Save to markdown
-    save_to_markdown(book_name, "geography.md", "Geography", geography_content)
+    save_to_markdown(book_name, "worldbuilding/geography.md", "Geography", geography_content)
     console.print("[bold green]✔ Geography generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return geography_content
@@ -85,7 +85,7 @@ def generate_history(book_name, prompt):
         )
 
     # Save to markdown
-    save_to_markdown(book_name, "history.md", "History", history_content)
+    save_to_markdown(book_name, "worldbuilding/history.md", "History", history_content)
     console.print("[bold green]✔ History generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return history_content
@@ -121,7 +121,7 @@ def generate_culture(book_name, prompt):
         )
 
     # Save to markdown
-    save_to_markdown(book_name, "culture.md", "Culture", culture_content)
+    save_to_markdown(book_name, "worldbuilding/culture.md", "Culture", culture_content)
     console.print("[bold green]✔ Culture generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return culture_content
@@ -157,7 +157,7 @@ def generate_magic_system(book_name, prompt):
         )
 
     # Save to markdown
-    save_to_markdown(book_name, "magic_system.md", "Magic/Science System", magic_system_content)
+    save_to_markdown(book_name, "worldbuilding/magic_system.md", "Magic/Science System", magic_system_content)
     console.print("[bold green]✔ Magic/Science system generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return magic_system_content
@@ -193,7 +193,7 @@ def generate_technology(book_name, prompt):
         )
 
     # Save to markdown
-    save_to_markdown(book_name, "technology.md", "Technology", technology_content)
+    save_to_markdown(book_name, "worldbuilding/technology.md", "Technology", technology_content)
     console.print("[bold green]✔ Technology generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return technology_content

@@ -6,7 +6,7 @@ console = Console()
 # Function to save content to a markdown file
 def save_to_markdown(book_name, file_name, header, content):
     """Save the generated content to the specified markdown file."""
-    file_path = os.path.join(book_name, 'outline', file_name)
+    file_path = os.path.join(book_name, file_name)
     console.print(f"[bold blue]Saving content to {file_path}...[/bold blue]")  # Progress message
     with open(file_path, 'w') as f:
         f.write(f"# {header}\n\n{content}")

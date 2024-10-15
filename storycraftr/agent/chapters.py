@@ -45,7 +45,7 @@ def generate_chapter(book_name, prompt, chapter_number):
         )
 
     # Save the updated chapter content to markdown
-    save_to_markdown(book_name, chapter_file, f"Chapter {chapter_number}", chapter_content)
+    save_to_markdown(book_name, "chapters/" + chapter_file, f"Chapter {chapter_number}", chapter_content)
     console.print(f"[bold green]✔ Chapter {chapter_number} generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return chapter_content
@@ -77,7 +77,7 @@ def generate_cover(book_name, prompt):
     )
 
     # Save the cover content to markdown
-    save_to_markdown(book_name, "cover.md", "Cover", cover_content)
+    save_to_markdown(book_name, "chapters/cover.md", "Cover", cover_content)
     console.print("[bold green]✔ Cover generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return cover_content
@@ -97,7 +97,7 @@ def generate_back_cover(book_name, prompt):
     )
 
     # Save to markdown
-    save_to_markdown(book_name, "back_cover.md", "Back Cover", back_cover_content)
+    save_to_markdown(book_name, "chapters/back_cover.md", "Back Cover", back_cover_content)
     console.print("[bold green]✔ Back cover generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return back_cover_content
@@ -132,7 +132,7 @@ def generate_epilogue(book_name, prompt):
         )
 
     # Save the updated epilogue content to markdown
-    save_to_markdown(book_name, "epilogue.md", "Epilogue", epilogue_content)
+    save_to_markdown(book_name, "chapters/epilogue.md", "Epilogue", epilogue_content)
     console.print("[bold green]✔ Epilogue generated successfully[/bold green]")  # Success message
     update_agent_files(book_name, assistant)
     return epilogue_content
