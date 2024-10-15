@@ -135,6 +135,38 @@
             border-radius: 5px;
             font-family: monospace;
         }
+
+        .openai-logo {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            width: 100px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .openai-logo img {
+            width: 100%;
+            height: auto;
+        }
+
+        .openai-logo p {
+            margin: 0;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .openai-logo a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .openai-logo a:hover {
+            color: #4A90E2;
+        }
     </style>
 </head>
 <body>
@@ -162,7 +194,12 @@
         <h1>Welcome to StoryCraftr 📚✨</h1>
         <p>Write your stories with the power of AI</p>
     </header>
-
+    <div class="openai-logo">
+        <a href="https://openai.com" target="_blank">
+            <img src="https://global.discourse-cdn.com/openai1/original/3X/3/7/37b0465af49ce945753b8555462012147b0fb27a.svg" alt="OpenAI Logo">
+            <p>Made with OpenAI</p>
+        </a>
+    </div>
     <script type="application/ld+json">
         {
           "@context": "https://schema.org",
