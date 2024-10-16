@@ -8,6 +8,7 @@ from storycraftr.cmd.outline import outline
 from storycraftr.cmd.chapters import chapters
 from storycraftr.cmd.iterate import iterate
 from storycraftr.cmd.publish import publish
+from storycraftr.templates.tex import TEMPLATE_TEX
 
 
 console = Console()
@@ -129,6 +130,32 @@ def init_structure(
     console.print(
         f"[bold green]✔[/bold green] Project '[bold]{book_name}[/bold]' initialized successfully.",
         style="bold green",
+    )
+
+    # Ruta donde se creará la nueva carpeta de book_name/templates/
+    new_template_dir = os.path.join(book_name, "templates")
+
+    # Log: Creación de la carpeta
+    console.log(f"Creando el directorio: {new_template_dir}", style="bold blue")
+
+    # Crear la carpeta si no existe
+    os.makedirs(new_template_dir, exist_ok=True)
+
+    # Ruta completa del archivo template.tex
+    new_template_path = os.path.join(new_template_dir, "template.tex")
+
+    # Log: Escribiendo el archivo
+    console.log(
+        f"Escribiendo el archivo LaTeX en: {new_template_path}", style="bold green"
+    )
+
+    # Escribir el contenido del template en el archivo
+    with open(new_template_path, "w") as f:
+        f.write(TEMPLATE_TEX)
+
+    # Log: Proceso completado
+    console.log(
+        f"Template copiado exitosamente a: {new_template_path}", style="bold magenta"
     )
 
 
