@@ -185,24 +185,7 @@ Replace `"book_name"` with the actual name of your book. This will open an inter
 
 Here's an example of how a typical chat might look:
 
-```bash
-$ storycraftr chat
-Starting chat for la-purga-de-los-dioses. Type exit() to quit.
-
-You: Can you give me ideas for the next chapter?
-
-[Assistants response (formatted in Markdown)]:
-### Chapter 5: The Turning Point
-In this chapter, Zevid faces a critical decision. As the rebellion grows stronger, he must choose whether to reveal his true intentions or continue manipulating the elite and the workers.
-
-Key Points:
-- Zevid infiltrates the Dark Tower.
-- He gains access to the ancient biotechnology that the elite use to control the masses.
-- Zevid must make a pivotal choice: destroy the system or control it for himself.
-
-You: exit()
-Exiting chat...
-```
+![chat](https://res.cloudinary.com/dyknhuvxt/image/upload/v1729089264/chat_idxfgi.png)
 
 In this session, you ask for ideas for the next chapter, and the assistant responds with a detailed outline formatted in Markdown.
 

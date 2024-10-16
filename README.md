@@ -42,6 +42,10 @@ storycraftr init "La purga de los dioses" --primary-language "es" --alternate-la
 storycraftr outline general-outline "Summarize the overall plot of a dystopian science fiction where advanced technology, resembling magic, has led to the fall of humanity’s elite and the rise of a manipulative villain who seeks to destroy both the ruling class and the workers."
 ```
 
+### Chat!!!
+
+![chat](https://res.cloudinary.com/dyknhuvxt/image/upload/v1729089264/chat_idxfgi.png)
+
 ## Full Guide
 
 For a complete guide, including more examples and instructions on how to fully leverage StoryCraftr, visit our **Getting Started** page:
