@@ -1,7 +1,7 @@
 import os
 from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message
 from rich.console import Console
-from rich.progress import track
+from rich.progress import Progress
 
 console = Console()
 
@@ -106,34 +106,58 @@ def consolidate_book_md(
             f"Consolidating chapters for [bold]{book_name}[/bold] without translation..."
         )
 
-    with open(output_file_path, "w", encoding="utf-8") as consolidated_md:
-        # Process each file in the specified order
-        for chapter_file in track(
-            files_to_process, description="Consolidating chapters..."
-        ):
-            chapter_path = os.path.join(chapters_dir, chapter_file)
+    # Create Progress object with two tasks
+    with Progress() as progress:
+        task_chapters = progress.add_task(
+            "[cyan]Processing chapters...", total=len(files_to_process)
+        )
+        if translate:
+            task_translation = progress.add_task(
+                "[cyan]Translating content...", total=50
+            )  # Arbitrary total for translation
+        else:
+            task_translation = None
 
-            if chapter_file.endswith(".md"):
-                console.print(f"Processing [bold]{chapter_file}[/bold]...")
+        with open(output_file_path, "w", encoding="utf-8") as consolidated_md:
+            # Process each file in the specified order
+            for chapter_file in files_to_process:
+                chapter_path = os.path.join(chapters_dir, chapter_file)
 
-                with open(chapter_path, "r", encoding="utf-8") as chapter_md:
-                    content = chapter_md.read()
+                if chapter_file.endswith(".md"):
+                    progress.update(
+                        task_chapters, description=f"Processing {chapter_file}..."
+                    )
+                    with open(chapter_path, "r", encoding="utf-8") as chapter_md:
+                        content = chapter_md.read()
 
-                    # If 'translate' is not None, translate the content using OpenAI
-                    if translate:
-                        console.print(
-                            f"Translating [bold]{chapter_file}[/bold] to [bold]{translate}[/bold]..."
-                        )
-                        content = create_message(
-                            thread_id=thread.id, content=content, assistant=assistant
-                        )
+                        # If 'translate' is not None, translate the content using OpenAI
+                        if translate:
+                            progress.update(
+                                task_translation,
+                                description=f"Translating {chapter_file} to {translate}...",
+                            )
+                            if translate:
+                                progress.reset(task_translation)
+                            content = create_message(
+                                thread_id=thread.id,
+                                content=content,
+                                assistant=assistant,
+                                progress=progress,
+                                task_id=task_translation,
+                            )
 
-                    # Write the (translated or original) content into the consolidated file
-                    consolidated_md.write(content)
-                    consolidated_md.write("\n\\newpage\n")
+                        # Write the (translated or original) content into the consolidated file
+                        consolidated_md.write(content)
+                        consolidated_md.write("\n\\newpage\n")
+
+                    # Update the progress for processing chapters
+                    progress.update(task_chapters, advance=1)
 
     # Log the completion of the consolidation
-    console.print(
-        f"[green bold]Book consolidated[/green bold] at [bold]{output_file_path}[/bold]"
+    # Al final de la consolidación, en lugar de console.print:
+    progress.update(
+        task_chapters,
+        description=f"[green bold]Book consolidated[/green bold] at {output_file_path}",
     )
+
     return output_file_path

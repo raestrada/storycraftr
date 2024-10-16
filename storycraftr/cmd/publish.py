@@ -39,7 +39,7 @@ def pdf(primary_language, translate=None, book_name=None):
         f"Generating PDF for the book in [bold]{primary_language}[/bold] language..."
     )
 
-    to_pdf(book_name, primary_language, translate)
+    output_pdf_path = to_pdf(book_name, primary_language, translate)
 
     # Success log
     console.print(

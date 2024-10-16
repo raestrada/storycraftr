@@ -125,21 +125,48 @@ With a well-outlined story and a detailed world, we can now generate the chapter
 
 ## Step 6: Publish Your Book
 
-StoryCraftr supports publishing your book to PDF, making it easy to share your work:
+StoryCraftr supports publishing your book to PDF, making it easy to share your work. To generate a PDF, you'll need to have **Pandoc** and **XeLaTeX** installed on your system.
 
-1. **Generate PDF**:  
-    ```bash
-    storycraftr publish pdf
-    ```
+### Prerequisites
 
-## Step 7: Translate Your Book
+Make sure to install **Pandoc** and **XeLaTeX** before running the *publish* command. Here are minimalistic installation instructions:
 
-If you initialized your book with alternate languages, you can translate the content automatically:
+- **macOS**:  
+  Install using Homebrew:
+  ```bash
+  brew install pandoc
+  brew install --cask mactex
+  ```
 
-1. **Translate to Alternate Languages**:  
-    ```bash
-    storycraftr translate
-    ```
+- **Linux**:  
+  Install using the package manager:
+  ```bash
+  sudo apt install pandoc texlive-xetex
+  ```
+
+- **Windows**:  
+  Download and install Pandoc from [Pandoc's website](https://pandoc.org/installing.html) and [MiKTeX](https://miktex.org/download) for XeLaTeX support.
+
+Once you have these dependencies installed, you can proceed to publish your book.
+
+### 1. Generate PDF:
+
+To generate a PDF of your book in the primary language, use the following command:
+
+```bash
+storycraftr publish pdf en
+```
+
+### 2. Generate PDF with Translation:
+
+If you want to translate your book and generate the PDF in another language (e.g., Spanish), you can use the `--translate` option:
+
+```bash
+storycraftr publish pdf en --translate es
+```
+
+Once the process is complete, the PDF file will be available in your project folder, ready to be shared or printed.
+
 
 ## Learn More About Writing
 

@@ -114,8 +114,9 @@ def create_or_get_assistant(book_name):
     return assistant
 
 
-# Function to create a message in a thread and handle async processing
-def create_message(thread_id, content, assistant, file_path=None):
+def create_message(
+    thread_id, content, assistant, file_path=None, progress=None, task_id=None
+):
     """
     Create a message in the thread and process it asynchronously.
 
@@ -124,20 +125,34 @@ def create_message(thread_id, content, assistant, file_path=None):
         content (str): The content of the message.
         assistant (object): The assistant object with an ID.
         file_path (str, optional): The path to a file to attach as an attachment. Defaults to None.
+        progress (rich.progress.Progress, optional): Progress object for tracking. Defaults to None.
+        task_id (int, optional): Task ID for the progress bar. Required if progress is passed.
 
     Returns:
         str: The text content of the last message returned by the assistant.
     """
 
-    console.print(
-        f"[bold blue]Creating message in thread {thread_id}...[/bold blue]"
-    )  # Progress message
+    # Flag to determine if we should print to the console
+    should_print = progress is None
+
+    # Use the provided progress or create a new one if not passed
+    internal_progress = False
+    if progress is None:
+        progress = Progress()
+        task_id = progress.add_task("[cyan]Waiting for assistant response...", total=50)
+        internal_progress = True
+
+    if should_print:
+        console.print(
+            f"[bold blue]Creating message in thread {thread_id}...[/bold blue]"
+        )  # Progress message
 
     # Prepare the base prompt
     if file_path and os.path.exists(file_path):
-        console.print(
-            f"[bold blue]Reading content from {file_path} for improvement...[/bold blue]"
-        )  # Progress message
+        if should_print:
+            console.print(
+                f"[bold blue]Reading content from {file_path} for improvement...[/bold blue]"
+            )  # Progress message
         with open(file_path, "r", encoding="utf-8") as f:
             file_content = f.read()
             # Append the file content to the prompt asking for improvement
@@ -145,9 +160,10 @@ def create_message(thread_id, content, assistant, file_path=None):
                 f"{content}\n\nHere is the existing content to improve:\n{file_content}"
             )
     else:
-        console.print(
-            f"[bold blue]Using provided prompt to generate new content...[/bold blue]"
-        )  # Progress message
+        if should_print:
+            console.print(
+                f"[bold blue]Using provided prompt to generate new content...[/bold blue]"
+            )  # Progress message
 
     # Prepare the message payload
     message_payload = {"thread_id": thread_id, "role": "user", "content": content}
@@ -159,26 +175,27 @@ def create_message(thread_id, content, assistant, file_path=None):
     run = client.beta.threads.runs.create(
         thread_id=thread_id, assistant_id=assistant.id
     )
-    console.print(
-        "[bold blue]Sending prompt to OpenAI API...[/bold blue]"
-    )  # Progress message
+    if should_print:
+        console.print(
+            "[bold blue]Sending prompt to OpenAI API...[/bold blue]"
+        )  # Progress message
 
-    with Progress() as progress:
-        task = progress.add_task("[cyan]Waiting run to finalize...", total=50)
+    if internal_progress:
+        progress.start()
 
-        # Simular el ciclo de espera del estado
-        while run.status == "queued" or run.status == "in_progress":
-            run = client.beta.threads.runs.retrieve(
-                thread_id=thread_id,
-                run_id=run.id,
-            )
-            # Simular progreso de la barra (puedes ajustar la lógica según tu caso)
-            progress.update(task, advance=1)
-            time.sleep(0.5)  # Esperar antes de volver a comprobar el estado del run
+    # Wait for the assistant response while updating the progress bar
+    while run.status == "queued" or run.status == "in_progress":
+        run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+        progress.update(task_id, advance=1)  # Update progress bar
+        time.sleep(0.5)  # Wait before checking the status again
 
-    console.print(
-        f"[bold green]Generated content received.[/bold green]"
-    )  # Success message
+    if internal_progress:
+        progress.stop()
+
+    if should_print:
+        console.print(
+            f"[bold green]Generated content received.[/bold green]"
+        )  # Success message
 
     # Retrieve the list of messages in the thread and return the last message content
     messages = client.beta.threads.messages.list(thread_id=thread_id)

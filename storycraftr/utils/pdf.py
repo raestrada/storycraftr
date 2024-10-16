@@ -50,13 +50,9 @@ def to_pdf(book_name: str, primary_language: str, translate: str = None) -> str:
     with open(consolidated_md_path, "r", encoding="utf-8") as f:
         md_content = f.read()
 
-    # Clean the markdown content by removing image references to missing files
-    console.print("Checking for missing images...")
-    cleaned_md_content = clean_markdown_images(md_content, book_name)
-
     # Write the cleaned markdown content back to the file
     with open(consolidated_md_path, "w", encoding="utf-8") as f:
-        f.write(cleaned_md_content)
+        f.write(md_content)
 
     # Determine the output PDF file name
     output_pdf_path = consolidated_md_path.replace(".md", ".pdf")
