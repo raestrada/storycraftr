@@ -21,7 +21,7 @@ storycraftr iterate check-names "Check character names for consistency."
 To update or fix a character name across the entire book:
 
 ```bash
-storycraftr iterate fix-name "Update character 'Santi' to 'Santiago' throughout the book."
+storycraftr iterate fix-name Santi Santiago
 ```
 
 ### 2. Refine Character Motivation

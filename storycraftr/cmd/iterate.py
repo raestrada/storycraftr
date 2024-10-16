@@ -2,7 +2,7 @@ import os
 import click
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.iterate import iterate_check_names
+from storycraftr.agent.iterate import iterate_check_names, fix_name_in_chapters
 
 console = Console()
 
@@ -41,18 +41,33 @@ def check_names(prompt, book_name=None):
 
 
 @iterate.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
-@click.argument("prompt")
-def fix_name(prompt, book_name):
-    """Fix character names across the entire book."""
+@click.option(
+    "--book-name", type=click.Path(), help="Path to the book directory", required=False
+)
+@click.argument("original_name")
+@click.argument("new_name")
+def fix_name(original_name, new_name, book_name=None):
+    """
+    Comando para cambiar el nombre de un personaje en todos los capítulos del libro.
+    Recibe como parámetros el nombre original y el nuevo nombre.
+    """
     if not book_name:
         book_name = os.getcwd()
 
     if not load_book_config(book_name):
         return None
 
-    console.print(f"[yellow]The command 'fix-name' is not yet implemented.[/yellow]")
-    console.print(f"Prompt: {prompt}")
+    console.print(
+        f"[bold blue]Iniciando el cambio de nombre: '{original_name}' a '{new_name}' en el libro: {book_name}[/bold blue]"
+    )
+
+    # Llamar a la función que realiza el cambio de nombres
+    fix_name_in_chapters(book_name, original_name, new_name)
+
+    # Success log
+    console.print(
+        f"[green bold]Cambio de nombre completado de '{original_name}' a '{new_name}' en todos los capítulos![/green bold]"
+    )
 
 
 @iterate.command()
