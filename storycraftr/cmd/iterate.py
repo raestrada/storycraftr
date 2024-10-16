@@ -2,7 +2,7 @@ import os
 import click
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
-
+from storycraftr.agent.iterate import iterate_check_names
 
 console = Console()
 
@@ -14,18 +14,30 @@ def iterate():
 
 
 @iterate.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
-@click.argument("prompt")
-def check_names(prompt, book_name):
-    """Check character names for consistency."""
+@click.option(
+    "--book-name", type=click.Path(), help="Path to the book directory", required=False
+)
+@click.argument("prompt", default="Check character names for consistency.")
+def check_names(prompt, book_name=None):
+    """
+    Comando para revisar la consistencia de los nombres de personajes en los capítulos de un libro.
+    Los capítulos se encuentran en 'book_name/chapters'.
+    """
     if not book_name:
         book_name = os.getcwd()
 
     if not load_book_config(book_name):
         return None
 
-    console.print(f"[yellow]The command 'check-names' is not yet implemented.[/yellow]")
-    console.print(f"Prompt: {prompt}")
+    console.print(
+        f"[bold blue]Iniciando la revisión de consistencia de nombres en los capítulos del libro: {book_name}[/bold blue]"
+    )
+
+    # Llamar a la función que revisa los nombres en los capítulos
+    iterate_check_names(book_name)
+
+    # Success log
+    console.print(f"[green bold]Success![/green bold] Check Names!")
 
 
 @iterate.command()

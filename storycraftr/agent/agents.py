@@ -42,33 +42,53 @@ def delete_assistant(book_name):
             break
 
 
-# Function to create or get an assistant
-def create_or_get_assistant(book_name):
+# Function to create or get an assistant with optional progress task
+def create_or_get_assistant(book_name, progress: Progress = None, task=None):
     name = book_name.split("/")[-1]
-    console.print(
-        f"[bold blue]Searching for existing assistant '{name}'...[/bold blue]"
-    )  # Progress message
+
+    # Progress message for searching an existing assistant
+    if progress and task:
+        progress.update(
+            task, description=f"Searching for existing assistant '{name}'..."
+        )
+    else:
+        console.print(
+            f"[bold blue]Searching for existing assistant '{name}'...[/bold blue]"
+        )
+
     assistant = None
     assistants = client.beta.assistants.list()
+
     for assistant in assistants.data:
         if assistant.name == name:
-            console.print(
-                f"[bold yellow]Assistant {name} already exists.[/bold yellow]"
-            )  # Success message
+            # Progress message for found assistant
+            if progress and task:
+                progress.update(task, description=f"Assistant {name} already exists.")
+            else:
+                console.print(
+                    f"[bold yellow]Assistant {name} already exists.[/bold yellow]"
+                )
             return assistant
 
-    # Step 1. Create a vector store for the book
-    console.print(
-        f"[bold blue]Creating vector store for '{book_name}'...[/bold blue]"
-    )  # Progress message
+    # Step 1: Create a vector store for the book
+    if progress and task:
+        progress.update(task, description=f"Creating vector store for '{book_name}'...")
+    else:
+        console.print(
+            f"[bold blue]Creating vector store for '{book_name}'...[/bold blue]"
+        )
+
     vector_store = client.beta.vector_stores.create(name=f"{book_name} Docs")
 
-    # Step 2. Upload Knowledge (Markdown files)
-    console.print(
-        f"[bold blue]Uploading knowledge from '{book_name}'...[/bold blue]"
-    )  # Progress message
-    md_files = load_markdown_files(book_name)
+    # Step 2: Upload Knowledge (Markdown files)
+    if progress and task:
+        progress.update(task, description=f"Uploading knowledge from '{book_name}'...")
+    else:
+        console.print(
+            f"[bold blue]Uploading knowledge from '{book_name}'...[/bold blue]"
+        )
 
+    md_files = load_markdown_files(book_name)
     file_streams = [open(file_path, "rb") for file_path in md_files]
 
     file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
@@ -76,21 +96,26 @@ def create_or_get_assistant(book_name):
     )
 
     while file_batch.status == "queued" or file_batch.status == "in_progress":
-        console.print(
-            f"[bold yellow]{file_batch.status}...[/bold yellow]"
-        )  # Progress message
+        if progress and task:
+            progress.update(task, description=f"{file_batch.status}...")
+        else:
+            console.print(f"[bold yellow]{file_batch.status}...[/bold yellow]")
         time.sleep(1)
 
-    # Step 3. Create the Assistant
-    console.print(
-        f"[bold blue]Reading behavior instructions...[/bold blue]"
-    )  # Progress message
+    # Step 3: Create the Assistant
+    if progress and task:
+        progress.update(task, description=f"Reading behavior instructions...")
+    else:
+        console.print(f"[bold blue]Reading behavior instructions...[/bold blue]")
+
     with open("behaviors/default.txt", "r") as file:
         instructions = file.read()
 
-    console.print(
-        f"[bold blue]Creating assistant '{name}'...[/bold blue]"
-    )  # Progress message
+    if progress and task:
+        progress.update(task, description=f"Creating assistant '{name}'...")
+    else:
+        console.print(f"[bold blue]Creating assistant '{name}'...[/bold blue]")
+
     assistant = client.beta.assistants.create(
         instructions=instructions,
         name=name,
@@ -98,18 +123,28 @@ def create_or_get_assistant(book_name):
         model="gpt-4o",
     )
 
-    # Associate the assistant with the vector store
-    console.print(
-        f"[bold blue]Associating assistant '{name}' with vector store...[/bold blue]"
-    )  # Progress message
+    # Step 4: Associate the assistant with the vector store
+    if progress and task:
+        progress.update(
+            task, description=f"Associating assistant '{name}' with vector store..."
+        )
+    else:
+        console.print(
+            f"[bold blue]Associating assistant '{name}' with vector store...[/bold blue]"
+        )
+
     assistant = client.beta.assistants.update(
         assistant_id=assistant.id,
         tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
     )
 
-    console.print(
-        f"[bold green]Assistant '{name}' created successfully.[/bold green]"
-    )  # Success message
+    # Success message
+    if progress and task:
+        progress.update(task, description=f"Assistant '{name}' created successfully.")
+    else:
+        console.print(
+            f"[bold green]Assistant '{name}' created successfully.[/bold green]"
+        )
 
     return assistant
 
@@ -205,7 +240,6 @@ def create_message(
 
 # Function to get a new thread
 def get_thread():
-    console.print(f"[bold blue]Creating new thread...[/bold blue]")  # Progress message
     return client.beta.threads.create()
 
 

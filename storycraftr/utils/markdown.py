@@ -1,4 +1,5 @@
 import os
+import shutil
 from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message
 from rich.console import Console
 from rich.progress import Progress
@@ -6,18 +7,44 @@ from rich.progress import Progress
 console = Console()
 
 
-# Function to save content to a markdown file
-def save_to_markdown(book_name, file_name, header, content):
-    """Save the generated content to the specified markdown file."""
+# Function to save content to a markdown file with optional task for progress updates
+def save_to_markdown(
+    book_name, file_name, header, content, progress: Progress = None, task=None
+):
+    """Save the generated content to the specified markdown file, creating a backup if the file exists.
+    Optionally updates a progress task.
+    """
     file_path = os.path.join(book_name, file_name)
-    console.print(
-        f"[bold blue]Saving content to {file_path}...[/bold blue]"
-    )  # Progress message
+    backup_path = file_path + ".back"
+
+    # If the file exists, create a backup
+    if os.path.exists(file_path):
+        if progress and task:
+            progress.update(task, description=f"Backing up {file_name}")
+        else:
+            console.print(
+                f"[bold yellow]Backing up {file_path} to {backup_path}...[/bold yellow]"
+            )
+        shutil.copyfile(file_path, backup_path)
+
+    # Save the new content to the markdown file
+    if progress and task:
+        progress.update(task, description=f"Saving content to {file_name}")
+    else:
+        console.print(
+            f"[bold blue]Saving content to {file_path}...[/bold blue]"
+        )  # Progress message
+
     with open(file_path, "w") as f:
         f.write(f"# {header}\n\n{content}")
-    console.print(
-        f"[bold green]Content saved successfully to {file_path}[/bold green]"
-    )  # Success message
+
+    if progress and task:
+        progress.update(task, description=f"Content saved successfully to {file_name}")
+    else:
+        console.print(
+            f"[bold green]Content saved successfully to {file_path}[/bold green]"
+        )  # Success message
+
     return file_path  # Return the path for reuse
 
 
