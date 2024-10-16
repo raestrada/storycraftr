@@ -186,7 +186,7 @@ Replace `"book_name"` with the actual name of your book. This will open an inter
 Here's an example of how a typical chat might look:
 
 ```bash
-$ python chat.py "la-purga-de-los-dioses"
+$ storycraftr chat
 Starting chat for la-purga-de-los-dioses. Type exit() to quit.
 
 You: Can you give me ideas for the next chapter?
