@@ -176,7 +176,7 @@ StoryCraftr now includes a command to chat directly with your AI assistant. This
 To start chatting with your assistant, make sure your book project is initialized and then run the following command:
 
 ```bash
-python chat.py "book_name"
+storycraftr chat
 ```
 
 Replace `"book_name"` with the actual name of your book. This will open an interactive session where you can type messages to your AI assistant. The responses will be formatted in Markdown, making it easy to read any formatted text, lists, or other structures returned by the assistant.
