@@ -191,7 +191,7 @@ Starting chat for la-purga-de-los-dioses. Type exit() to quit.
 
 You: Can you give me ideas for the next chapter?
 
-[Assistant's response (formatted in Markdown)]:
+[Assistants response (formatted in Markdown)]:
 ### Chapter 5: The Turning Point
 In this chapter, Zevid faces a critical decision. As the rebellion grows stronger, he must choose whether to reveal his true intentions or continue manipulating the elite and the workers.
 
