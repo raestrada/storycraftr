@@ -11,7 +11,7 @@ Use the attached chapter file as a reference to evolve and improve the content b
 COVER_PROMPT = """
 Create a professional book cover in markdown format for the book titled '{title}'. 
 Include the title, author ('{author}').
-The cover reference a image that I would request later. Reference the image.
+put the placeholder PUT_IMAGE_CODE_HERE replacing all the img md code so then I can replace it with the cover image.
 STRICTLY Return only the cover markdown limited only to what should be printed.
 Use this prompt as additional context: {prompt}. Write the content in {language}.
 """

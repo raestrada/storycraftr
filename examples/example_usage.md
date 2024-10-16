@@ -26,4 +26,5 @@ storycraftr chapters cover "Generate a cover text for the novel 'The Purge of th
 
 storycraftr chapters back-cover "Generate a back-cover text for 'The Purge of the Gods,' a dystopian novel where advanced biotechnology is seen as magic, and a cunning villain manipulates both the elite and the workers to achieve ultimate control."
 
-
+storycraftr publish pdf en
+storycraftr publish pdf en --translate es

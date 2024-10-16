@@ -7,6 +7,8 @@ from storycraftr.cmd.worldbuilding import worldbuilding
 from storycraftr.cmd.outline import outline
 from storycraftr.cmd.chapters import chapters
 from storycraftr.cmd.iterate import iterate
+from storycraftr.cmd.publish import publish
+
 
 console = Console()
 
@@ -203,6 +205,7 @@ cli.add_command(worldbuilding)
 cli.add_command(outline)
 cli.add_command(chapters)
 cli.add_command(iterate)
+cli.add_command(publish)
 
 if __name__ == "__main__":
     cli()
