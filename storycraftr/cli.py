@@ -8,6 +8,7 @@ from storycraftr.cmd.outline import outline
 from storycraftr.cmd.chapters import chapters
 from storycraftr.cmd.iterate import iterate
 from storycraftr.cmd.publish import publish
+from storycraftr.cmd.chat import chat
 from storycraftr.templates.tex import TEMPLATE_TEX
 
 
@@ -233,6 +234,7 @@ cli.add_command(outline)
 cli.add_command(chapters)
 cli.add_command(iterate)
 cli.add_command(publish)
+cli.add_command(chat)
 
 if __name__ == "__main__":
     cli()

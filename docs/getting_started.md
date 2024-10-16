@@ -167,6 +167,51 @@ storycraftr publish pdf en --translate es
 
 Once the process is complete, the PDF file will be available in your project folder, ready to be shared or printed.
 
+## Step 7: Chat with Your Assistant
+
+StoryCraftr now includes a command to chat directly with your AI assistant. This allows you to ask questions, brainstorm ideas, or request improvements to your book's content in an interactive session, all from the comfort of your terminal.
+
+### How to Start a Chat
+
+To start chatting with your assistant, make sure your book project is initialized and then run the following command:
+
+```bash
+python chat.py "book_name"
+```
+
+Replace `"book_name"` with the actual name of your book. This will open an interactive session where you can type messages to your AI assistant. The responses will be formatted in Markdown, making it easy to read any formatted text, lists, or other structures returned by the assistant.
+
+### Example Chat Session
+
+Here's an example of how a typical chat might look:
+
+```bash
+$ python chat.py "la-purga-de-los-dioses"
+Starting chat for la-purga-de-los-dioses. Type exit() to quit.
+
+You: Can you give me ideas for the next chapter?
+
+[Assistant's response (formatted in Markdown)]:
+### Chapter 5: The Turning Point
+In this chapter, Zevid faces a critical decision. As the rebellion grows stronger, he must choose whether to reveal his true intentions or continue manipulating the elite and the workers.
+
+Key Points:
+- Zevid infiltrates the Dark Tower.
+- He gains access to the ancient biotechnology that the elite use to control the masses.
+- Zevid must make a pivotal choice: destroy the system or control it for himself.
+
+You: exit()
+Exiting chat...
+```
+
+In this session, you ask for ideas for the next chapter, and the assistant responds with a detailed outline formatted in Markdown.
+
+#### How to Exit the Chat
+You can exit the chat at any time by typing:
+
+``` exit() ```
+
+This will gracefully close the chat session and return you to your terminal.
 
 ## Learn More About Writing
 
