@@ -41,10 +41,12 @@ In Sanderson's writing methodology, having a clear starting point and preparatio
     echo "Focus on character development and conflict resolution in a futuristic society." > behaviors/default.txt
     ```
 
-3. **Initialize the book**: Clear **genre** and **structure** definition aligns with Sanderson’s emphasis on creating consistent rules for your world and plot ([Sanderson's First Law](https://www.brandonsanderson.com/sandersons-first-law/)).  
+3. **Initialize the book**: A clear definition of genre and structure aligns with Sanderson’s emphasis on creating consistent rules for your world and plot ([Sanderson's First Law](https://www.brandonsanderson.com/sandersons-first-law/)). We've added an optional parameter --reference-author. If you use it, the system will try to emulate the style of that author; if not, it will assume the style based on what you write.
+
     ```bash
-    storycraftr init "La purga de los dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt"
+    storycraftr init "The Purge of the Gods" --primary-language "en" --alternate-languages "es" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt"  --reference-author "Brandon Sanderson"
     ```
+> **Note:** In the following commands, any modified files are always backed up with a *.back* extension.
 
 ## Step 3: Generate the Outline
 
