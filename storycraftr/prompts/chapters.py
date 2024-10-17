@@ -8,7 +8,7 @@ Ensure the chapter contributes meaningfully to the plot, character development, 
 
 CHAPTER_PROMPT_REFINE = """
 Refine and evolve the content based on this prompt: {prompt}.
-Improve the narrative flow, character development, and pacing, based on the following prompt: {prompt}.
+Improve the narrative flow, character development, and pacing.
 """
 
 
@@ -37,6 +37,6 @@ The epilogue should tie up loose ends and provide closure in a way that compleme
 
 EPILOGUE_PROMPT_REFINE = """
 Refine and evolve the content based on this prompt: {prompt}.
-Improve its narrative flow, tie up remaining plot points, and evolve the content based on this prompt: {prompt}.
+Improve its narrative flow, tie up remaining plot points, and evolve the content.
 Ensure that the refined epilogue maintains the tone and themes of the story.
 """
