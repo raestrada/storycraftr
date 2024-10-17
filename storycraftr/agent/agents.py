@@ -229,7 +229,7 @@ def create_message(
     try:
         # Send prompt to OpenAI API
         avoid_cache_content = generate_prompt_with_hash(
-            f"content\n\n{FORMAT_OUTPUT.format(reference_author=config.reference_author)}"
+            f"content\n\n{FORMAT_OUTPUT.format(reference_author=config.reference_author, language=config.primary_language)}"
         )
         client.beta.threads.messages.create(
             thread_id=thread_id, role="user", content=avoid_cache_content
