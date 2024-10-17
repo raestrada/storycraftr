@@ -11,6 +11,7 @@ Write the content in {language}.
 
 CHARACTER_SUMMARY_PROMPT_NEW = """
 Generate a detailed character summary for the book {book_name} based on this prompt: {prompt}.
+Define most important characters startign for the main characters and continuing with secondaries.
 Write the content in {language}.
 """
 

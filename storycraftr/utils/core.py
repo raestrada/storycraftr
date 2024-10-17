@@ -1,9 +1,22 @@
 import os
+import hashlib
 import json
 from typing import NamedTuple
 from rich.console import Console
 
 console = Console()
+
+
+def generate_prompt_with_hash(original_prompt):
+    # Genera un hash basado en el contenido del prompt
+    hash_object = hashlib.sha256(original_prompt.encode())
+    hash_hex = hash_object.hexdigest()
+
+    # Combina el hash con el prompt original (puedes limitar el hash a los primeros caracteres si prefieres)
+    modified_prompt = (
+        f"{hash_hex}: {original_prompt}"  # Usa los primeros 10 caracteres del hash
+    )
+    return modified_prompt
 
 
 # Define the structure for the book using NamedTuple

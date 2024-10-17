@@ -6,7 +6,7 @@ from openai import OpenAI
 from rich.console import Console
 from rich.progress import Progress
 from storycraftr.prompts.core import FORMAT_OUTPUT
-from storycraftr.utils.core import load_book_config
+from storycraftr.utils.core import load_book_config, generate_prompt_with_hash
 
 load_dotenv()
 
@@ -14,17 +14,28 @@ client = OpenAI()
 console = Console()
 
 
-# Function to load all Markdown files from the book's directory and subdirectories
 def load_markdown_files(book_path):
     """Load all Markdown files from the book's directory and subdirectories."""
     console.print(
         f"[bold blue]Loading all Markdown files from '{book_path}'...[/bold blue]"
     )  # Progress message
+
+    # Find all Markdown files in the directory
     md_files = glob.glob(f"{book_path}/**/*.md", recursive=True)
+
+    # Filter out files with less than 3 lines
+    valid_md_files = []
+    for file_path in md_files:
+        with open(file_path, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+            if len(lines) > 3:
+                valid_md_files.append(file_path)
+
     console.print(
-        f"[bold green]Loaded {len(md_files)} Markdown files.[/bold green]"
+        f"[bold green]Loaded {len(valid_md_files)} Markdown files with more than 3 lines.[/bold green]"
     )  # Success message
-    return md_files
+
+    return valid_md_files
 
 
 # Function to delete an existing assistant
@@ -80,7 +91,7 @@ def create_or_get_assistant(book_path, progress: Progress = None, task=None):
             f"[bold blue]Creating vector store for '{book_path}'...[/bold blue]"
         )
 
-    vector_store = client.beta.vector_stores.create(name=f"{book_path} Docs")
+    vector_store = client.beta.vector_stores.create(name=f"{name} Docs")
 
     # Step 2: Upload Knowledge (Markdown files)
     if progress and task:
@@ -91,18 +102,20 @@ def create_or_get_assistant(book_path, progress: Progress = None, task=None):
         )
 
     md_files = load_markdown_files(book_path)
-    file_streams = [open(file_path, "rb") for file_path in md_files]
 
-    file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
-        vector_store_id=vector_store.id, files=file_streams
-    )
+    if len(md_files):
+        file_streams = [open(file_path, "rb") for file_path in md_files]
 
-    while file_batch.status == "queued" or file_batch.status == "in_progress":
-        if progress and task:
-            progress.update(task, description=f"{file_batch.status}...")
-        else:
-            console.print(f"[bold yellow]{file_batch.status}...[/bold yellow]")
-        time.sleep(1)
+        file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+            vector_store_id=vector_store.id, files=file_streams
+        )
+
+        while file_batch.status == "queued" or file_batch.status == "in_progress":
+            if progress and task:
+                progress.update(task, description=f"{file_batch.status}...")
+            else:
+                console.print(f"[bold yellow]{file_batch.status}...[/bold yellow]")
+            time.sleep(1)
 
     # Step 3: Create the Assistant
     if progress and task:
@@ -135,10 +148,11 @@ def create_or_get_assistant(book_path, progress: Progress = None, task=None):
             f"[bold blue]Associating assistant '{name}' with vector store...[/bold blue]"
         )
 
-    assistant = client.beta.assistants.update(
-        assistant_id=assistant.id,
-        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
-    )
+    if len(md_files):
+        assistant = client.beta.assistants.update(
+            assistant_id=assistant.id,
+            tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
+        )
 
     # Success message
     if progress and task:
@@ -214,10 +228,11 @@ def create_message(
 
     try:
         # Send prompt to OpenAI API
+        avoid_cache_content = generate_prompt_with_hash(
+            f"content\n\n{FORMAT_OUTPUT.format(reference_author=config.reference_author)}"
+        )
         client.beta.threads.messages.create(
-            thread_id=thread_id,
-            role="user",
-            content=f"content\n\n{FORMAT_OUTPUT.format(reference_author=config.reference_author)}",
+            thread_id=thread_id, role="user", content=avoid_cache_content
         )
 
         # Start the assistant run
