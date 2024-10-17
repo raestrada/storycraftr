@@ -17,7 +17,7 @@ def summarize_content(assistant, original_prompt):
 
     # Enviar el mensaje a través del asistente y obtener la respuesta
     summary_response = create_message(
-        thread_id=thread.id, content=content, assistant=assistant
+        book_path, thread_id=thread.id, content=content, assistant=assistant
     )
 
     if summary_response:
@@ -40,7 +40,7 @@ def optimize_query_with_summary(assistant, summarized_prompt):
 
     # Enviar el mensaje a través del asistente
     optimized_response = create_message(
-        thread_id=thread.id, content=content, assistant=assistant
+        book_path, thread_id=thread.id, content=content, assistant=assistant
     )
 
     if optimized_response:
@@ -62,7 +62,7 @@ def final_query(assistant, optimized_prompt):
     console.print("[cyan]Executing the final query...[/cyan]")
 
     final_response = create_message(
-        thread_id=thread.id, content=content, assistant=assistant
+        book_path, thread_id=thread.id, content=content, assistant=assistant
     )
 
     if final_response:

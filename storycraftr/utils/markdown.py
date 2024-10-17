@@ -9,12 +9,12 @@ console = Console()
 
 # Function to save content to a markdown file with optional task for progress updates
 def save_to_markdown(
-    book_name, file_name, header, content, progress: Progress = None, task=None
+    book_path, file_name, header, content, progress: Progress = None, task=None
 ):
     """Save the generated content to the specified markdown file, creating a backup if the file exists.
     Optionally updates a progress task.
     """
-    file_path = os.path.join(book_name, file_name)
+    file_path = os.path.join(book_path, file_name)
     backup_path = file_path + ".back"
 
     # If the file exists, create a backup
@@ -49,9 +49,9 @@ def save_to_markdown(
 
 
 # Function to append content to an existing markdown file
-def append_to_markdown(book_name, folder_name, file_name, content):
+def append_to_markdown(book_path, folder_name, file_name, content):
     """Append content to an existing markdown file."""
-    file_path = os.path.join(book_name, folder_name, file_name)
+    file_path = os.path.join(book_path, folder_name, file_name)
 
     if os.path.exists(file_path):
         with open(file_path, "a") as f:
@@ -62,9 +62,9 @@ def append_to_markdown(book_name, folder_name, file_name, content):
 
 
 # Function to read content from a markdown file
-def read_from_markdown(book_name, folder_name, file_name):
+def read_from_markdown(book_path, folder_name, file_name):
     """Read content from the specified markdown file."""
-    file_path = os.path.join(book_name, folder_name, file_name)
+    file_path = os.path.join(book_path, folder_name, file_name)
 
     if os.path.exists(file_path):
         with open(file_path, "r") as f:
@@ -75,30 +75,21 @@ def read_from_markdown(book_name, folder_name, file_name):
         raise FileNotFoundError(f"File {file_path} does not exist.")
 
 
-import os
-import re
-from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message
-from rich.console import Console
-from rich.progress import track
-
-console = Console()
-
-
 def consolidate_book_md(
-    book_name: str, primary_language: str, translate: str = None
+    book_path: str, primary_language: str, translate: str = None
 ) -> str:
-    chapters_dir = os.path.join(book_name, "chapters")
+    chapters_dir = os.path.join(book_path, "chapters")
     output_file_name = (
         f"book-{primary_language}.md" if not translate else f"book-{translate}.md"
     )
-    output_file_path = os.path.join(book_name, "book", output_file_name)
+    output_file_path = os.path.join(book_path, "book", output_file_name)
 
     # Ensure the "book" folder exists
-    book_dir = os.path.join(book_name, "book")
+    book_dir = os.path.join(book_path, "book")
     os.makedirs(book_dir, exist_ok=True)
 
     # Create or get the assistant and thread
-    assistant = create_or_get_assistant(book_name)
+    assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
     # Files to process in the specified order
@@ -126,11 +117,11 @@ def consolidate_book_md(
     # Log start of consolidation and translation status
     if translate:
         console.print(
-            f"Consolidating chapters for [bold]{book_name}[/bold] and translating to [bold]{translate}[/bold]..."
+            f"Consolidating chapters for [bold]{book_path}[/bold] and translating to [bold]{translate}[/bold]..."
         )
     else:
         console.print(
-            f"Consolidating chapters for [bold]{book_name}[/bold] without translation..."
+            f"Consolidating chapters for [bold]{book_path}[/bold] without translation..."
         )
 
     # Create Progress object with two tasks
@@ -166,6 +157,7 @@ def consolidate_book_md(
                             if translate:
                                 progress.reset(task_translation)
                             content = create_message(
+                                book_path,
                                 thread_id=thread.id,
                                 content=content,
                                 assistant=assistant,

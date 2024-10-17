@@ -21,26 +21,26 @@ def iterate():
 
 @iterate.command()
 @click.option(
-    "--book-name", type=click.Path(), help="Path to the book directory", required=False
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )
 @click.argument("prompt", default="Check character names for consistency.")
-def check_names(prompt, book_name=None):
+def check_names(prompt, book_path=None):
     """
     Comando para revisar la consistencia de los nombres de personajes en los capítulos de un libro.
-    Los capítulos se encuentran en 'book_name/chapters'.
+    Los capítulos se encuentran en 'book_path/chapters'.
     """
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
     console.print(
-        f"[bold blue]Iniciando la revisión de consistencia de nombres en los capítulos del libro: {book_name}[/bold blue]"
+        f"[bold blue]Iniciando la revisión de consistencia de nombres en los capítulos del libro: {book_path}[/bold blue]"
     )
 
     # Llamar a la función que revisa los nombres en los capítulos
-    iterate_check_names(book_name)
+    iterate_check_names(book_path)
 
     # Success log
     console.print(f"[green bold]Success![/green bold] Check Names!")
@@ -48,27 +48,27 @@ def check_names(prompt, book_name=None):
 
 @iterate.command()
 @click.option(
-    "--book-name", type=click.Path(), help="Path to the book directory", required=False
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )
 @click.argument("original_name")
 @click.argument("new_name")
-def fix_name(original_name, new_name, book_name=None):
+def fix_name(original_name, new_name, book_path=None):
     """
     Comando para cambiar el nombre de un personaje en todos los capítulos del libro.
     Recibe como parámetros el nombre original y el nuevo nombre.
     """
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
     console.print(
-        f"[bold blue]Iniciando el cambio de nombre: '{original_name}' a '{new_name}' en el libro: {book_name}[/bold blue]"
+        f"[bold blue]Iniciando el cambio de nombre: '{original_name}' a '{new_name}' en el libro: {book_path}[/bold blue]"
     )
 
     # Llamar a la función que realiza el cambio de nombres
-    fix_name_in_chapters(book_name, original_name, new_name)
+    fix_name_in_chapters(book_path, original_name, new_name)
 
     # Success log
     console.print(
@@ -78,27 +78,27 @@ def fix_name(original_name, new_name, book_name=None):
 
 @iterate.command()
 @click.option(
-    "--book-name", type=click.Path(), help="Path to the book directory", required=False
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )
 @click.argument("character_name")
 @click.argument("story_context")
-def refine_motivation(character_name, story_context, book_name=None):
+def refine_motivation(character_name, story_context, book_path=None):
     """
     Command to refine the motivations of a character across all chapters of the book.
     It takes the character's name and the story context as parameters.
     """
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
     console.print(
-        f"[bold blue]Starting motivation refinement for '{character_name}' in the book: {book_name}[/bold blue]"
+        f"[bold blue]Starting motivation refinement for '{character_name}' in the book: {book_path}[/bold blue]"
     )
 
     # Call the function to refine the character's motivations
-    refine_character_motivation(book_name, character_name, story_context)
+    refine_character_motivation(book_path, character_name, story_context)
 
     # Success log
     console.print(
@@ -108,26 +108,26 @@ def refine_motivation(character_name, story_context, book_name=None):
 
 @iterate.command()
 @click.option(
-    "--book-name", type=click.Path(), help="Path to the book directory", required=False
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )
 @click.argument("argument")
-def strengthen_argument(argument, book_name=None):
+def strengthen_argument(argument, book_path=None):
     """
     Command to ensure the core argument of the story is strong and clear across all chapters.
     Takes the argument as a parameter.
     """
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
     console.print(
-        f"[bold blue]Starting to strengthen the core argument: '{argument}' in the book: {book_name}[/bold blue]"
+        f"[bold blue]Starting to strengthen the core argument: '{argument}' in the book: {book_path}[/bold blue]"
     )
 
     # Call the function to strengthen the core argument in the chapters
-    strengthen_core_argument(book_name, argument)
+    strengthen_core_argument(book_path, argument)
 
     # Success log
     console.print(
@@ -137,27 +137,27 @@ def strengthen_argument(argument, book_name=None):
 
 @iterate.command()
 @click.option(
-    "--book-name", type=click.Path(), help="Path to the book directory", required=False
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )
 @click.argument("position", type=int)
 @click.argument("prompt")
-def insert_chapter(position, prompt, book_name=None):
+def insert_chapter(position, prompt, book_path=None):
     """
     Command to insert a new chapter at the specified position, shifting existing chapters and renaming them accordingly.
     Adjusts the content of the chapters before and after the insertion, ensuring the new chapter fits contextually.
     """
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
     console.print(
-        f"[bold blue]Inserting a new chapter at position {position} in the book: {book_name}[/bold blue]"
+        f"[bold blue]Inserting a new chapter at position {position} in the book: {book_path}[/bold blue]"
     )
 
     # Call the function to insert the new chapter and adjust the surrounding chapters
-    insert_new_chapter(book_name, position, prompt)
+    insert_new_chapter(book_path, position, prompt)
 
     # Success log
     console.print(
@@ -166,15 +166,15 @@ def insert_chapter(position, prompt, book_name=None):
 
 
 @iterate.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
 @click.argument("chapter_number", type=int)
-def split_chapter(prompt, chapter_number, book_name):
+def split_chapter(prompt, chapter_number, book_path):
     """Split a chapter and adjust the numbering of subsequent chapters."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
     console.print(
@@ -184,15 +184,15 @@ def split_chapter(prompt, chapter_number, book_name):
 
 
 @iterate.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
 @click.argument("chapter_position", type=int)
-def add_flashback(prompt, chapter_position, book_name):
+def add_flashback(prompt, chapter_position, book_path):
     """Add a flashback scene between two chapters."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
     console.print(
@@ -204,14 +204,14 @@ def add_flashback(prompt, chapter_position, book_name):
 
 
 @iterate.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
-def update_plot_points(prompt, book_name):
+def update_plot_points(prompt, book_path):
     """Refine key plot points across the story."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
     console.print(
@@ -221,14 +221,14 @@ def update_plot_points(prompt, book_name):
 
 
 @iterate.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
-def check_consistency(prompt, book_name):
+def check_consistency(prompt, book_path):
     """Check for consistency across all chapters and elements of the book."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
     # Placeholder for future retrieval-based consistency check

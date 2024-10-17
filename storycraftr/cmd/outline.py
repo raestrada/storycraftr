@@ -19,56 +19,56 @@ def outline():
 
 
 @outline.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
-def general_outline(prompt, book_name=None):
+def general_outline(prompt, book_path=None):
     """Generate the general outline of the book."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
-    generate_general_outline(book_name, prompt)
+    generate_general_outline(book_path, prompt)
 
 
 @outline.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
-def character_summary(prompt, book_name=None):
+def character_summary(prompt, book_path=None):
     """Generate the character summary of the book."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
-    generate_character_summary(book_name, prompt)
+    generate_character_summary(book_path, prompt)
 
 
 @outline.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
-def plot_points(prompt, book_name=None):
+def plot_points(prompt, book_path=None):
     """Generate the main plot points of the book."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
-    generate_plot_points(book_name, prompt)
+    generate_plot_points(book_path, prompt)
 
 
 @outline.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
-def chapter_synopsis(prompt, book_name=None):
+def chapter_synopsis(prompt, book_path=None):
     """Generate the chapter-by-chapter synopsis of the book."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
-    generate_chapter_synopsis(book_name, prompt)
+    generate_chapter_synopsis(book_path, prompt)

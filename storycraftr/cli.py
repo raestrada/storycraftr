@@ -36,56 +36,59 @@ def load_openai_api_key():
 load_openai_api_key()
 
 
-def verify_book_path(book_name=None):
+def verify_book_path(book_path=None):
     """Verify if the book path is valid and contains storycraftr.json."""
-    if not book_name:
-        book_name = (
+    if not book_path:
+        book_path = (
             os.getcwd()
-        )  # Use the current directory if --book-name is not provided
-    storycraftr_file = os.path.join(book_name, "storycraftr.json")
+        )  # Use the current directory if --book-path is not provided
+    storycraftr_file = os.path.join(book_path, "storycraftr.json")
 
     if not os.path.exists(storycraftr_file):
         raise click.ClickException(
-            f"The file storycraftr.json was not found in the path: {book_name}"
+            f"The file storycraftr.json was not found in the path: {book_path}"
         )
 
-    return book_name
+    return book_path
 
 
-def is_initialized(book_name):
+def is_initialized(book_path):
     """Check if the book structure is already initialized."""
-    storycraftr_file = os.path.join(book_name, "storycraftr.json")
+    storycraftr_file = os.path.join(book_path, "storycraftr.json")
     return os.path.exists(storycraftr_file)
 
 
 # Function to show error if project is not initialized
-def project_not_initialized_error(book_name):
+def project_not_initialized_error(book_path):
     console.print(
-        f"[bold red]✖[/bold red] Project '[bold]{book_name}[/bold]' is not initialized. "
-        f"Run '[bold]storycraftr init {book_name}[/bold]' first.",
+        f"[bold red]✖[/bold red] Project '[bold]{book_path}[/bold]' is not initialized. "
+        f"Run '[bold]storycraftr init {book_path}[/bold]' first.",
         style="bold red",
     )
 
 
 def init_structure(
-    book_name,
+    book_path,
     license,
     primary_language,
     alternate_languages,
     default_author,
     genre,
     behavior_content,
+    reference_author,
 ):
     # Show initialization start
-    console.print(f"[bold blue]Initializing book structure: {book_name}[/bold blue]")
+    console.print(f"[bold blue]Initializing book structure: {book_path}[/bold blue]")
+
+    book_name = book_path.split("/")[-1]
 
     # Iterate over the list and create each file, showing progress
     for file in storycraftr.templates.folder.files_to_create:
         # Build the full file path
-        file_path = os.path.join(book_name, file["folder"], file["filename"])
+        file_path = os.path.join(book_path, file["folder"], file["filename"])
 
         # Ensure the directory exists
-        os.makedirs(os.path.join(book_name, file["folder"]), exist_ok=True)
+        os.makedirs(os.path.join(book_path, file["folder"]), exist_ok=True)
 
         # Write the content to the file
         with open(file_path, "w") as f:
@@ -96,15 +99,17 @@ def init_structure(
 
     # Create the storycraftr.json file
     config_data = {
+        "book_path": book_path,
         "book_name": book_name,
         "primary_language": primary_language,
         "alternate_languages": alternate_languages,
         "default_author": default_author,
         "genre": genre,
         "license": license,
+        "reference_author": reference_author,
     }
 
-    config_file = os.path.join(book_name, "storycraftr.json")
+    config_file = os.path.join(book_path, "storycraftr.json")
     with open(config_file, "w") as f:
         json.dump(config_data, f, indent=4)
 
@@ -113,8 +118,8 @@ def init_structure(
         f"[green]Configuration file created:[/green] {config_file}", style="green"
     )
 
-    # Create 'behaviors' folder inside the root book_name directory
-    behaviors_dir = os.path.join(book_name, "behaviors")
+    # Create 'behaviors' folder inside the root book_path directory
+    behaviors_dir = os.path.join(book_path, "behaviors")
     os.makedirs(behaviors_dir, exist_ok=True)
 
     # Create the default.txt file inside the 'behaviors' folder with the behavior content
@@ -129,12 +134,12 @@ def init_structure(
 
     # Confirm completion
     console.print(
-        f"[bold green]✔[/bold green] Project '[bold]{book_name}[/bold]' initialized successfully.",
+        f"[bold green]✔[/bold green] Project '[bold]{book_path}[/bold]' initialized successfully.",
         style="bold green",
     )
 
-    # Ruta donde se creará la nueva carpeta de book_name/templates/
-    new_template_dir = os.path.join(book_name, "templates")
+    # Ruta donde se creará la nueva carpeta de book_path/templates/
+    new_template_dir = os.path.join(book_path, "templates")
 
     # Log: Creación de la carpeta
     console.log(f"Creando el directorio: {new_template_dir}", style="bold blue")
@@ -146,18 +151,14 @@ def init_structure(
     new_template_path = os.path.join(new_template_dir, "template.tex")
 
     # Log: Escribiendo el archivo
-    console.log(
-        f"Escribiendo el archivo LaTeX en: {new_template_path}", style="bold green"
-    )
+    console.log(f"Writing LaTex file: {new_template_path}", style="bold green")
 
     # Escribir el contenido del template en el archivo
     with open(new_template_path, "w") as f:
         f.write(TEMPLATE_TEX)
 
     # Log: Proceso completado
-    console.log(
-        f"Template copiado exitosamente a: {new_template_path}", style="bold magenta"
-    )
+    console.log(f"LaTex template copied: {new_template_path}", style="bold magenta")
 
 
 @click.group()
@@ -167,7 +168,7 @@ def cli():
 
 
 @click.command()
-@click.argument("book_name")
+@click.argument("book_path")
 @click.option(
     "--license",
     default="CC BY-NC-SA",
@@ -190,11 +191,22 @@ def cli():
 @click.option(
     "--behavior", help="Behavior content, either as a string or a path to a file."
 )
+@click.option(
+    "--reference-author",
+    help="Behavior content, either as a string or a path to a file.",
+)
 def init(
-    book_name, license, primary_language, alternate_languages, author, genre, behavior
+    book_path,
+    license,
+    primary_language,
+    alternate_languages,
+    author,
+    genre,
+    behavior,
+    reference_author="(None: use all your knwoledge to assume writing style )",
 ):
     """Initialize the book structure with relevant configuration and behavior content."""
-    if not is_initialized(book_name):
+    if not is_initialized(book_path):
         alternate_languages_list = (
             [lang.strip() for lang in alternate_languages.split(",")]
             if alternate_languages
@@ -211,17 +223,18 @@ def init(
             )
 
         init_structure(
-            book_name,
+            book_path,
             license,
             primary_language,
             alternate_languages_list,
             author,
             genre,
             behavior_content,
+            reference_author,
         )
     else:
         console.print(
-            f"[bold yellow]⚠[/bold yellow] Project '[bold]{book_name}[/bold]' is already initialized.",
+            f"[bold yellow]⚠[/bold yellow] Project '[bold]{book_path}[/bold]' is already initialized.",
             style="yellow",
         )
 

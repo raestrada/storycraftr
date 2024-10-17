@@ -64,7 +64,7 @@ def test_generate_cover(
     # Mocks
     mock_load_book_config.return_value = MagicMock(
         primary_language="en",
-        book_name="My Book",
+        book_path="My Book",
         default_author="Author Name",
         genre="Science Fiction",
         alternate_languages=["es"],

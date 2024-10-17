@@ -8,33 +8,37 @@ console = Console()
 
 # Define the structure for the book using NamedTuple
 class BookConfig(NamedTuple):
+    book_path: str
     book_name: str
     primary_language: str
     alternate_languages: list
     default_author: str
     genre: str
     license: str
+    reference_author: str
 
 
 # Function to load the JSON file and convert it into a BookConfig object
-def load_book_config(book_name):
+def load_book_config(book_path):
     try:
         with open(
-            os.path.join(book_name, "storycraftr.json"), "r", encoding="utf-8"
+            os.path.join(book_path, "storycraftr.json"), "r", encoding="utf-8"
         ) as file:
             data = json.load(file)
             # Create an instance of BookConfig with the values from the JSON
             book_config = BookConfig(
+                book_path=data["book_path"],
                 book_name=data["book_name"],
                 primary_language=data["primary_language"],
                 alternate_languages=data["alternate_languages"],
                 default_author=data["default_author"],
                 genre=data["genre"],
                 license=data["license"],
+                reference_author=data["reference_author"],
             )
     except FileNotFoundError or NotADirectoryError:
         console.print(
-            f"[bold red]⚠[/bold red] Folder '[bold]{book_name}[/bold]' is not a storycraftr project.",
+            f"[bold red]⚠[/bold red] Folder '[bold]{book_path}[/bold]' is not a storycraftr project.",
             style="red",
         )
         return None

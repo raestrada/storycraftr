@@ -179,7 +179,7 @@ To start chatting with your assistant, make sure your book project is initialize
 storycraftr chat
 ```
 
-Replace `"book_name"` with the actual name of your book. This will open an interactive session where you can type messages to your AI assistant. The responses will be formatted in Markdown, making it easy to read any formatted text, lists, or other structures returned by the assistant.
+Replace `"book_path"` with the actual name of your book. This will open an interactive session where you can type messages to your AI assistant. The responses will be formatted in Markdown, making it easy to read any formatted text, lists, or other structures returned by the assistant.
 
 ### Example Chat Session
 

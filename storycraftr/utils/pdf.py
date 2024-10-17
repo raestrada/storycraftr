@@ -24,7 +24,7 @@ def check_tool_installed(tool_name: str) -> bool:
         return False
 
 
-def to_pdf(book_name: str, primary_language: str, translate: str = None) -> str:
+def to_pdf(book_path: str, primary_language: str, translate: str = None) -> str:
     # Check if pandoc is installed
     if not check_tool_installed("pandoc"):
         console.print(
@@ -40,11 +40,11 @@ def to_pdf(book_name: str, primary_language: str, translate: str = None) -> str:
         raise SystemExit(1)
 
     # Log the start of the process
-    console.print(f"Starting PDF conversion for book: [bold]{book_name}[/bold]")
+    console.print(f"Starting PDF conversion for book: [bold]{book_path}[/bold]")
 
     # Get the path of the consolidated markdown
     console.print("Consolidating chapters into a single markdown file...")
-    consolidated_md_path = consolidate_book_md(book_name, primary_language, translate)
+    consolidated_md_path = consolidate_book_md(book_path, primary_language, translate)
 
     # Read the consolidated markdown content
     with open(consolidated_md_path, "r", encoding="utf-8") as f:
@@ -59,7 +59,7 @@ def to_pdf(book_name: str, primary_language: str, translate: str = None) -> str:
     console.print(f"Markdown consolidated at [bold]{consolidated_md_path}[/bold]")
 
     # Path to the LaTeX template
-    template_path = os.path.join(book_name, "templates", "template.tex")
+    template_path = os.path.join(book_path, "templates", "template.tex")
 
     if not os.path.exists(template_path):
         console.print(

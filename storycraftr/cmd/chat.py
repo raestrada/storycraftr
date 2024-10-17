@@ -8,19 +8,19 @@ console = Console()
 
 
 @click.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
-def chat(book_name=None):
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
+def chat(book_path=None):
     """
     Start a chat session with the assistant for the given book name.
     """
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
     console.print(
-        f"Starting chat for [bold]{book_name}[/bold]. Type [bold green]exit()[/bold green] to quit."
+        f"Starting chat for [bold]{book_path}[/bold]. Type [bold green]exit()[/bold green] to quit."
     )
 
     # Create or get the assistant and thread
-    assistant = create_or_get_assistant(book_name)
+    assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
     while True:
@@ -37,7 +37,7 @@ def chat(book_name=None):
         # Send message to assistant
         try:
             response = create_message(
-                thread_id=thread.id, content=user_input, assistant=assistant
+                book_path, thread_id=thread.id, content=user_input, assistant=assistant
             )
         except Exception as e:
             console.print(f"[bold red]Error: {str(e)}[/bold red]")

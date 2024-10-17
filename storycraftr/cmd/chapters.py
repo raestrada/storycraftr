@@ -21,55 +21,55 @@ def chapters():
 @chapters.command()
 @click.argument("chapter_number", type=int)
 @click.argument("prompt")
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
-def chapter(chapter_number, prompt, book_name=None):
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
+def chapter(chapter_number, prompt, book_path=None):
     """Generate a new chapter for the book."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
-    generate_chapter(book_name, chapter_number, prompt)
+    generate_chapter(book_path, chapter_number, prompt)
 
 
 @chapters.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
-def cover(prompt, book_name=None):
+def cover(prompt, book_path=None):
     """Generate the cover of the book."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
-    generate_cover(book_name, prompt)
+    generate_cover(book_path, prompt)
 
 
 @chapters.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
-def back_cover(prompt, book_name=None):
+def back_cover(prompt, book_path=None):
     """Generate the back cover of the book."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
-    generate_back_cover(book_name, prompt)
+    generate_back_cover(book_path, prompt)
 
 
 @chapters.command()
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
-def epilogue(prompt, book_name=None):
+def epilogue(prompt, book_path=None):
     """Generate the epilogue of the book."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         return None
 
-    generate_epilogue(book_name, prompt)
+    generate_epilogue(book_path, prompt)

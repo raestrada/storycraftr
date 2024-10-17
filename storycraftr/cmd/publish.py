@@ -22,15 +22,15 @@ def publish():
     default=None,
     help="Translate the book to this language before publishing",
 )
-@click.option("--book-name", type=click.Path(), help="Path to the book directory")
-def pdf(primary_language, translate=None, book_name=None):
+@click.option("--book-path", type=click.Path(), help="Path to the book directory")
+def pdf(primary_language, translate=None, book_path=None):
     """Publish the book as a PDF."""
-    if not book_name:
-        book_name = os.getcwd()
+    if not book_path:
+        book_path = os.getcwd()
 
-    if not load_book_config(book_name):
+    if not load_book_config(book_path):
         console.print(
-            f"[red bold]Error:[/red bold] Book configuration not found in {book_name}."
+            f"[red bold]Error:[/red bold] Book configuration not found in {book_path}."
         )
         return None
 
@@ -39,7 +39,7 @@ def pdf(primary_language, translate=None, book_name=None):
         f"Generating PDF for the book in [bold]{primary_language}[/bold] language..."
     )
 
-    output_pdf_path = to_pdf(book_name, primary_language, translate)
+    output_pdf_path = to_pdf(book_path, primary_language, translate)
 
     # Success log
     console.print(
