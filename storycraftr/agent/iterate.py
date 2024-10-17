@@ -118,13 +118,6 @@ def iterate_check_names(book_name):
     return corrections
 
 
-import os
-from rich.progress import Progress
-from storycraftr.prompts.iterate import FIX_NAME_PROMPT
-from storycraftr.agent.agents import create_message, get_thread, create_or_get_assistant
-from storycraftr.utils.markdown import save_to_markdown
-
-
 def fix_name_in_chapters(book_name, original_name, new_name):
     """
     Function to update character names across all chapters in a book.
@@ -359,11 +352,13 @@ def insert_new_chapter(book_name, position, prompt):
         task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
 
         # Adjust the names of the chapters from the insert point onwards
-        for i in range(position, len(files_to_process)):
+        i = len(files_to_process) - 1
+        while i >= position:
             old_chapter_path = os.path.join(chapters_dir, files_to_process[i])
             new_chapter_path = os.path.join(chapters_dir, f"chapter-{i + 2}.md")
             os.rename(old_chapter_path, new_chapter_path)
             progress.update(task_chapters, advance=1)
+            i -= 1
 
         # Get or create the assistant and thread
         assistant = create_or_get_assistant(book_name)
