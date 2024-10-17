@@ -417,7 +417,6 @@ def insert_new_chapter(book_name, position, prompt):
             progress.reset(task_openai)
             rewrite_chapters(
                 book_name,
-                assistant,
                 prev_chapter_path,
                 prev_chapter,
                 position,
@@ -430,7 +429,6 @@ def insert_new_chapter(book_name, position, prompt):
             progress.reset(task_openai)
             rewrite_chapters(
                 book_name,
-                assistant,
                 next_chapter_path,
                 next_chapter,
                 position,
@@ -440,14 +438,13 @@ def insert_new_chapter(book_name, position, prompt):
             )
 
 
-def rewrite_chapters(
-    book_name, assistant, path, num, position, prompt, progress, task_chapters
-):
+def rewrite_chapters(book_name, path, num, position, prompt, progress, task_chapters):
     """
     Function to rewrite the chapters before and after the inserted chapter to ensure consistency with the new chapter.
     Utilizes the retrieval system to access the full context of the book without loading chapter contents directly.
     """
     # Get the assistant and thread
+    assistant = create_or_get_assistant(book_name)
     thread = get_thread()
 
     # Rewrite chapters using retrieval context
