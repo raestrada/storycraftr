@@ -32,14 +32,16 @@ Return the revised markdown without adding any explanations, notes, or comments.
 """
 
 INSERT_CHAPTER_PROMPT = """
-Insert a new chapter at position {position} in the book.
+Insert a new chapter at position {position} in the book. When a new chapter is inserted at position {position}, 
+all subsequent chapters will be renumbered accordingly. 
+For example, if a new chapter is inserted at position 3, the current chapter 3 will become chapter 4, chapter 4 will become chapter 5, and so on.
 Use the retrieval system to access the chapters before and after this position, ensuring that the new chapter fits seamlessly with the narrative, themes, and character arcs.
 Use this prompt for context: {prompt}.
 Return the new chapter in markdown format, ready for inclusion in the book without adding any explanations, notes, or comments.
 """
 
 REWRITE_SURROUNDING_CHAPTERS_PROMPT = """
-Rewrite the chapters {chapter}, ensuring that they fit seamlessly with the newly inserted chapter {position}.
+Write the chapters {chapter}, ensuring that they fit seamlessly with the previous and next chapter.
 Utilize the retrieval system to gather context from the full book, making sure the tone, style, and character arcs remain consistent.
 Use this prompt for context: {prompt}.
 Return the rewritten chapters in markdown format, without adding any explanations, notes, or comments.
