@@ -3,6 +3,7 @@ title: StoryCraftr Documentation
 description: Documentation for StoryCraftr - Your AI-powered Book Creation Assistant
 baseurl: "" # Para GitHub Pages, si tu sitio está en la raíz del repositorio
 url: "https://storycraftr.app" # Tu dominio
+remote_theme: just-the-docs/just-the-docs  # Tema remoto Just the Docs
 
 # Configuración de Markdown y conversión
 markdown: kramdown
