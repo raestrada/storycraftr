@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message
 from rich.console import Console
