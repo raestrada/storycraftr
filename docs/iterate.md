@@ -45,7 +45,7 @@ storycraftr iterate strengthen-argument "Ensure the argument of rebellion agains
 Sometimes, you may need to insert a chapter between two existing ones. This command will **insert a new chapter** and automatically **adjust the numbering** of all subsequent chapters.
 
 ```bash
-storycraftr iterate insert-chapter "Insert a new chapter between chapters 3 and 4." 3
+storycraftr iterate insert-chapter 5 "just extend the idea in 3 chapters instead of 2"
 ```
 
 ### 5. Split a Chapter

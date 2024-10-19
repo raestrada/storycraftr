@@ -4,7 +4,9 @@ import hashlib
 import json
 from typing import NamedTuple
 from rich.console import Console
+from rich.markdown import Markdown  # Importar soporte de Markdown de Rich
 from storycraftr.prompts.permute import longer_date_formats
+from storycraftr.state import debug_state  # Importar el estado de debug
 
 console = Console()
 
@@ -19,6 +21,12 @@ def generate_prompt_with_hash(original_prompt, date):
 
     # Combina la frase seleccionada, un salto de línea, el hash y el prompt original
     modified_prompt = f"{random_phrase}\n\n{hash_hex[:10]}: {original_prompt}"  # Usa los primeros 10 caracteres del hash
+
+    # Si el modo debug está activado, imprime el prompt modificado en formato Markdown
+    if debug_state.is_debug():
+        console.print(
+            Markdown(modified_prompt)
+        )  # Usa Rich para imprimir en formato Markdown
 
     return modified_prompt
 

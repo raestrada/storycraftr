@@ -3,6 +3,7 @@ import os
 import json
 from rich.console import Console
 import storycraftr.templates.folder
+from storycraftr.state import debug_state
 from storycraftr.cmd.worldbuilding import worldbuilding
 from storycraftr.cmd.outline import outline
 from storycraftr.cmd.chapters import chapters
@@ -162,9 +163,12 @@ def init_structure(
 
 
 @click.group()
-def cli():
+@click.option("--debug", is_flag=True, help="Enable debug mode")
+def cli(debug):
     """StoryCraftr CLI - A tool to help you write books using OpenAI."""
-    pass
+    debug_state.set_debug(debug)  # Configura el estado de debug
+    if debug:
+        click.echo("Debug mode is ON")
 
 
 @click.command()
