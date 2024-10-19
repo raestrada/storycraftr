@@ -181,23 +181,25 @@
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .chat-banner p {
-            margin: 0;
+        .chat-banner {
+            position: relative; /* Necesario para que el botón se posicione en relación a este contenedor */
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
         }
 
         .chat-close {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: white;
-            color: #4A90E2;
+            position: absolute; /* Permite mover el botón dentro del contenedor */
+            top: 10px; /* Ajusta según necesites */
+            right: 10px; /* Ajusta según necesites */
+            background: none;
             border: none;
-            font-size: 1.5em;
+            font-size: 24px;
             cursor: pointer;
-            padding: 0 10px;
-            border-radius: 50%;
-            line-height: 1;
+        }
+
+        .chat-close:hover {
+            color: red; /* Estilo opcional al pasar el mouse */
         }
     </style>
 </head>
@@ -264,9 +266,9 @@
     </section>
     <section>
         <div class="chat-banner">
+            <button class="chat-close" onclick="document.querySelector('.chat-banner').style.display='none';">&times;</button>
             <h2> 
                 💬 Introducing Chat!!! – A Simple Yet Powerful Tool to Supercharge Your Conversations! 💥
-                <button class="chat-close" onclick="document.querySelector('.chat-banner').style.display='none';">&times;</button>
             </h2>
             <p>
                 Whether you're brainstorming ideas, refining your story, or just need a little creative spark, Chat!!! is here to help. 
