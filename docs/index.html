@@ -167,6 +167,38 @@
         .openai-logo a:hover {
             color: #4A90E2;
         }
+
+        chat-banner {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #4A90E2;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 1.2em;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-banner p {
+            margin: 0;
+        }
+
+        .chat-close {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: white;
+            color: #4A90E2;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0 10px;
+            border-radius: 50%;
+            line-height: 1;
+        }
     </style>
 </head>
 <body>
@@ -230,7 +262,22 @@
 
         <a href="https://github.com/raestrada/storycraftr" class="button">Explore the Code on GitHub</a>
     </section>
+    <section>
+        <div class="chat-banner">
+            <p>
+                💬 Introducing Chat!!! – A Simple Yet Powerful Tool to Supercharge Your Conversations! 💥
+                <button class="chat-close" onclick="document.querySelector('.chat-banner').style.display='none';">&times;</button>
+            </p>
+            <p>
+                Whether you're brainstorming ideas, refining your story, or just need a little creative spark, Chat!!! is here to help. 
+                It's a straightforward, easy-to-use feature that lets you dive deep into meaningful discussions, 
+                unlock new insights, and get your thoughts flowing effortlessly.
 
+                🚀 Sometimes, all you need is a little chat to get the gears turning! Try it out and watch your creativity soar!
+            </p>
+            <img src="https://res.cloudinary.com/dyknhuvxt/image/upload/v1729089264/chat_idxfgi.png">
+        </div>
+    </section>
     <section>
         <h2>Join Our Community 🚀</h2>
         <p>
