@@ -1,21 +1,25 @@
 import os
+import secrets  # Para generar números aleatorios seguros
 import hashlib
 import json
 from typing import NamedTuple
 from rich.console import Console
+from storycraftr.prompts.permute import longer_date_formats
 
 console = Console()
 
 
-def generate_prompt_with_hash(original_prompt):
+def generate_prompt_with_hash(original_prompt, date):
     # Genera un hash basado en el contenido del prompt
     hash_object = hashlib.sha256(original_prompt.encode())
     hash_hex = hash_object.hexdigest()
 
-    # Combina el hash con el prompt original (puedes limitar el hash a los primeros caracteres si prefieres)
-    modified_prompt = (
-        f"{hash_hex}: {original_prompt}"  # Usa los primeros 10 caracteres del hash
-    )
+    # Selecciona una frase aleatoria de la lista usando secrets.choice para mayor seguridad
+    random_phrase = secrets.choice(longer_date_formats).format(date=date)
+
+    # Combina la frase seleccionada, un salto de línea, el hash y el prompt original
+    modified_prompt = f"{random_phrase}\n\n{hash_hex[:10]}: {original_prompt}"  # Usa los primeros 10 caracteres del hash
+
     return modified_prompt
 
 

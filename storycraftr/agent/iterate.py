@@ -8,6 +8,8 @@ from storycraftr.prompts.iterate import (
     STRENGTHEN_ARGUMENT_PROMPT,
     INSERT_CHAPTER_PROMPT,
     REWRITE_SURROUNDING_CHAPTERS_PROMPT,
+    INSERT_FLASHBACK_CHAPTER_PROMPT,
+    REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT,
 )
 from storycraftr.agent.agents import (
     update_agent_files,
@@ -321,7 +323,7 @@ def strengthen_core_argument(book_path, argument):
     return
 
 
-def insert_new_chapter(book_path, position, prompt):
+def insert_new_chapter(book_path, position, prompt, flashback=False):
     """
     Function to insert a new chapter at the specified position, renaming chapters and adjusting content accordingly.
     """
@@ -368,8 +370,10 @@ def insert_new_chapter(book_path, position, prompt):
         assistant = create_or_get_assistant(book_path)
         thread = get_thread()
 
+        prompt = INSERT_FLASHBACK_CHAPTER_PROMPT if flashback else INSERT_CHAPTER_PROMPT
+
         # Generate new chapter content using context
-        prompt_text = INSERT_CHAPTER_PROMPT.format(prompt=prompt, position=position)
+        prompt_text = prompt.format(prompt=prompt, position=position)
         new_chapter_text = create_message(
             book_path,
             thread_id=thread.id,
@@ -423,6 +427,7 @@ def insert_new_chapter(book_path, position, prompt):
                 prompt,
                 progress,
                 task_openai,
+                flashback,
             )
 
         if next_chapter:
@@ -435,10 +440,13 @@ def insert_new_chapter(book_path, position, prompt):
                 prompt,
                 progress,
                 task_openai,
+                flashback,
             )
 
 
-def rewrite_chapters(book_path, path, num, position, prompt, progress, task_chapters):
+def rewrite_chapters(
+    book_path, path, num, position, prompt, progress, task_chapters, flashback=False
+):
     """
     Function to rewrite the chapters before and after the inserted chapter to ensure consistency with the new chapter.
     Utilizes the retrieval system to access the full context of the book without loading chapter contents directly.
@@ -447,10 +455,14 @@ def rewrite_chapters(book_path, path, num, position, prompt, progress, task_chap
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    # Rewrite chapters using retrieval context
-    rewrite_prompt = REWRITE_SURROUNDING_CHAPTERS_PROMPT.format(
-        prompt=prompt, position=position, chapter=num
+    prompt = (
+        REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT
+        if flashback
+        else REWRITE_SURROUNDING_CHAPTERS_PROMPT
     )
+
+    # Rewrite chapters using retrieval context
+    rewrite_prompt = prompt.format(prompt=prompt, position=position, chapter=num)
 
     updated_chapters = create_message(
         book_path,

@@ -166,6 +166,33 @@ def insert_chapter(position, prompt, book_path=None):
 
 
 @iterate.command()
+@click.option(
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+)
+@click.argument("position", type=int)
+@click.argument("prompt")
+def add_flashback(position, prompt, book_path=None):
+    """Add a flashback scene between two chapters."""
+    if not book_path:
+        book_path = os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    console.print(
+        f"[bold blue]Inserting a new flashback chapter at position {position} in the book: {book_path}[/bold blue]"
+    )
+
+    # Call the function to insert the new chapter and adjust the surrounding chapters
+    insert_new_chapter(book_path, position, prompt, flashback=True)
+
+    # Success log
+    console.print(
+        f"[green bold] Flashback Chapter insertion completed at position {position}, and chapters renumbered accordingly![/green bold]"
+    )
+
+
+@iterate.command()
 @click.option("--book-path", type=click.Path(), help="Path to the book directory")
 @click.argument("prompt")
 @click.argument("chapter_number", type=int)
@@ -181,26 +208,6 @@ def split_chapter(prompt, chapter_number, book_path):
         f"[yellow]The command 'split-chapter' is not yet implemented.[/yellow]"
     )
     console.print(f"Prompt: {prompt}, Split chapter: {chapter_number}")
-
-
-@iterate.command()
-@click.option("--book-path", type=click.Path(), help="Path to the book directory")
-@click.argument("prompt")
-@click.argument("chapter_position", type=int)
-def add_flashback(prompt, chapter_position, book_path):
-    """Add a flashback scene between two chapters."""
-    if not book_path:
-        book_path = os.getcwd()
-
-    if not load_book_config(book_path):
-        return None
-
-    console.print(
-        f"[yellow]The command 'add-flashback' is not yet implemented.[/yellow]"
-    )
-    console.print(
-        f"Prompt: {prompt}, Flashback between chapters: {chapter_position} and {chapter_position + 1}"
-    )
 
 
 @iterate.command()
