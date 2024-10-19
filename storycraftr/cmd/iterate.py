@@ -8,6 +8,7 @@ from storycraftr.agent.iterate import (
     refine_character_motivation,
     strengthen_core_argument,
     insert_new_chapter,
+    check_consistency_across,
 )
 
 console = Console()
@@ -228,22 +229,32 @@ def update_plot_points(prompt, book_path):
 
 
 @iterate.command()
-@click.option("--book-path", type=click.Path(), help="Path to the book directory")
+@click.option(
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+)
 @click.argument("prompt")
 def check_consistency(prompt, book_path):
-    """Check for consistency across all chapters and elements of the book."""
+    """
+    Command to check the overall consistency of chapters in the book.
+    Takes an optional custom prompt as an argument.
+    """
     if not book_path:
         book_path = os.getcwd()
 
     if not load_book_config(book_path):
         return None
 
-    # Placeholder for future retrieval-based consistency check
     console.print(
-        f"[yellow]The command 'check-consistency' is not yet implemented.[/yellow]"
+        f"[bold blue]Starting to check overall consistency in the book: {book_path}[/bold blue]"
     )
-    console.print(f"Prompt: {prompt}")
-    # Future implementation would involve checking character arcs, plot points, worldbuilding, etc., using retrieval.
+
+    # Call the function to check the consistency across chapters
+    check_consistency_across(book_path, prompt)
+
+    # Success log
+    console.print(
+        f"[green bold]Overall consistency check completed across all chapters![/green bold]"
+    )
 
 
 if __name__ == "__main__":

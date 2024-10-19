@@ -58,3 +58,10 @@ The flashback should feel integral to the story, adding depth without disrupting
 Generate content only for the requested chapter, without altering or including content from other chapters.
 Use this prompt for context: {prompt}.
 """
+
+CHECK_CHAPTER_CONSISTENCY_PROMPT = """
+Check the consistency of chapter with the entire book, ensuring that the events, tone, and character developments align with the overall narrative.
+Use the retrieval system to access all relevant information from the entire book to maintain coherence in plot, character arcs, and themes.
+Execute this check chapter by chapter, making sure each chapter fits seamlessly into the full story, and that there are no inconsistencies with the previous and subsequent chapters.
+Ensure that the writing style and tone remain consistent throughout.
+"""

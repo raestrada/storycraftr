@@ -21,7 +21,7 @@ storycraftr iterate check-names "Check character names for consistency."
 To update or fix a character name across the entire book:
 
 ```bash
-storycraftr iterate fix-name Santi Santiago
+storycraftr iterate fix-name Zevid Rhaedin
 ```
 
 ### 2. Refine Character Motivation
@@ -29,7 +29,7 @@ storycraftr iterate fix-name Santi Santiago
 Characters need strong motivations, and sometimes these evolve as you write. This command will **refine character motivations** throughout the book, ensuring consistency and depth.
 
 ```bash
-storycraftr iterate refine-motivation "Refine the motivations of 'Elena' in a story about rebellion against gods."
+storycraftr iterate refine-motivation "Rahedin ""Refine its motivations in a story about rebellion against gods."
 ```
 
 ### 3. Strengthen Story Argument
@@ -45,7 +45,7 @@ storycraftr iterate strengthen-argument "Ensure the argument of rebellion agains
 Sometimes, you may need to insert a chapter between two existing ones. This command will **insert a new chapter** and automatically **adjust the numbering** of all subsequent chapters.
 
 ```bash
-storycraftr iterate insert-chapter 5 "just extend the idea in 3 chapters instead of 2"
+storycraftr iterate insert-chapter 2 "Insert a new chapter that explores a critical event from the protagonist’s past, shedding light on their true intentions and setting the stage for the conflict in chapter 1."
 ```
 
 ### 5. Split a Chapter
@@ -53,7 +53,7 @@ storycraftr iterate insert-chapter 5 "just extend the idea in 3 chapters instead
 If a chapter becomes too long or covers too many topics, you can **split it into two separate chapters**. This command will split the specified chapter and adjust the numbering of all subsequent chapters.
 
 ```bash
-storycraftr iterate split-chapter "Split chapter 5 into two chapters." 5
+storycraftr 5 iterate split-chapter "Split chapter 5 into two chapters."
 ```
 
 ### 6. Add Flashbacks
@@ -61,7 +61,7 @@ storycraftr iterate split-chapter "Split chapter 5 into two chapters." 5
 Flashbacks are a great way to add depth to a character’s backstory. This command lets you **add a flashback scene** between two chapters, ensuring it integrates seamlessly with the surrounding narrative.
 
 ```bash
-storycraftr iterate add-flashback "Add a flashback between chapters 6 and 7." 6
+storycraftr iterate add-flashback 3 "Insert a flashback revealing a hidden alliance the protagonist formed years ago, explaining a key turning point in the current events."
 ```
 
 ### 7. Update Plot Points

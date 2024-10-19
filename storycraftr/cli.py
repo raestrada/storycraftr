@@ -2,16 +2,6 @@ import click
 import os
 import json
 from rich.console import Console
-import storycraftr.templates.folder
-from storycraftr.state import debug_state
-from storycraftr.cmd.worldbuilding import worldbuilding
-from storycraftr.cmd.outline import outline
-from storycraftr.cmd.chapters import chapters
-from storycraftr.cmd.iterate import iterate
-from storycraftr.cmd.publish import publish
-from storycraftr.cmd.chat import chat
-from storycraftr.templates.tex import TEMPLATE_TEX
-
 
 console = Console()
 
@@ -33,8 +23,17 @@ def load_openai_api_key():
         console.print(f"[red]The file {api_key_file} does not exist.[/red]")
 
 
-# Run the function
 load_openai_api_key()
+
+import storycraftr.templates.folder
+from storycraftr.state import debug_state
+from storycraftr.cmd.worldbuilding import worldbuilding
+from storycraftr.cmd.outline import outline
+from storycraftr.cmd.chapters import chapters
+from storycraftr.cmd.iterate import iterate
+from storycraftr.cmd.publish import publish
+from storycraftr.cmd.chat import chat
+from storycraftr.templates.tex import TEMPLATE_TEX
 
 
 def verify_book_path(book_path=None):
@@ -254,4 +253,5 @@ cli.add_command(publish)
 cli.add_command(chat)
 
 if __name__ == "__main__":
+    # Run the function
     cli()

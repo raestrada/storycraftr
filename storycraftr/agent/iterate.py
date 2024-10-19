@@ -10,6 +10,7 @@ from storycraftr.prompts.iterate import (
     REWRITE_SURROUNDING_CHAPTERS_PROMPT,
     INSERT_FLASHBACK_CHAPTER_PROMPT,
     REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT,
+    CHECK_CHAPTER_CONSISTENCY_PROMPT,
 )
 from storycraftr.agent.agents import (
     update_agent_files,
@@ -22,7 +23,9 @@ from storycraftr.utils.markdown import save_to_markdown
 console = Console()
 
 
-def check_character_names_consistency(book_path, chapter_path, progress, task_id):
+def check_character_names_consistency(
+    book_path, chapter_path, progress, task_id, assistant
+):
     """
     Checks for character name consistency in a chapter file.
     Uses an OpenAI assistant to perform the review.
@@ -32,7 +35,6 @@ def check_character_names_consistency(book_path, chapter_path, progress, task_id
     prompt = CHECK_NAMES_PROMPT
 
     # Get or create the assistant and the thread
-    assistant = create_or_get_assistant(book_path, progress, task_id)
     thread = get_thread()
 
     # Create the message with the thread_id and assistant
@@ -84,6 +86,7 @@ def iterate_check_names(book_path):
         return corrections
 
     # Create a rich progress bar
+    assistant = create_or_get_assistant(book_path)
     with Progress() as progress:
         # Task to process chapters
         task_chapters = progress.add_task(
@@ -100,7 +103,7 @@ def iterate_check_names(book_path):
 
             # Call the function to check name consistency in the chapter
             corrections[chapter_file] = check_character_names_consistency(
-                book_path, chapter_path, progress, task_openai
+                book_path, chapter_path, progress, task_openai, assistant=assistant
             )
 
             # Save to markdown
@@ -188,9 +191,11 @@ def fix_name_in_chapters(book_path, original_name, new_name):
     return
 
 
-def refine_character_motivation(book_path, character_name, story_context):
+def process_chapters(
+    book_path, prompt_template, task_description, file_suffix, **prompt_kwargs
+):
     """
-    Function to refine character motivations across all chapters in a book.
+    Generic function to process chapters in a book with a given prompt template.
     """
     chapters_dir = os.path.join(book_path, "chapters")
 
@@ -209,25 +214,20 @@ def refine_character_motivation(book_path, character_name, story_context):
     # Create progress bar
     with Progress() as progress:
         task_chapters = progress.add_task(
-            "[cyan]Refining character motivations...", total=len(files_to_process)
+            f"[cyan]{task_description}", total=len(files_to_process)
         )
-        # Task for calling OpenAI for each chapter
         task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
 
-        # Iterate over each chapter file
         for chapter_file in files_to_process:
             chapter_path = os.path.join(chapters_dir, chapter_file)
 
-            # Create the prompt using the defined format
-            prompt = REFINE_MOTIVATION_PROMPT.format(
-                character_name=character_name, story_context=story_context
-            )
+            # Create the prompt using the provided template and kwargs
+            prompt = prompt_template.format(**prompt_kwargs)
 
             # Get the assistant and thread
             assistant = create_or_get_assistant(book_path)
             thread = get_thread()
 
-            # Send the message to refine the character's motivations
             progress.reset(task_openai)
             refined_text = create_message(
                 book_path,
@@ -243,84 +243,56 @@ def refine_character_motivation(book_path, character_name, story_context):
             save_to_markdown(
                 book_path,
                 os.path.join("chapters", chapter_file),
-                "Character Motivation Refinement",
+                file_suffix,
                 refined_text,
                 progress=progress,
                 task=task_chapters,
             )
 
-            # Advance the progress bar
             progress.update(task_chapters, advance=1)
 
     update_agent_files(book_path, assistant)
     return
+
+
+def refine_character_motivation(book_path, character_name, story_context):
+    """
+    Function to refine character motivations across all chapters in a book.
+    """
+    process_chapters(
+        book_path,
+        prompt_template=REFINE_MOTIVATION_PROMPT,
+        task_description="Refining character motivations...",
+        file_suffix="Character Motivation Refinement",
+        character_name=character_name,
+        story_context=story_context,
+    )
 
 
 def strengthen_core_argument(book_path, argument):
     """
     Function to strengthen the core argument across all chapters in a book.
     """
-    chapters_dir = os.path.join(book_path, "chapters")
+    process_chapters(
+        book_path,
+        prompt_template=STRENGTHEN_ARGUMENT_PROMPT,
+        task_description="Strengthening core argument across chapters...",
+        file_suffix="Core Argument Strengthening",
+        argument=argument,
+    )
 
-    if not os.path.exists(chapters_dir):
-        raise FileNotFoundError(
-            f"The chapter directory '{chapters_dir}' does not exist."
-        )
 
-    files_to_process = [f for f in os.listdir(chapters_dir) if f.endswith(".md")]
-
-    if not files_to_process:
-        raise FileNotFoundError(
-            "No Markdown (.md) files were found in the chapter directory."
-        )
-
-    # Create progress bar
-    with Progress() as progress:
-        task_chapters = progress.add_task(
-            "[cyan]Strengthening core argument across chapters...",
-            total=len(files_to_process),
-        )
-        # Task for calling OpenAI for each chapter
-        task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
-
-        # Iterate over each chapter file
-        for chapter_file in files_to_process:
-            chapter_path = os.path.join(chapters_dir, chapter_file)
-
-            # Create the prompt using the defined format
-            prompt = STRENGTHEN_ARGUMENT_PROMPT.format(argument=argument)
-
-            # Get the assistant and thread
-            assistant = create_or_get_assistant(book_path)
-            thread = get_thread()
-
-            progress.reset(task_openai)
-            # Send the message to refine the argument in the chapter
-            refined_text = create_message(
-                book_path,
-                thread_id=thread.id,
-                content=prompt,
-                assistant=assistant,
-                progress=progress,
-                task_id=task_openai,
-                file_path=chapter_path,
-            )
-
-            # Save the refined chapter
-            save_to_markdown(
-                book_path,
-                os.path.join("chapters", chapter_file),
-                "Core Argument Strengthening",
-                refined_text,
-                progress=progress,
-                task=task_chapters,
-            )
-
-            # Advance the progress bar
-            progress.update(task_chapters, advance=1)
-
-    update_agent_files(book_path, assistant)
-    return
+def check_consistency_across(book_path, consistency_type):
+    """
+    Function to check the consistency of chapters in a book.
+    """
+    process_chapters(
+        book_path,
+        prompt_template=CHECK_CHAPTER_CONSISTENCY_PROMPT,
+        task_description=f"Checking {consistency_type} consistency across chapters...",
+        file_suffix=f"{consistency_type} Consistency Check",
+        consistency_type=consistency_type,
+    )
 
 
 def insert_new_chapter(book_path, position, prompt, flashback=False):
