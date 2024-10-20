@@ -134,6 +134,15 @@
             color: #333;
             border-radius: 5px;
             font-family: monospace;
+            word-wrap: break-word; /* Permite que el texto largo se ajuste en varias líneas */
+            white-space: pre-wrap; /* Mantiene los saltos de línea pero permite ajustar el texto */
+            overflow-wrap: break-word; /* Otra opción para asegurar que las palabras largas se ajusten */
+        }
+
+        @media (max-width: 768px) {
+            .coming-soon code {
+                word-break: break-all; /* Rompe palabras largas en pantallas pequeñas si es necesario */
+            }
         }
 
 
