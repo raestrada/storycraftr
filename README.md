@@ -5,9 +5,9 @@
 
 Welcome to [**StoryCraftr**](https://storycraftr.app), the open-source project designed to revolutionize how books are written. With the power of AI and a streamlined command-line interface (CLI), StoryCraftr helps you craft your story, manage worldbuilding, structure your book, and generate chapters — all while keeping you in full control.
 
-## Release Notes v0.5.0-alpha1
+## Release Notes v0.6.0-alpha2
 
-You can find the release notes for version `v0.5.0-alpha1` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.5.0-alpha1).
+You can find the release notes for version `v0.6.0-alpha2` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.6.0-alpha2).
 
 ## Step 1: Install StoryCraftr
 
@@ -16,7 +16,7 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.5.2-alpha1
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.6.0-alpha2
 ```
 
 ### Important: Before using StoryCraftr, make sure to set your OpenAI API key:
@@ -66,6 +66,46 @@ Writing a book is a journey that involves not only creativity but also structure
 - **Chapters**: Automatically generate chapters, cover pages, and epilogues based on your ideas.
 
 With StoryCraftr, you'll never feel stuck again. Let AI guide your creative process, generate ideas, and help you bring your world and characters to life.
+
+## StoryCraftr Chat Feature 💬
+
+The **StoryCraftr Chat** feature allows users to engage directly with an AI assistant, helping to brainstorm, refine, and improve your book in real time. The chat supports various commands for outlining, iterating, and world-building, making it a powerful tool for writers to create and enhance their stories interactively.
+
+### Key Commands:
+- **Iterate**: Refine character names, motivations, and even insert new chapters mid-book.  
+  Example:  
+  ```bash
+  !iterate insert-chapter 3 "Add a flashback between chapters 2 and 3."
+  ```
+
+- **Outline**: Generate the general plot, chapter summaries, or key plot points.  
+  Example:  
+  ```bash
+  !outline general-outline "Summarize the overall plot of a dystopian sci-fi novel."
+  ```
+
+- **Worldbuilding**: Build the world’s history, geography, and technology, or develop the magic system.  
+  Example:  
+  ```bash
+  !worldbuilding magic-system "Describe the 'magic' system based on advanced technology."
+  ```
+
+- **Chapters**: Write new chapters or adjust existing ones and generate cover text.  
+  Example:  
+  ```bash
+  !chapters chapter 1 "Write chapter 1 based on the synopsis."
+  ```
+
+You can start a chat session with the assistant using:
+```bash
+storycraftr chat --book-path /path/to/your/book
+```
+
+For help with available commands during the session, simply type:
+```bash
+help()
+```
+
 
 ## Contributing
 

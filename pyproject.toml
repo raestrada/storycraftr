@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "storycraftr"
-version = "0.5.2-alpha1"
+version = "0.6.0-alpha2"
 description = "A CLI tool for writing books using OpenAI."
 authors = ["Tu nombre <tuemail@example.com>"]
 license = "MIT"
