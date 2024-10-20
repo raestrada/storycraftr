@@ -15,6 +15,67 @@ client = OpenAI()
 console = Console()
 
 
+def get_vector_store_id_by_name(assistant_name):
+    """Retrieve the vector store ID by name."""
+    vector_stores = client.beta.vector_stores.list()
+
+    # Construir el nombre predecible del vector store
+    expected_name = f"{assistant_name} Docs"
+
+    # Buscar el vector store cuyo nombre coincida con el esperado
+    for vector_store in vector_stores.data:
+        if vector_store.name == expected_name:
+            return vector_store.id
+
+    console.print(
+        f"[bold red]No vector store found with name '{expected_name}'.[/bold red]"
+    )
+    return None
+
+
+def upload_markdown_files_to_vector_store(
+    vector_store_id, book_path, progress=None, task=None
+):
+    """
+    Function to upload all markdown files from the book path to the specified vector store.
+
+    Parameters:
+    vector_store_id (str): ID of the vector store to which files will be uploaded.
+    book_path (str): Path to the book directory containing markdown files.
+    progress (Progress, optional): Progress bar object for tracking progress.
+    task (Task, optional): Task ID for progress tracking.
+    """
+    console.print(
+        f"[bold blue]Uploading all knowledge files from '{book_path}'...[/bold blue]"
+    )
+
+    # Cargar los archivos markdown
+    md_files = load_markdown_files(book_path)
+
+    if len(md_files) == 0:
+        console.print("[bold yellow]No Markdown files found to upload.[/bold yellow]")
+        return
+
+    file_streams = [open(file_path, "rb") for file_path in md_files]
+
+    # Subir los archivos al vector store
+    file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+        vector_store_id=vector_store_id, files=file_streams
+    )
+
+    # Monitorear el progreso
+    while file_batch.status == "queued" or file_batch.status == "in_progress":
+        if progress and task:
+            progress.update(task, description=f"{file_batch.status}...")
+        else:
+            console.print(f"[bold yellow]{file_batch.status}...[/bold yellow]")
+        time.sleep(1)
+
+    console.print(
+        f"[bold green]Files uploaded successfully to vector store '{vector_store_id}'.[/bold green]"
+    )
+
+
 def load_markdown_files(book_path):
     """Load all Markdown files from the book's directory and subdirectories."""
     console.print(
@@ -60,7 +121,6 @@ def delete_assistant(book_path):
 def create_or_get_assistant(book_path, progress: Progress = None, task=None):
     name = book_path.split("/")[-1]
 
-    # Progress message for searching an existing assistant
     if progress and task:
         progress.update(
             task, description=f"Searching for existing assistant '{name}'..."
@@ -75,7 +135,6 @@ def create_or_get_assistant(book_path, progress: Progress = None, task=None):
 
     for assistant in assistants.data:
         if assistant.name == name:
-            # Progress message for found assistant
             if progress and task:
                 progress.update(task, description=f"Assistant {name} already exists.")
             else:
@@ -84,53 +143,15 @@ def create_or_get_assistant(book_path, progress: Progress = None, task=None):
                 )
             return assistant
 
-    # Step 1: Create a vector store for the book
-    if progress and task:
-        progress.update(task, description=f"Creating vector store for '{book_path}'...")
-    else:
-        console.print(
-            f"[bold blue]Creating vector store for '{book_path}'...[/bold blue]"
-        )
-
+    # Crear vector store
     vector_store = client.beta.vector_stores.create(name=f"{name} Docs")
 
-    # Step 2: Upload Knowledge (Markdown files)
-    if progress and task:
-        progress.update(task, description=f"Uploading knowledge from '{book_path}'...")
-    else:
-        console.print(
-            f"[bold blue]Uploading knowledge from '{book_path}'...[/bold blue]"
-        )
+    # Subir archivos markdown al vector store usando la función común
+    upload_markdown_files_to_vector_store(vector_store.id, book_path, progress, task)
 
-    md_files = load_markdown_files(book_path)
-
-    if len(md_files):
-        file_streams = [open(file_path, "rb") for file_path in md_files]
-
-        file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
-            vector_store_id=vector_store.id, files=file_streams
-        )
-
-        while file_batch.status == "queued" or file_batch.status == "in_progress":
-            if progress and task:
-                progress.update(task, description=f"{file_batch.status}...")
-            else:
-                console.print(f"[bold yellow]{file_batch.status}...[/bold yellow]")
-            time.sleep(1)
-
-    # Step 3: Create the Assistant
-    if progress and task:
-        progress.update(task, description=f"Reading behavior instructions...")
-    else:
-        console.print(f"[bold blue]Reading behavior instructions...[/bold blue]")
-
+    # Crear el asistente
     with open("behaviors/default.txt", "r") as file:
         instructions = file.read()
-
-    if progress and task:
-        progress.update(task, description=f"Creating assistant '{name}'...")
-    else:
-        console.print(f"[bold blue]Creating assistant '{name}'...[/bold blue]")
 
     assistant = client.beta.assistants.create(
         instructions=instructions,
@@ -139,29 +160,13 @@ def create_or_get_assistant(book_path, progress: Progress = None, task=None):
         model="gpt-4o",
     )
 
-    # Step 4: Associate the assistant with the vector store
-    if progress and task:
-        progress.update(
-            task, description=f"Associating assistant '{name}' with vector store..."
-        )
-    else:
-        console.print(
-            f"[bold blue]Associating assistant '{name}' with vector store...[/bold blue]"
-        )
+    # Asociar el asistente con el vector store
+    assistant = client.beta.assistants.update(
+        assistant_id=assistant.id,
+        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
+    )
 
-    if len(md_files):
-        assistant = client.beta.assistants.update(
-            assistant_id=assistant.id,
-            tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
-        )
-
-    # Success message
-    if progress and task:
-        progress.update(task, description=f"Assistant '{name}' created successfully.")
-    else:
-        console.print(
-            f"[bold green]Assistant '{name}' created successfully.[/bold green]"
-        )
+    console.print(f"[bold green]Assistant '{name}' created successfully.[/bold green]")
 
     return assistant
 
@@ -322,9 +327,21 @@ def get_thread():
 
 # Function to update the assistant's knowledge with new files
 def update_agent_files(book_path, assistant):
-    delete_assistant(book_path)
-    create_or_get_assistant(book_path)
+    # Obtener el nombre del asistente
+    assistant_name = assistant.name
+
+    # Obtener el vector_store_id por nombre
+    vector_store_id = get_vector_store_id_by_name(assistant_name)
+
+    if not vector_store_id:
+        console.print(
+            f"[bold red]Error: Could not find vector store for assistant '{assistant_name}'.[/bold red]"
+        )
+        return
+
+    # Usar la función común para subir los archivos al vector store correspondiente
+    upload_markdown_files_to_vector_store(vector_store_id, book_path)
 
     console.print(
         f"[bold green]Files updated successfully in assistant '{assistant.name}'.[/bold green]"
-    )  # Success message
+    )
