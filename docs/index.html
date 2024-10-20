@@ -71,6 +71,28 @@
             margin: 0 auto;
         }
 
+        @media (max-width: 768px) {
+            .release-link, nav {
+                position: static; /* Cambia a estático para apilar los elementos */
+                text-align: center; /* Centra los elementos en pantallas pequeñas */
+                margin: 10px 0; /* Añade espacio entre ellos */
+            }
+            
+            nav {
+                padding-right: 0; /* Elimina el padding en la derecha */
+            }
+            
+            nav a {
+                display: block; /* Haz que los enlaces se muestren uno debajo del otro */
+                margin: 5px 0; /* Espacio entre los enlaces */
+            }
+
+            header img {
+                max-width: 100px; /* Reduce el tamaño del logo en pantallas más pequeñas */
+            }
+        }
+
+
         h1 {
             font-size: 2.5em;
             margin-bottom: 0.5em;
