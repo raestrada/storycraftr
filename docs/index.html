@@ -136,38 +136,6 @@
             font-family: monospace;
         }
 
-        .openai-logo {
-            position: absolute; /* Posición absoluta dentro de su contenedor */
-            top: 50px; /* Ajuste desde la parte superior del contenedor */
-            left: 20px; /* Ajuste desde la parte izquierda del contenedor */
-            width: 100px;
-            background-color: white;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            z-index: 10; /* Asegura que quede por encima de otros elementos */
-        }
-
-        .openai-logo img {
-            width: 100%;
-            height: auto;
-        }
-
-        .openai-logo p {
-            margin: 0;
-            font-size: 12px;
-            color: #333;
-        }
-
-        .openai-logo a {
-            text-decoration: none;
-            color: #333;
-        }
-
-        .openai-logo a:hover {
-            color: #4A90E2;
-        }
 
         chat-banner {
             position: fixed;
@@ -202,6 +170,60 @@
         .chat-close:hover {
             color: red; /* Estilo opcional al pasar el mouse */
         }
+
+        .openai-logo, .github-logo {
+            position: absolute;
+            top: 50px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 10;
+        }
+
+        .openai-logo {
+            left: 20px;
+            width: 120px; /* Ajuste del ancho del contenedor OpenAI */
+        }
+
+        .github-logo {
+            right: 20px;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px; /* Más espacio para el logo y texto */
+        }
+
+        .openai-logo img {
+            width: 100%; /* El logo de OpenAI ocupa todo el ancho del contenedor */
+            height: auto;
+        }
+
+        .github-logo img {
+            width: 40px; /* Tamaño cuadrado para el logo de GitHub */
+            height: 40px; /* Mismo tamaño de ancho y alto */
+        }
+
+        .openai-logo p, .github-logo p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .openai-logo a, .github-logo a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .openai-logo a:hover, .github-logo a:hover {
+            color: #4A90E2;
+        }
+
+        @media (max-width: 768px) {
+            .openai-logo, .github-logo {
+                display: none; /* Ocultar los logos en pantallas más pequeñas */
+            }
+        }
     </style>
 </head>
 <body>
@@ -232,6 +254,13 @@
             <a href="https://openai.com" target="_blank">
                 <img src="https://global.discourse-cdn.com/openai1/original/3X/3/7/37b0465af49ce945753b8555462012147b0fb27a.svg" alt="OpenAI Logo">
                 <p>Made with OpenAI</p>
+            </a>
+        </div>
+    
+        <div class="github-logo">
+            <a href="https://github.com/raestrada/storycraftr" target="_blank" style="display: flex; align-items: center;">
+                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" width="40" height="40">
+                <p style="margin-left: 10px;">View on GitHub</p>
             </a>
         </div>
     </header>
