@@ -25,17 +25,6 @@ echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
 
 Once installed and the API key is set, you can run the tool using the command `storycraftr`.
 
-## Step 2: Initialize Your Book Project
-
-In Sanderson's writing methodology, having a clear starting point and preparation is essential for consistency and flow. Let's create our science fiction novel titled **La Purga de los Dioses** by **Rodrigo Estrada**.
-
-1.  **Create the project**:
-
-    ```bash
-    mkdir la-purga-de-los-dioses
-    cd la-purga-de-los-dioses
-    ```
-
 ## Step 2: Create the Behavior File
 
 The **behavior file** is a crucial component that guides the AI’s **writing process**. It represents the **vision** of the writer and defines the behavior the AI should follow when generating the story. This file goes beyond plot or character details—it sets the tone, style, and thematic focus of the book and is the foundation for how the AI approaches the entire writing process.
@@ -89,6 +78,7 @@ The behavior file serves as the **creative guide** for your story. It helps the 
 
         ```bash
         storycraftr init "The Purge of the Gods" --primary-language "en" --alternate-languages "es" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt"  --reference-author "Brandon Sanderson"
+        cd "The Purge of the Gods"
         ```
 
     > **Note:** In the following commands, any modified files are always backed up with a _.back_ extension.
