@@ -11,7 +11,7 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.6.0-alpha2
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.6.1-alpha2
 ```
 
 ### Important: Before running the `storycraftr` command
