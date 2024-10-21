@@ -1,5 +1,7 @@
 # StoryCraftr Chat Feature Tutorial 💬✨
 
+![chat](https://res.cloudinary.com/dyknhuvxt/image/upload/v1729551304/chat-example_hdo9yu.png)
+
 ## Getting Help in Chat
 
 At any time, if you're unsure of what commands are available or how to use them, you can get help within the chat by typing:
@@ -12,13 +14,18 @@ This will provide a list of available commands and their usage.
 
 ## Using Multi-word Prompts
 
-When asking the assistant to generate or refine content, you should enclose multi-word inputs in quotes to ensure they are processed as a single argument. For example:
+When interacting with the StoryCraftr assistant, it's important to enclose multi-word inputs in quotes to ensure they are processed as a single cohesive prompt. For example:
 
-```bash
-[You]: "Explain how Zevid manipulates the elite using their own biotechnology in the rebellion."
-```
+```[You]: "Explain how Zevid manipulates the elite using their own biotechnology in the rebellion."```
 
-This will ensure that the assistant treats the entire input as one cohesive prompt.
+This ensures that the assistant treats the entire input as one argument rather than splitting it into separate terms.
+
+**Bonus!** The assistant is pre-loaded with the full StoryCraftr documentation, so you can ask it about any command or feature. For example, if you need help with a specific command:
+
+```[You]: "Show me how to use the insert-chapter command and its parameters."```
+
+This will provide you with clear guidance directly within the chat, ensuring you have everything you need to use StoryCraftr to its full potential!
+
 
 ## Overview
 

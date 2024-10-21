@@ -5,9 +5,9 @@
 
 Welcome to [**StoryCraftr**](https://storycraftr.app), the open-source project designed to revolutionize how books are written. With the power of AI and a streamlined command-line interface (CLI), StoryCraftr helps you craft your story, manage worldbuilding, structure your book, and generate chapters — all while keeping you in full control.
 
-## Release Notes v0.6.0-alpha2
+## Release Notes v0.7.0-alpha3
 
-You can find the release notes for version `v0.6.0-alpha2` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.6.0-alpha2).
+You can find the release notes for version `v0.7.0-alpha3` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.7.0-alpha3).
 
 ## Step 1: Install StoryCraftr
 
@@ -16,7 +16,7 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.6.1-alpha2
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.7.0-alpha3
 ```
 
 ### Important: Before using StoryCraftr, make sure to set your OpenAI API key:
@@ -50,7 +50,7 @@ Whether you're brainstorming ideas, refining your story, or just need a little c
 
 🚀 Sometimes, all you need is a little chat to get the gears turning! Try it out and watch your creativity soar!
 
-![chat](https://res.cloudinary.com/dyknhuvxt/image/upload/v1729089264/chat_idxfgi.png)
+![chat](https://res.cloudinary.com/dyknhuvxt/image/upload/v1729551304/chat-example_hdo9yu.png)
 
 ## Full Guide
 

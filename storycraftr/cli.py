@@ -2,9 +2,28 @@ import click
 import os
 import sys
 import json
+import requests
 from rich.console import Console
 
 console = Console()
+
+
+def download_file(url, save_path, filename):
+    os.makedirs(save_path, exist_ok=True)
+    save_path = os.path.join(save_path, filename)
+    try:
+        response = requests.get(url, timeout=10, verify=True)
+        response.raise_for_status()
+        with open(save_path, "w", encoding="utf-8") as f:
+            f.write(response.text)
+        console.print(
+            f"[bold green]File successfully downloaded from {url}[/bold green]"
+        )
+    except requests.exceptions.RequestException as e:
+        console.print(
+            f"[bold red]Error downloading the file from {url}: {e}[/bold red]"
+        )
+        sys.exit(1)
 
 
 def load_openai_api_key():
@@ -35,6 +54,7 @@ from storycraftr.cmd.iterate import iterate
 from storycraftr.cmd.publish import publish
 from storycraftr.cmd.chat import chat
 from storycraftr.templates.tex import TEMPLATE_TEX
+from storycraftr.agent.agents import create_or_get_assistant
 
 
 def verify_book_path(book_path=None):
@@ -160,6 +180,23 @@ def init_structure(
 
     # Log: Proceso completado
     console.log(f"LaTex template copied: {new_template_path}", style="bold magenta")
+
+    # Lista de URLs para descargar los archivos
+    urls = [
+        "https://raw.githubusercontent.com/raestrada/storycraftr/refs/heads/main/docs/getting_started.md",
+        "https://raw.githubusercontent.com/raestrada/storycraftr/refs/heads/main/docs/iterate.md",
+        "https://raw.githubusercontent.com/raestrada/storycraftr/refs/heads/main/docs/chat.md",
+    ]
+
+    # Nombres de archivo correspondientes para cada URL
+    filenames = ["getting_started.md", "iterate.md", "chat.md"]
+
+    # Descargar cada archivo en la carpeta 'storycraftr'
+    for url, filename in zip(urls, filenames):
+        file_path = os.path.join(book_path, "storycraftr")
+        download_file(url, file_path, filename)
+
+    create_or_get_assistant(book_path)
 
 
 @click.group()

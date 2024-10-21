@@ -151,7 +151,7 @@ def create_or_get_assistant(book_path, progress: Progress = None, task=None):
     upload_markdown_files_to_vector_store(vector_store.id, book_path, progress, task)
 
     # Crear el asistente
-    with open("behaviors/default.txt", "r") as file:
+    with open(os.path.join(book_path, "behaviors", "default.txt"), "r") as file:
         instructions = file.read()
 
     assistant = client.beta.assistants.create(

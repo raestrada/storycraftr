@@ -11,7 +11,7 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.6.1-alpha2
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.7.0-alpha3
 ```
 
 ### Important: Before running the `storycraftr` command
@@ -234,7 +234,7 @@ Replace `"book_path"` with the actual name of your book. This will open an inter
 
 Here's an example of how a typical chat might look:
 
-![chat](https://res.cloudinary.com/dyknhuvxt/image/upload/v1729089264/chat_idxfgi.png)
+![chat](https://res.cloudinary.com/dyknhuvxt/image/upload/v1729551304/chat-example_hdo9yu.png)
 
 In this session, you ask for ideas for the next chapter, and the assistant responds with a detailed outline formatted in Markdown.
 
