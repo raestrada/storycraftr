@@ -31,7 +31,7 @@ The **behavior file** is a crucial component that guides the AI’s **writing pr
 
 This file should communicate the **high-level ideas** you, the writer, want the AI to follow. It’s like a creative manifesto that tells the AI **how to write** the book, what kind of **voice** to use, and how to approach the content from an artistic and stylistic perspective. The behavior file is where you articulate your **vision for the project**, ensuring the AI writes in a way that aligns with your creative goals.
 
-### **What Should Go in the Behavior File?**
+### What Should Go in the Behavior File?
 
 In the behavior file, you can include a variety of elements to help guide the AI:
 
@@ -50,7 +50,7 @@ echo "Write in a dark, introspective tone focusing on a morally ambiguous protag
 
 ---
 
-### **Why the Behavior File Matters**
+### Why the Behavior File Matters
 
 Unlike the outline (which provides structure) or worldbuilding (which defines the setting), the behavior file **sets the framework for the creative approach**. It tells the AI **how to think like you**, making sure that each piece of content it generates fits within the story’s **artistic direction**. Without this file, the AI might not align with your intended tone or style, resulting in a disjointed narrative.
 
@@ -58,7 +58,7 @@ Think of the behavior file as your way of ensuring the AI “understands” your
 
 ---
 
-### **Example Behavior File for *The Purge of the Gods***
+### Example Behavior File for *The Purge of the Gods
 
 - **Title**: *The Purge of the Gods*
 - **Genre**: Dystopian Science Fiction
