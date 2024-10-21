@@ -209,6 +209,7 @@
         color: red; /* Estilo opcional al pasar el mouse */
       }
 
+      .vscode-logo,
       .openai-logo,
       .github-logo {
         position: absolute;
@@ -233,6 +234,14 @@
         padding: 10px 15px; /* Más espacio para el logo y texto */
       }
 
+      .vscode-logo {
+        top: 120px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        padding: 10px 15px; /* Más espacio para el logo y texto */
+      }
+
       .openai-logo img {
         width: 100%; /* El logo de OpenAI ocupa todo el ancho del contenedor */
         height: auto;
@@ -243,6 +252,12 @@
         height: 40px; /* Mismo tamaño de ancho y alto */
       }
 
+      .vscode-logo img {
+        width: 40px; /* Tamaño cuadrado para el logo de GitHub */
+        height: 40px; /* Mismo tamaño de ancho y alto */
+      }
+
+      .vscode-logo p,
       .openai-logo p,
       .github-logo p {
         margin: 5px 0 0;
@@ -250,18 +265,21 @@
         color: #333;
       }
 
+      .vscode-logo a,
       .openai-logo a,
       .github-logo a {
         text-decoration: none;
         color: #333;
       }
 
+      .vscode-logo a:hover,
       .openai-logo a:hover,
       .github-logo a:hover {
         color: #4a90e2;
       }
 
       @media (max-width: 768px) {
+        .vscode-logo
         .openai-logo,
         .github-logo {
           display: none; /* Ocultar los logos en pantallas más pequeñas */
@@ -375,6 +393,21 @@
           <p style="margin-left: 10px">View on GitHub</p>
         </a>
       </div>
+      <div class="vscode-logo">
+        <a
+          href="https://marketplace.visualstudio.com/items?itemName=StoryCraftr.storycraftr"
+          target="_blank"
+          style="display: flex; align-items: center"
+        >
+          <img
+            src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/visualstudiocode.svg"
+            alt="VSCode Logo"
+            width="40"
+            height="40"
+          />
+          <p style="margin-left: 10px">Extension</p>
+        </a>
+      </div>
     </header>
     <script type="application/ld+json">
       {
@@ -415,6 +448,16 @@
       <a href="https://github.com/raestrada/storycraftr" class="button"
         >Explore the Code on GitHub</a
       >
+    </section>
+    <section>
+      <h2>New in StoryCraftr 🚀</h2>
+      <p>
+        We're excited to announce the **alpha release** of the **StoryCraftr Extension** for VSCode! Now you can enhance your story creation process directly from your favorite code editor.
+      </p>
+      <a href="https://marketplace.visualstudio.com/items?itemName=StoryCraftr.storycraftr" class="button">
+        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/visualstudiocode.svg" alt="VSCode Logo" width="20" height="20" style="vertical-align: middle;" />
+        Try the VSCode Extension (Alpha)
+      </a>
     </section>
     <section>
       <div class="chat-banner">
