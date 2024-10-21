@@ -3,6 +3,7 @@ import click
 import inspect
 from rich.console import Console
 from rich.markdown import Markdown
+from storycraftr.utils.core import load_book_config
 from storycraftr.agent.agents import get_thread, create_or_get_assistant, create_message
 from storycraftr.cmd import iterate, outline, worldbuilding, chapters
 
@@ -24,8 +25,13 @@ def chat(book_path=None):
     Start a chat session with the assistant for the given book name.
     Now also allows executing commands dynamically from various modules.
     """
+
     if not book_path:
         book_path = os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
     console.print(
         f"Starting chat for [bold]{book_path}[/bold]. Type [bold green]exit()[/bold green] to quit or [bold green]help()[/bold green] for a list of available commands."
     )

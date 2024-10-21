@@ -53,7 +53,7 @@ storycraftr iterate insert-chapter 2 "Insert a new chapter that explores a criti
 If a chapter becomes too long or covers too many topics, you can **split it into two separate chapters**. This command will split the specified chapter and adjust the numbering of all subsequent chapters.
 
 ```bash
-storycraftr 5 iterate split-chapter "Split chapter 5 into two chapters."
+storycraftr iterate split-chapter 3 "Split chapter into two chapters."
 ```
 
 ### 6. Add Flashbacks

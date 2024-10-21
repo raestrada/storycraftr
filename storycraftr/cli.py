@@ -1,5 +1,6 @@
 import click
 import os
+import sys
 import json
 from rich.console import Console
 
@@ -95,7 +96,7 @@ def init_structure(
             f.write(file["content"])
 
         # Log the created file
-        console.log(f"[green]File created:[/green] {file_path}")
+        console.print(f"[green]File created:[/green] {file_path}")
 
     # Create the storycraftr.json file
     config_data = {
@@ -221,9 +222,8 @@ def init(
             with open(behavior, "r") as f:
                 behavior_content = f.read()
         else:
-            behavior_content = (
-                behavior  # Si no es un archivo, asumimos que es un string
-            )
+            console.print(f"[bold red] Behavior MUST be a file [/bold red]")
+            sys.exit(1)
 
         init_structure(
             book_path,

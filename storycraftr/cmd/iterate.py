@@ -141,7 +141,7 @@ def strengthen_argument(argument, book_path=None):
     "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )
 @click.argument("position", type=int)
-@click.argument("prompt")
+@click.argument("prompt", type=str)
 def insert_chapter(position, prompt, book_path=None):
     """
     Command to insert a new chapter at the specified position, shifting existing chapters and renaming them accordingly.
@@ -194,7 +194,9 @@ def add_flashback(position, prompt, book_path=None):
 
 
 @iterate.command()
-@click.option("--book-path", type=click.Path(), help="Path to the book directory")
+@click.option(
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+)
 @click.argument("prompt")
 @click.argument("chapter_number", type=int)
 def split_chapter(prompt, chapter_number, book_path):
@@ -212,7 +214,9 @@ def split_chapter(prompt, chapter_number, book_path):
 
 
 @iterate.command()
-@click.option("--book-path", type=click.Path(), help="Path to the book directory")
+@click.option(
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+)
 @click.argument("prompt")
 def update_plot_points(prompt, book_path):
     """Refine key plot points across the story."""

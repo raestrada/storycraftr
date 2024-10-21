@@ -20,7 +20,7 @@ COVER_PROMPT = """
 Create a professional book cover in markdown format for the book titled '{title}'.
 Include only the title and author ('{author}').
 Strictly return only the cover content in markdown format, ready for direct use in the book.
-Use the following as additional context: {prompt}.
+This is the previous one that you have to improve: {prompt}.
 """
 
 
@@ -28,7 +28,7 @@ BACK_COVER_PROMPT = """
 Generate a detailed and engaging synopsis for the back cover of the book titled '{title}', written by '{author}'.
 Include the genre ('{genre}') and any alternate languages ('{alternate_languages}') where the book is available.
 Include ALWAYS the license type '{license}', along with a professional description of the license.
-Use the following as additional context: {prompt}.
+This is the previous one that you have to improve: {prompt}.
 """
 
 
