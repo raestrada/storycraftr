@@ -1,6 +1,7 @@
 import os
 import glob
 import time
+import openai
 from datetime import datetime
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -192,7 +193,7 @@ def create_message(
         task_id (int, optional): Task ID for the progress bar. Required if progress is passed.
 
     Raises:
-        OpenAIError: Custom exception if a problem occurs during the OpenAI request.
+        : Custom exception if a problem occurs during the OpenAI request.
     """
 
     config = load_book_config(book_path)
@@ -237,6 +238,7 @@ def create_message(
         avoid_cache_content = generate_prompt_with_hash(
             f"{FORMAT_OUTPUT.format(reference_author=config.reference_author, language=config.primary_language)}\n\n{content}",
             datetime.now().strftime("%B %d, %Y"),
+            book_path=book_path,
         )
         client.beta.threads.messages.create(
             thread_id=thread_id, role="user", content=avoid_cache_content
@@ -274,50 +276,56 @@ def create_message(
             console.print(
                 "[bold yellow]Warning: The response matches the original prompt. You might be out of credit.[/bold yellow]"
             )
-            raise OpenAIError(
+            raise (
                 "The response matches the original prompt. Check your account for credit availability."
             )
 
         return response_text
 
-    except openai.error.Timeout as e:
+    except openai.APITimeoutError as e:
         console.print(f"[bold red]OpenAI API request timed out: {e}[/bold red]")
-        raise OpenAIError("OpenAI API request timed out. Please try again.")
-    except openai.error.APIError as e:
-        console.print(f"[bold red]OpenAI API returned an API Error: {e}[/bold red]")
-        raise OpenAIError(f"OpenAI API returned an API Error: {e}")
-    except openai.error.APIConnectionError as e:
+        raise Exception("OpenAI API request timed out. Please try again.")
+    except openai.InternalServerError as e:
+        console.print(
+            f"[bold red]OpenAI API returned an Internal Server Error: {e}[/bold red]"
+        )
+        raise Exception(f"OpenAI API returned an Internal Server Error: {e}")
+    except openai.APIConnectionError as e:
         console.print(f"[bold red]OpenAI API request failed to connect: {e}[/bold red]")
-        raise OpenAIError(
+        raise Exception(
             f"OpenAI API request failed to connect. Please check your network connection: {e}"
         )
-    except openai.error.InvalidRequestError as e:
+    except openai.BadRequestError as e:
         console.print(f"[bold red]OpenAI API request was invalid: {e}[/bold red]")
-        raise OpenAIError(
+        raise Exception(
             f"OpenAI API request was invalid. Please check your request parameters: {e}"
         )
-    except openai.error.AuthenticationError as e:
+    except openai.AuthenticationError as e:
         console.print(
             f"[bold red]OpenAI API request was not authorized: {e}[/bold red]"
         )
-        raise OpenAIError(
+        raise Exception(
             "OpenAI API request was not authorized. Please check your API key or credentials."
         )
-    except openai.error.PermissionError as e:
+    except openai.PermissionDeniedError as e:
         console.print(f"[bold red]OpenAI API request was not permitted: {e}[/bold red]")
-        raise OpenAIError(
+        raise Exception(
             "OpenAI API request was not permitted. Please check your permissions or access level."
         )
-    except openai.error.RateLimitError as e:
+    except openai.RateLimitError as e:
         console.print(
             f"[bold red]OpenAI API request exceeded rate limit: {e}[/bold red]"
         )
-        raise OpenAIError(
+        raise Exception(
             "OpenAI API request exceeded rate limit. Please wait and try again."
         )
-    except Exception as e:
-        console.print(f"[bold red]Unexpected error: {e}[/bold red]")
-        raise OpenAIError(f"Unexpected error: {e}")
+    except openai.UnprocessableEntityError as e:
+        console.print(
+            f"[bold red]OpenAI API request could not be processed: {e}[/bold red]"
+        )
+        raise Exception(
+            "OpenAI API request could not be processed. Please check the format and try again."
+        )
 
 
 # Function to get a new thread
