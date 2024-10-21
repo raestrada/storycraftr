@@ -1,12 +1,13 @@
-import * as vscode from "vscode";
-import PanelClass from "./panel";
+import * as vscode from 'vscode';
+import { createPanel } from './panel'; // Importing the panel function
 
-export function activate(extContext: vscode.ExtensionContext) {
-  extContext.subscriptions.push(
-    vscode.commands.registerCommand("extensionnamegoeshere.start", () => {
-      PanelClass.createOrShow(extContext);
-    }),
-  );
+export function activate(context: vscode.ExtensionContext) {
+    // Register the command that triggers the webview panel
+    const disposable = vscode.commands.registerCommand('storycraftr.openPanel', () => {
+        createPanel(context); // Call the createPanel function
+    });
+
+    context.subscriptions.push(disposable);
 }
 
 export function deactivate() {}

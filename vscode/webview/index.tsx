@@ -1,7 +1,6 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import App from './components/App'; // Import the App component
 
-// Component import
-import App from "./components/App";
-
-ReactDOM.render(<App />, document.getElementById("root") as HTMLElement);
+// Render the App component inside the root div of the webview HTML
+ReactDOM.render(<App />, document.getElementById('root'));

@@ -1,35 +1,34 @@
-import * as React from "react";
+import * as vscode from 'vscode';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 
-interface vscode {
-  postMessage(message: any): void;
+function App() {
+    const [output, setOutput] = useState<string>('');
+
+    const sendCommand = (command: string) => {
+        const vscode = acquireVsCodeApi();
+        vscode.postMessage({ command: 'runCommand', text: command });
+    };
+
+    useEffect(() => {
+        window.addEventListener('message', event => {
+            const { result } = event.data;
+            setOutput(prev => prev + result + '\n');
+        });
+    }, []);
+
+    return (
+        <div>
+            <h1>StoryCraftr Control Panel</h1>
+            <button onClick={() => sendCommand('outline general-outline "Summarize the plot"')}>
+                Generate General Outline
+            </button>
+            <button onClick={() => sendCommand('chapters chapter 1 "Write chapter 1 based on synopsis"')}>
+                Generate Chapter 1
+            </button>
+            <pre>{output}</pre>
+        </div>
+    );
 }
-declare const vscode: vscode;
-
-const sendMessage = () => {
-  console.log("button clicked");
-  vscode.postMessage({ command: "testing" });
-};
-
-const App = () => {
-  const [buttonText, setButtonText] = React.useState("The brain is pending");
-
-  React.useEffect(() => {
-    window.addEventListener("message", (event) => {
-      const message = event.data; // The json data that the extension sent
-      switch (message.command) {
-        case "refactor":
-          setButtonText("The brain is working");
-          break;
-      }
-    });
-  });
-
-  return (
-    <div>
-      <h1>Functional Components Work!</h1>
-      <button onClick={sendMessage}>{buttonText}</button>
-    </div>
-  );
-};
 
 export default App;
