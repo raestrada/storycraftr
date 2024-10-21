@@ -14,6 +14,7 @@ markdown = "3.7"   # Especificando la versión de Markdown
 pandoc = "2.4"     # Especificando la versión de Pandoc
 rich = "^13.9.2"
 python-dotenv = "^1.0.1"
+pyyaml = "^6.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"

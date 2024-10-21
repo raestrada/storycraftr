@@ -60,19 +60,19 @@ Think of the behavior file as your way of ensuring the AI “understands” your
 
 ### Example Behavior File for The Purge of the Gods
 
-- **Title**: *The Purge of the Gods*
+- **Title**: _The Purge of the Gods_
 - **Genre**: Dystopian Science Fiction
 - **Tone**: Dark, introspective, and morally ambiguous
 - **Main Themes**: Power, control, manipulation, and societal decay
 - **Narrative Focus**: The story should focus heavily on internal character conflicts and the moral consequences of actions. It’s a character-driven story with a gradual unfolding of a manipulative protagonist's plan.
 - **Protagonist Approach**: The protagonist is morally gray, often manipulative, and should be presented with increasing ruthlessness. The AI should depict the world as hostile, unforgiving, and filled with complex characters who reflect this.
 - **Pacing and Length**: The story should be mid-length (250-300 pages), with a gradual build-up of tension. Include detailed worldbuilding but keep the focus on character development and power dynamics.
+
 ---
 
 ### **Why is this Important?**
 
 The behavior file serves as the **creative guide** for your story. It helps the AI maintain consistency in **style**, **tone**, and **focus** as it develops the novel. It ensures the AI's writing process is in harmony with your initial vision and remains aligned with your intended **narrative** and **thematic direction** throughout the writing process.
-
 
 3.  **Initialize the book**: A clear definition of genre and structure aligns with Sanderson’s emphasis on creating consistent rules for your world and plot ([Sanderson's First Law](https://www.brandonsanderson.com/sandersons-first-law/)). We've added an optional parameter --reference-author. If you use it, the system will try to emulate the style of that author; if not, it will assume the style based on what you write.
 
