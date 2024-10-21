@@ -29,7 +29,7 @@
       "storybuilding"
   ],
   "description": "StoryCraftr: AI-powered writing assistant for authors, seamlessly integrating outline generation, character development, and real-time chat functionality directly in VS Code.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.94.0"
   },
