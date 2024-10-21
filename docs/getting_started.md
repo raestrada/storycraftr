@@ -58,7 +58,7 @@ Think of the behavior file as your way of ensuring the AI “understands” your
 
 ---
 
-### Example Behavior File for *The Purge of the Gods
+### Example Behavior File for The Purge of the Gods
 
 - **Title**: *The Purge of the Gods*
 - **Genre**: Dystopian Science Fiction
