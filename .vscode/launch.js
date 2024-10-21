@@ -3,9 +3,7 @@
     "configurations": [
         {
             "name": "Run StoryCraftr Extension",
-            "program": "${workspaceFolder}/vscode/extension.js",
             "type": "extensionHost",
-            "sourceMaps": true,
             "request": "launch",
             "runtimeExecutable": "${execPath}",
             "args": [
