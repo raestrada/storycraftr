@@ -13,7 +13,7 @@ repos:
     hooks:
       - id: bandit
         name: Detect common security issues in Python code
-        args: ["-s", "B101"]  # Ignorar warnings por assert (opcional)
+        args: ["-s", "B101"] # Ignorar warnings por assert (opcional)
 
   # Detectar secretos en el código
   - repo: https://github.com/Yelp/detect-secrets
@@ -33,7 +33,7 @@ repos:
     rev: v4.4.0
     hooks:
       - id: check-added-large-files
-        args: ["--maxkb=500"]  # Puedes ajustar el tamaño máximo en KB
+        args: ["--maxkb=500"] # Puedes ajustar el tamaño máximo en KB
 
   # Evitar links simbólicos
   - repo: https://github.com/pre-commit/pre-commit-hooks

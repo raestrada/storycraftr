@@ -1,388 +1,468 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EH0253LPK5"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-EH0253LPK5"
+    ></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-    gtag('config', 'G-EH0253LPK5');
+      gtag("config", "G-EH0253LPK5");
     </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="StoryCraftr - Your AI-powered Book Creation Assistant">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="StoryCraftr - Your AI-powered Book Creation Assistant"
+    />
     <title>StoryCraftr - Write Your Story with AI</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-            color: #333;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        color: #333;
+      }
 
-        header {
-            background-color: #4A90E2;
-            color: #fff;
-            padding: 1em 0;
-            position: relative;
+      header {
+        background-color: #4a90e2;
+        color: #fff;
+        padding: 1em 0;
+        position: relative;
+      }
+
+      nav {
+        text-align: right;
+        padding-right: 20px;
+        margin-bottom: 10px;
+      }
+
+      nav a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        margin-left: 20px;
+      }
+
+      nav a:hover {
+        text-decoration: underline;
+      }
+
+      .release-link {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        font-size: 0.9em;
+      }
+
+      .release-link a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .release-link a:hover {
+        text-decoration: underline;
+      }
+
+      header img {
+        max-width: 150px;
+        display: block;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 768px) {
+        .release-link,
+        nav {
+          position: static; /* Cambia a estático para apilar los elementos */
+          text-align: center; /* Centra los elementos en pantallas pequeñas */
+          margin: 10px 0; /* Añade espacio entre ellos */
         }
 
         nav {
-            text-align: right;
-            padding-right: 20px;
-            margin-bottom: 10px;
+          padding-right: 0; /* Elimina el padding en la derecha */
         }
 
         nav a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-            margin-left: 20px;
-        }
-
-        nav a:hover {
-            text-decoration: underline;
-        }
-
-        .release-link {
-            position: absolute;
-            top: 10px;
-            left: 20px;
-            font-size: 0.9em;
-        }
-
-        .release-link a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .release-link a:hover {
-            text-decoration: underline;
+          display: block; /* Haz que los enlaces se muestren uno debajo del otro */
+          margin: 5px 0; /* Espacio entre los enlaces */
         }
 
         header img {
-            max-width: 150px;
-            display: block;
-            margin: 0 auto;
+          max-width: 100px; /* Reduce el tamaño del logo en pantallas más pequeñas */
         }
+      }
 
-        @media (max-width: 768px) {
-            .release-link, nav {
-                position: static; /* Cambia a estático para apilar los elementos */
-                text-align: center; /* Centra los elementos en pantallas pequeñas */
-                margin: 10px 0; /* Añade espacio entre ellos */
-            }
-            
-            nav {
-                padding-right: 0; /* Elimina el padding en la derecha */
-            }
-            
-            nav a {
-                display: block; /* Haz que los enlaces se muestren uno debajo del otro */
-                margin: 5px 0; /* Espacio entre los enlaces */
-            }
+      h1 {
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
+      }
 
-            header img {
-                max-width: 100px; /* Reduce el tamaño del logo en pantallas más pequeñas */
-            }
-        }
+      p {
+        font-size: 1.2em;
+        line-height: 1.6em;
+      }
 
+      section {
+        padding: 3em 1.5em;
+      }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 0.5em;
-        }
+      .button {
+        background-color: #4a90e2;
+        color: white;
+        padding: 0.8em 2em;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 5px;
+        margin-top: 1em;
+        display: inline-block;
+      }
 
-        p {
-            font-size: 1.2em;
-            line-height: 1.6em;
-        }
+      .button:hover {
+        background-color: #357abd;
+      }
 
-        section {
-            padding: 3em 1.5em;
-        }
+      footer {
+        margin-top: 2em;
+        padding: 2em 0;
+        background-color: #333;
+        color: #fff;
+      }
 
-        .button {
-            background-color: #4A90E2;
-            color: white;
-            padding: 0.8em 2em;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 5px;
-            margin-top: 1em;
-            display: inline-block;
-        }
+      footer a {
+        color: #4a90e2;
+        text-decoration: none;
+      }
 
-        .button:hover {
-            background-color: #357ABD;
-        }
+      footer a:hover {
+        color: #fff;
+      }
 
-        footer {
-            margin-top: 2em;
-            padding: 2em 0;
-            background-color: #333;
-            color: #fff;
-        }
+      .coming-soon {
+        background-color: #ffcc00;
+        color: #333;
+        padding: 1em;
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-top: 2em;
+        border-radius: 5px;
+      }
 
-        footer a {
-            color: #4A90E2;
-            text-decoration: none;
-        }
+      .coming-soon code {
+        display: block;
+        margin-top: 0.5em;
+        padding: 0.5em;
+        background-color: #fff6cc;
+        color: #333;
+        border-radius: 5px;
+        font-family: monospace;
+        word-wrap: break-word; /* Permite que el texto largo se ajuste en varias líneas */
+        white-space: pre-wrap; /* Mantiene los saltos de línea pero permite ajustar el texto */
+        overflow-wrap: break-word; /* Otra opción para asegurar que las palabras largas se ajusten */
+      }
 
-        footer a:hover {
-            color: #fff;
-        }
-
-        .coming-soon {
-            background-color: #ffcc00;
-            color: #333;
-            padding: 1em;
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 2em;
-            border-radius: 5px;
-        }
-
+      @media (max-width: 768px) {
         .coming-soon code {
-            display: block;
-            margin-top: 0.5em;
-            padding: 0.5em;
-            background-color: #fff6cc;
-            color: #333;
-            border-radius: 5px;
-            font-family: monospace;
-            word-wrap: break-word; /* Permite que el texto largo se ajuste en varias líneas */
-            white-space: pre-wrap; /* Mantiene los saltos de línea pero permite ajustar el texto */
-            overflow-wrap: break-word; /* Otra opción para asegurar que las palabras largas se ajusten */
+          word-break: break-all; /* Rompe palabras largas en pantallas pequeñas si es necesario */
         }
+      }
 
-        @media (max-width: 768px) {
-            .coming-soon code {
-                word-break: break-all; /* Rompe palabras largas en pantallas pequeñas si es necesario */
-            }
-        }
+      chat-banner {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #4a90e2;
+        color: white;
+        text-align: center;
+        padding: 15px 0;
+        font-size: 1.2em;
+        z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+      }
 
+      .chat-banner {
+        position: relative; /* Necesario para que el botón se posicione en relación a este contenedor */
+        padding: 20px;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+      }
 
-        chat-banner {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #4A90E2;
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-            font-size: 1.2em;
-            z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-        }
+      .chat-close {
+        position: absolute; /* Permite mover el botón dentro del contenedor */
+        top: 10px; /* Ajusta según necesites */
+        right: 10px; /* Ajusta según necesites */
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+      }
 
-        .chat-banner {
-            position: relative; /* Necesario para que el botón se posicione en relación a este contenedor */
-            padding: 20px;
-            background-color: #f0f0f0;
-            border-radius: 10px;
-        }
+      .chat-close:hover {
+        color: red; /* Estilo opcional al pasar el mouse */
+      }
 
-        .chat-close {
-            position: absolute; /* Permite mover el botón dentro del contenedor */
-            top: 10px; /* Ajusta según necesites */
-            right: 10px; /* Ajusta según necesites */
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-        }
+      .openai-logo,
+      .github-logo {
+        position: absolute;
+        top: 50px;
+        background-color: white;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        z-index: 10;
+      }
 
-        .chat-close:hover {
-            color: red; /* Estilo opcional al pasar el mouse */
-        }
+      .openai-logo {
+        left: 20px;
+        width: 120px; /* Ajuste del ancho del contenedor OpenAI */
+      }
 
-        .openai-logo, .github-logo {
-            position: absolute;
-            top: 50px;
-            background-color: white;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            z-index: 10;
-        }
+      .github-logo {
+        right: 20px;
+        display: flex;
+        align-items: center;
+        padding: 10px 15px; /* Más espacio para el logo y texto */
+      }
 
-        .openai-logo {
-            left: 20px;
-            width: 120px; /* Ajuste del ancho del contenedor OpenAI */
-        }
+      .openai-logo img {
+        width: 100%; /* El logo de OpenAI ocupa todo el ancho del contenedor */
+        height: auto;
+      }
 
+      .github-logo img {
+        width: 40px; /* Tamaño cuadrado para el logo de GitHub */
+        height: 40px; /* Mismo tamaño de ancho y alto */
+      }
+
+      .openai-logo p,
+      .github-logo p {
+        margin: 5px 0 0;
+        font-size: 12px;
+        color: #333;
+      }
+
+      .openai-logo a,
+      .github-logo a {
+        text-decoration: none;
+        color: #333;
+      }
+
+      .openai-logo a:hover,
+      .github-logo a:hover {
+        color: #4a90e2;
+      }
+
+      @media (max-width: 768px) {
+        .openai-logo,
         .github-logo {
-            right: 20px;
-            display: flex;
-            align-items: center;
-            padding: 10px 15px; /* Más espacio para el logo y texto */
+          display: none; /* Ocultar los logos en pantallas más pequeñas */
         }
+      }
 
-        .openai-logo img {
-            width: 100%; /* El logo de OpenAI ocupa todo el ancho del contenedor */
-            height: auto;
-        }
+      .chat-link {
+        font-weight: bold;
+        color: #ff4500; /* Bright orange-red color */
+        text-decoration: none;
+        transition:
+          color 0.3s ease,
+          transform 0.3s ease;
+        position: relative;
+      }
 
-        .github-logo img {
-            width: 40px; /* Tamaño cuadrado para el logo de GitHub */
-            height: 40px; /* Mismo tamaño de ancho y alto */
-        }
+      .chat-link:hover {
+        color: #ff6347; /* Lighter red on hover */
+        transform: scale(1.1); /* Slightly enlarge the text on hover */
+      }
 
-        .openai-logo p, .github-logo p {
-            margin: 5px 0 0;
-            font-size: 12px;
-            color: #333;
-        }
+      .chat-link::after {
+        content: "✨";
+        font-size: 18px;
+        position: absolute;
+        right: -25px;
+        top: 0;
+        opacity: 0;
+        transition:
+          opacity 0.3s ease,
+          right 0.3s ease;
+      }
 
-        .openai-logo a, .github-logo a {
-            text-decoration: none;
-            color: #333;
-        }
-
-        .openai-logo a:hover, .github-logo a:hover {
-            color: #4A90E2;
-        }
-
-        @media (max-width: 768px) {
-            .openai-logo, .github-logo {
-                display: none; /* Ocultar los logos en pantallas más pequeñas */
-            }
-        }
-
-        .chat-link {
-    font-weight: bold;
-    color: #ff4500; /* Bright orange-red color */
-    text-decoration: none;
-    transition: color 0.3s ease, transform 0.3s ease;
-    position: relative;
-}
-
-.chat-link:hover {
-    color: #ff6347; /* Lighter red on hover */
-    transform: scale(1.1); /* Slightly enlarge the text on hover */
-}
-
-.chat-link::after {
-    content: "✨";
-    font-size: 18px;
-    position: absolute;
-    right: -25px;
-    top: 0;
-    opacity: 0;
-    transition: opacity 0.3s ease, right 0.3s ease;
-}
-
-.chat-link:hover::after {
-    right: -5px;
-    opacity: 1;
-}
+      .chat-link:hover::after {
+        right: -5px;
+        opacity: 1;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <meta name="description" content="StoryCraftr: An AI-powered tool for writers to outline, create, and refine novels. Boost your storytelling process using advanced AI for world-building, character development, and chapter generation.">
-        <meta name="keywords" content="AI writing tool, novel writing, outline tool, character development, world-building, AI storytelling, StoryCraftr, creative writing, book writing assistant">
-        <meta name="robots" content="index, follow">
-        <meta property="og:title" content="StoryCraftr - Write Your Stories with AI Power">
-        <meta property="og:description" content="StoryCraftr helps writers create novels through AI-powered outlining, world-building, and character generation. Explore its capabilities now.">
-        <meta property="og:image" content="https://res.cloudinary.com/dyknhuvxt/image/upload/f_auto,q_auto/ofhhkf6f7bryfgvbxxwc">
-        <meta property="og:url" content="https://github.com/raestrada/storycraftr">
-        <meta name="twitter:card" content="summary_large_image">
-    
-        <div class="release-link">
-            <a href="https://github.com/raestrada/storycraftr/releases/tag/v0.6.0-alpha2">Release Notes v0.6.0-alpha2</a>
-        </div>
-        
-        <nav>
-            <a href="getting_started.html">Getting Started</a>
-            <a href="iterate.html">Iterating Your Book</a>
-            <a href="chat.html" class="chat-link">Chat!!!</a>
-        </nav>
-        
-        <img src="https://res.cloudinary.com/dyknhuvxt/image/upload/f_auto,q_auto/ofhhkf6f7bryfgvbxxwc" alt="StoryCraftr Logo">
-        
-        <h1>Welcome to StoryCraftr 📚✨</h1>
-        <p>Write your stories with the power of AI</p>
-        <div class="openai-logo">
-            <a href="https://openai.com" target="_blank">
-                <img src="https://global.discourse-cdn.com/openai1/original/3X/3/7/37b0465af49ce945753b8555462012147b0fb27a.svg" alt="OpenAI Logo">
-                <p>Made with OpenAI</p>
-            </a>
-        </div>
-    
-        <div class="github-logo">
-            <a href="https://github.com/raestrada/storycraftr" target="_blank" style="display: flex; align-items: center;">
-                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" width="40" height="40">
-                <p style="margin-left: 10px;">View on GitHub</p>
-            </a>
-        </div>
+      <meta
+        name="description"
+        content="StoryCraftr: An AI-powered tool for writers to outline, create, and refine novels. Boost your storytelling process using advanced AI for world-building, character development, and chapter generation."
+      />
+      <meta
+        name="keywords"
+        content="AI writing tool, novel writing, outline tool, character development, world-building, AI storytelling, StoryCraftr, creative writing, book writing assistant"
+      />
+      <meta name="robots" content="index, follow" />
+      <meta
+        property="og:title"
+        content="StoryCraftr - Write Your Stories with AI Power"
+      />
+      <meta
+        property="og:description"
+        content="StoryCraftr helps writers create novels through AI-powered outlining, world-building, and character generation. Explore its capabilities now."
+      />
+      <meta
+        property="og:image"
+        content="https://res.cloudinary.com/dyknhuvxt/image/upload/f_auto,q_auto/ofhhkf6f7bryfgvbxxwc"
+      />
+      <meta
+        property="og:url"
+        content="https://github.com/raestrada/storycraftr"
+      />
+      <meta name="twitter:card" content="summary_large_image" />
+
+      <div class="release-link">
+        <a
+          href="https://github.com/raestrada/storycraftr/releases/tag/v0.6.0-alpha2"
+          >Release Notes v0.6.0-alpha2</a
+        >
+      </div>
+
+      <nav>
+        <a href="getting_started.html">Getting Started</a>
+        <a href="iterate.html">Iterating Your Book</a>
+        <a href="chat.html" class="chat-link">Chat!!!</a>
+      </nav>
+
+      <img
+        src="https://res.cloudinary.com/dyknhuvxt/image/upload/f_auto,q_auto/ofhhkf6f7bryfgvbxxwc"
+        alt="StoryCraftr Logo"
+      />
+
+      <h1>Welcome to StoryCraftr 📚✨</h1>
+      <p>Write your stories with the power of AI</p>
+      <div class="openai-logo">
+        <a href="https://openai.com" target="_blank">
+          <img
+            src="https://global.discourse-cdn.com/openai1/original/3X/3/7/37b0465af49ce945753b8555462012147b0fb27a.svg"
+            alt="OpenAI Logo"
+          />
+          <p>Made with OpenAI</p>
+        </a>
+      </div>
+
+      <div class="github-logo">
+        <a
+          href="https://github.com/raestrada/storycraftr"
+          target="_blank"
+          style="display: flex; align-items: center"
+        >
+          <img
+            src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+            alt="GitHub Logo"
+            width="40"
+            height="40"
+          />
+          <p style="margin-left: 10px">View on GitHub</p>
+        </a>
+      </div>
     </header>
     <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          "name": "StoryCraftr",
-          "description": "AI-powered tool for novel writing, character development, world-building and more.",
-          "url": "https://github.com/raestrada/storycraftr",
-          "applicationCategory": "WritingAssistant"
-        }
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "StoryCraftr",
+        "description": "AI-powered tool for novel writing, character development, world-building and more.",
+        "url": "https://github.com/raestrada/storycraftr",
+        "applicationCategory": "WritingAssistant"
+      }
     </script>
 
     <section>
-        <div class="coming-soon">
-            🚧 Coming Soon - Beta Release! 🚀
-            <br>Meanwhile, you can download the Alpha version, which is fully usable but may still have bugs:
-            <code>pipx install git+https://github.com/raestrada/storycraftr.git@v0.6.1-alpha2</code>
-        </div>
+      <div class="coming-soon">
+        🚧 Coming Soon - Beta Release! 🚀
+        <br />Meanwhile, you can download the Alpha version, which is fully
+        usable but may still have bugs:
+        <code
+          >pipx install
+          git+https://github.com/raestrada/storycraftr.git@v0.6.1-alpha2</code
+        >
+      </div>
     </section>
 
     <section>
-        <h2>Why StoryCraftr?</h2>
+      <h2>Why StoryCraftr?</h2>
+      <p>
+        Whether you're a seasoned writer or just starting out, StoryCraftr helps
+        you create intricate worlds 🌍, develop compelling characters 🦸‍♂️, and
+        generate seamless story outlines 📝 and full-length chapters 📖 with
+        ease.
+      </p>
+      <p>
+        Let AI guide your creative process while you focus on your unique
+        vision.
+      </p>
+
+      <a href="https://github.com/raestrada/storycraftr" class="button"
+        >Explore the Code on GitHub</a
+      >
+    </section>
+    <section>
+      <div class="chat-banner">
+        <button
+          class="chat-close"
+          onclick="document.querySelector('.chat-banner').style.display='none';"
+        >
+          &times;
+        </button>
+        <h2>
+          💬 Introducing Chat!!! – A Simple Yet Powerful Tool to Supercharge
+          Your Conversations! 💥
+        </h2>
         <p>
-            Whether you're a seasoned writer or just starting out, StoryCraftr helps you create intricate worlds 🌍,
-            develop compelling characters 🦸‍♂️, and generate seamless story outlines 📝 and full-length chapters 📖
-            with ease.
+          Whether you're brainstorming ideas, refining your story, or just need
+          a little creative spark, Chat!!! is here to help. It's a
+          straightforward, easy-to-use feature that lets you dive deep into
+          meaningful discussions, unlock new insights, and get your thoughts
+          flowing effortlessly. 🚀 Sometimes, all you need is a little chat to
+          get the gears turning! Try it out and watch your creativity soar!
         </p>
-        <p>Let AI guide your creative process while you focus on your unique vision.</p>
-
-        <a href="https://github.com/raestrada/storycraftr" class="button">Explore the Code on GitHub</a>
+        <img
+          src="https://res.cloudinary.com/dyknhuvxt/image/upload/v1729089264/chat_idxfgi.png"
+          style="max-width: 100%; height: auto; display: block; margin: 0 auto"
+        />
+      </div>
     </section>
     <section>
-        <div class="chat-banner">
-            <button class="chat-close" onclick="document.querySelector('.chat-banner').style.display='none';">&times;</button>
-            <h2> 
-                💬 Introducing Chat!!! – A Simple Yet Powerful Tool to Supercharge Your Conversations! 💥
-            </h2>
-            <p>
-                Whether you're brainstorming ideas, refining your story, or just need a little creative spark, Chat!!! is here to help. 
-                It's a straightforward, easy-to-use feature that lets you dive deep into meaningful discussions, 
-                unlock new insights, and get your thoughts flowing effortlessly.
-
-                🚀 Sometimes, all you need is a little chat to get the gears turning! Try it out and watch your creativity soar!
-            </p>
-            <img src="https://res.cloudinary.com/dyknhuvxt/image/upload/v1729089264/chat_idxfgi.png" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
-        </div>
-    </section>
-    <section>
-        <h2>Join Our Community 🚀</h2>
-        <p>
-            StoryCraftr is a collaborative effort, and we need you to help shape the future of writing!
-            Whether you're a developer, writer, or simply passionate about storytelling, you can make a difference.
-        </p>
-        <a href="https://github.com/raestrada/storycraftr/blob/main/CONTRIBUTING.md" class="button">Contribute Now</a>
+      <h2>Join Our Community 🚀</h2>
+      <p>
+        StoryCraftr is a collaborative effort, and we need you to help shape the
+        future of writing! Whether you're a developer, writer, or simply
+        passionate about storytelling, you can make a difference.
+      </p>
+      <a
+        href="https://github.com/raestrada/storycraftr/blob/main/CONTRIBUTING.md"
+        class="button"
+        >Contribute Now</a
+      >
     </section>
 
     <footer>
-        <p>Follow us on <a href="https://twitter.com/Storycraftrapp">Twitter</a> for the latest updates</p>
-        <p>&copy; 2024 StoryCraftr</p>
+      <p>
+        Follow us on
+        <a href="https://twitter.com/Storycraftrapp">Twitter</a> for the latest
+        updates
+      </p>
+      <p>&copy; 2024 StoryCraftr</p>
     </footer>
-
-</body>
+  </body>
 </html>

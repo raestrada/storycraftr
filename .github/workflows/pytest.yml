@@ -3,10 +3,10 @@ name: Run Tests with Poetry and Pytest
 on:
   push:
     branches:
-      - '**'  # Ejecutar en todas las ramas
+      - "**" # Ejecutar en todas las ramas
   pull_request:
     branches:
-      - '**'  # Ejecutar en todos los PRs, independientemente de la rama
+      - "**" # Ejecutar en todos los PRs, independientemente de la rama
 
 jobs:
   pytest:
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install Poetry
         run: |

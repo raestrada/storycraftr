@@ -53,7 +53,7 @@ You can trigger the following commands within the chat by typing the appropriate
 The **Iterate** commands are designed to help you iteratively improve the book's content. You can refine specific aspects such as character names, motivations, or plot points.
 
 - **Check character names**:
-  
+
   ```bash
   !iterate check-names "Check character names for consistency."
   ```

@@ -61,6 +61,7 @@ For a complete guide, including more examples and instructions on how to fully l
 ## Why StoryCraftr?
 
 Writing a book is a journey that involves not only creativity but also structure, consistency, and planning. **StoryCraftr** is here to assist you with:
+
 - **Worldbuilding**: Define the geography, history, cultures, and more.
 - **Outline**: Generate a cohesive story outline, from character summaries to chapter synopses.
 - **Chapters**: Automatically generate chapters, cover pages, and epilogues based on your ideas.
@@ -72,46 +73,52 @@ With StoryCraftr, you'll never feel stuck again. Let AI guide your creative proc
 The **StoryCraftr Chat** feature allows users to engage directly with an AI assistant, helping to brainstorm, refine, and improve your book in real time. The chat supports various commands for outlining, iterating, and world-building, making it a powerful tool for writers to create and enhance their stories interactively.
 
 ### Key Commands:
+
 - **Iterate**: Refine character names, motivations, and even insert new chapters mid-book.  
-  Example:  
+  Example:
+
   ```bash
   !iterate insert-chapter 3 "Add a flashback between chapters 2 and 3."
   ```
 
 - **Outline**: Generate the general plot, chapter summaries, or key plot points.  
-  Example:  
+  Example:
+
   ```bash
   !outline general-outline "Summarize the overall plot of a dystopian sci-fi novel."
   ```
 
 - **Worldbuilding**: Build the world’s history, geography, and technology, or develop the magic system.  
-  Example:  
+  Example:
+
   ```bash
   !worldbuilding magic-system "Describe the 'magic' system based on advanced technology."
   ```
 
 - **Chapters**: Write new chapters or adjust existing ones and generate cover text.  
-  Example:  
+  Example:
   ```bash
   !chapters chapter 1 "Write chapter 1 based on the synopsis."
   ```
 
 You can start a chat session with the assistant using:
+
 ```bash
 storycraftr chat --book-path /path/to/your/book
 ```
 
 For help with available commands during the session, simply type:
+
 ```bash
 help()
 ```
-
 
 ## Contributing
 
 We welcome contributions of all kinds! Whether you’re a developer, writer, or simply interested in improving the tool, you can help. Here’s how you can contribute:
 
 1. **Fork the repository** and create your branch:
+
 ```bash
 git checkout -b feature/YourFeature
 ```

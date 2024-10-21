@@ -54,23 +54,22 @@ Use Semantic Commit Messages to make your changes clearer and more organized. Th
 
 Examples:
 
-- Adding a new feature:  
-    ```bash
-    git commit -m "feat(worldbuilding): add new geography prompt handling"
-    ```
-  
-- Fixing a bug:  
-    ```bash
-    git commit -m "fix(outline): correct plot points generation bug"
-    ```
+- Adding a new feature:
+  ```bash
+  git commit -m "feat(worldbuilding): add new geography prompt handling"
+  ```
+- Fixing a bug:
 
-- Updating documentation:  
-    ```bash
-    git commit -m "docs: update README with new installation instructions"
-    ```
+  ```bash
+  git commit -m "fix(outline): correct plot points generation bug"
+  ```
+
+- Updating documentation:
+  ```bash
+  git commit -m "docs: update README with new installation instructions"
+  ```
 
 Make sure to commit often with meaningful messages to keep track of your changes effectively.
-
 
 ### 7. Push Your Changes
 
