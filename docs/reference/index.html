@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="Python" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Welcome to StoryCraftr&#39;s documentation! &#8212; StoryCraftr MIT documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=fe323acf"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="welcome-to-storycraftr-s-documentation">
+<h1>Welcome to StoryCraftr's documentation!<a class="headerlink" href="#welcome-to-storycraftr-s-documentation" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="reference-guide">
+<h1>Reference Guide<a class="headerlink" href="#reference-guide" title="Link to this heading">¶</a></h1>
+<section id="agent-module">
+<h2>Agent Module<a class="headerlink" href="#agent-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="command-module">
+<h2>Command Module<a class="headerlink" href="#command-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-storycraftr.prompts.chapters">
+<span id="prompts-module"></span><h2>Prompts Module<a class="headerlink" href="#module-storycraftr.prompts.chapters" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-storycraftr.utils.core">
+<span id="utils-module"></span><span id="module-storycraftr.prompts.worldbuilding"></span><span id="module-storycraftr.prompts.permute"></span><span id="module-storycraftr.prompts.outline"></span><span id="module-storycraftr.prompts.iterate"></span><span id="module-storycraftr.prompts.core"></span><h2>Utils Module<a class="headerlink" href="#module-storycraftr.utils.core" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="storycraftr.utils.core.BookConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">storycraftr.utils.core.</span></span><span class="sig-name descname"><span class="pre">BookConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">book_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">book_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary_language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alternate_languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_author</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genre</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">license</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_author</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#storycraftr.utils.core.BookConfig" title="Link to this definition">¶</a></dt>
+<dd><p>A NamedTuple representing the configuration of a book.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>book_path (str): The path to the book's directory.
+book_name (str): The name of the book.
+primary_language (str): The primary language of the book.
+alternate_languages (list): A list of alternate languages.
+default_author (str): The default author of the book.
+genre (str): The genre of the book.
+license (str): The license type for the book.
+reference_author (str): A reference author for style guidance.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="storycraftr.utils.core.BookConfig.alternate_languages">
+<span class="sig-name descname"><span class="pre">alternate_languages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><a class="headerlink" href="#storycraftr.utils.core.BookConfig.alternate_languages" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="storycraftr.utils.core.BookConfig.book_name">
+<span class="sig-name descname"><span class="pre">book_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#storycraftr.utils.core.BookConfig.book_name" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="storycraftr.utils.core.BookConfig.book_path">
+<span class="sig-name descname"><span class="pre">book_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#storycraftr.utils.core.BookConfig.book_path" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="storycraftr.utils.core.BookConfig.default_author">
+<span class="sig-name descname"><span class="pre">default_author</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#storycraftr.utils.core.BookConfig.default_author" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="storycraftr.utils.core.BookConfig.genre">
+<span class="sig-name descname"><span class="pre">genre</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#storycraftr.utils.core.BookConfig.genre" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="storycraftr.utils.core.BookConfig.license">
+<span class="sig-name descname"><span class="pre">license</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#storycraftr.utils.core.BookConfig.license" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="storycraftr.utils.core.BookConfig.primary_language">
+<span class="sig-name descname"><span class="pre">primary_language</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#storycraftr.utils.core.BookConfig.primary_language" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="storycraftr.utils.core.BookConfig.reference_author">
+<span class="sig-name descname"><span class="pre">reference_author</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#storycraftr.utils.core.BookConfig.reference_author" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 7</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="storycraftr.utils.core.file_has_more_than_three_lines">
+<span class="sig-prename descclassname"><span class="pre">storycraftr.utils.core.</span></span><span class="sig-name descname"><span class="pre">file_has_more_than_three_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#storycraftr.utils.core.file_has_more_than_three_lines" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a file has more than three lines.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>file_path (str): The path to the file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if the file has more than three lines, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="storycraftr.utils.core.generate_prompt_with_hash">
+<span class="sig-prename descclassname"><span class="pre">storycraftr.utils.core.</span></span><span class="sig-name descname"><span class="pre">generate_prompt_with_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">book_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#storycraftr.utils.core.generate_prompt_with_hash" title="Link to this definition">¶</a></dt>
+<dd><p>Generates a modified prompt by combining a random phrase from a list,
+a date, and the original prompt. Logs the prompt details in a YAML file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>original_prompt (str): The original prompt to be modified.
+date (str): The current date to be used in the prompt.
+book_path (str): Path to the book's directory where prompts.yaml will be saved.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: The modified prompt with the date and random phrase.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="storycraftr.utils.core.load_book_config">
+<span class="sig-prename descclassname"><span class="pre">storycraftr.utils.core.</span></span><span class="sig-name descname"><span class="pre">load_book_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">book_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#storycraftr.utils.core.BookConfig" title="storycraftr.utils.core.BookConfig"><span class="pre">BookConfig</span></a></span></span><a class="headerlink" href="#storycraftr.utils.core.load_book_config" title="Link to this definition">¶</a></dt>
+<dd><p>Loads the book's configuration from the storycraftr.json file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>book_path (str): The path to the book's directory.</p>
+</dd>
+<dt>Returns:</dt><dd><p>BookConfig: An instance of the BookConfig NamedTuple containing the book's settings.
+None: If the storycraftr.json file is not found or is in an invalid directory.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="templates">
+<h2>Templates<a class="headerlink" href="#templates" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><p>(Si necesitas documentar algo relacionado con templates, puedes añadirlo aquí.)</p>
+</div></blockquote>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">StoryCraftr</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Rodrigo Estrada.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
