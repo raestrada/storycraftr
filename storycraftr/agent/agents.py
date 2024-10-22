@@ -325,13 +325,29 @@ def process_chapters(
         file_suffix (str): Suffix for the output file.
         **prompt_kwargs: Additional arguments for the prompt template.
     """
+    # Directories to process
     chapters_dir = os.path.join(book_path, "chapters")
-    if not os.path.exists(chapters_dir):
-        raise FileNotFoundError(
-            f"The chapter directory '{chapters_dir}' does not exist."
-        )
+    outline_dir = os.path.join(book_path, "outline")
+    worldbuilding_dir = os.path.join(book_path, "worldbuilding")
 
-    files_to_process = [f for f in os.listdir(chapters_dir) if f.endswith(".md")]
+    # Check if directories exist
+    for dir_path in [chapters_dir, outline_dir, worldbuilding_dir]:
+        if not os.path.exists(dir_path):
+            raise FileNotFoundError(f"The directory '{dir_path}' does not exist.")
+
+    # Files to exclude
+    excluded_files = ["cover.md", "back-cover.md"]
+
+    # Get Markdown files from each directory, excluding the unwanted files
+    files_to_process = []
+    for dir_path in [chapters_dir, outline_dir, worldbuilding_dir]:
+        files = [
+            f
+            for f in os.listdir(dir_path)
+            if f.endswith(".md") and f not in excluded_files
+        ]
+        files_to_process.extend([os.path.join(dir_path, f) for f in files])
+
     if not files_to_process:
         raise FileNotFoundError(
             "No Markdown (.md) files were found in the chapter directory."
