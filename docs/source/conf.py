@@ -35,3 +35,6 @@ extensions = [
 
 # Opcionalmente, si quieres usar un tema como 'alabaster' o 'readthedocs'
 html_theme = "alabaster"
+
+# Configuración del prefijo de URL
+html_baseurl = "https://storycraftr.app/reference/"
