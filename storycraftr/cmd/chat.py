@@ -1,6 +1,6 @@
 import os
 import click
-import inspect
+import shlex
 from rich.console import Console
 from rich.markdown import Markdown
 from storycraftr.utils.core import load_book_config
@@ -23,9 +23,8 @@ command_modules = {
 def chat(book_path=None):
     """
     Start a chat session with the assistant for the given book name.
-    Now also allows executing commands dynamically from various modules.
+    Allows executing commands dynamically from various modules.
     """
-
     if not book_path:
         book_path = os.getcwd()
 
@@ -39,21 +38,20 @@ def chat(book_path=None):
     # Create or get the assistant and thread
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
+
     console.print("[bold green]USE help() to get help and exit() to exit[/bold green]")
+
     while True:
         user_input = console.input("[bold blue]You:[/bold blue] ")
 
-        # Exit the chat
         if user_input.lower() == "exit()":
             console.print("[bold red]Exiting chat...[/bold red]")
             break
 
-        # Display help
         if user_input.lower() == "help()":
             display_help()
             continue
 
-        # Check if the user is asking to execute a command
         if user_input.startswith("!"):
             execute_cli_command(user_input[1:])
             continue
@@ -61,7 +59,7 @@ def chat(book_path=None):
         user_input = (
             f"Answer the next prompt formatted on markdown (text): {user_input}"
         )
-        # Send message to assistant
+
         try:
             response = create_message(
                 book_path, thread_id=thread.id, content=user_input, assistant=assistant
@@ -70,18 +68,8 @@ def chat(book_path=None):
             console.print(f"[bold red]Error: {str(e)}[/bold red]")
             continue
 
-        # Display assistant's response formatted as markdown
         markdown_response = Markdown(response)
         console.print(markdown_response)
-
-
-import inspect
-
-import shlex
-import inspect
-
-import shlex
-import inspect
 
 
 def execute_cli_command(user_input):
@@ -90,32 +78,24 @@ def execute_cli_command(user_input):
     calling the undecorated function directly.
     """
     try:
-        # Use shlex.split to handle quotes and separate arguments correctly
         parts = shlex.split(user_input)
         module_name = parts[0]
-        command_name = parts[1].replace("-", "_")  # Replace hyphens with underscores
-        command_args = parts[2:]  # Keep the rest of the arguments as a list
+        command_name = parts[1].replace("-", "_")
+        command_args = parts[2:]
 
-        # Check if the module exists in command_modules
         if module_name in command_modules:
             module = command_modules[module_name]
 
-            # Introspection: Get the function by name
             if hasattr(module, command_name):
                 cmd_func = getattr(module, command_name)
 
-                # Check if it's a Click command
                 if hasattr(cmd_func, "callback"):
-                    # Call the underlying undecorated function directly
                     cmd_func = cmd_func.callback
 
-                # Check if it's a callable (function)
                 if callable(cmd_func):
                     console.print(
                         f"Executing command from module: [bold]{module_name}[/bold]"
                     )
-
-                    # Directly call the function with the argument list
                     cmd_func(*command_args)
                 else:
                     console.print(

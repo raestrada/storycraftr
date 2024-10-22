@@ -11,46 +11,67 @@ from storycraftr.state import debug_state  # Importar el estado de debug
 console = Console()
 
 
-def generate_prompt_with_hash(original_prompt, date, book_path):
-    # Selecciona una frase aleatoria de la lista usando secrets.choice para mayor seguridad
-    random_phrase = secrets.choice(longer_date_formats).format(date=date)
+def generate_prompt_with_hash(original_prompt: str, date: str, book_path: str) -> str:
+    """
+    Generates a modified prompt by combining a random phrase from a list,
+    a date, and the original prompt. Logs the prompt details in a YAML file.
 
-    # Combina la frase seleccionada, un salto de línea, el hash y el prompt original
+    Args:
+        original_prompt (str): The original prompt to be modified.
+        date (str): The current date to be used in the prompt.
+        book_path (str): Path to the book's directory where prompts.yaml will be saved.
+
+    Returns:
+        str: The modified prompt with the date and random phrase.
+    """
+    # Selecciona una frase aleatoria segura de la lista
+    random_phrase = secrets.choice(longer_date_formats).format(date=date)
     modified_prompt = f"{random_phrase}\n\n{original_prompt}"
 
-    # Ruta del archivo YAML
+    # Define la ruta del archivo YAML
     yaml_path = os.path.join(book_path, "prompts.yaml")
 
-    # Crea una nueva entrada para el log
+    # Nueva entrada de log con fecha y prompt original
     log_entry = {"date": str(date), "original_prompt": original_prompt}
 
-    # Verifica si el archivo ya existe
+    # Verifica si el archivo YAML existe y carga los datos
     if os.path.exists(yaml_path):
-        # Si existe, cargamos los datos existentes
-        with open(yaml_path, "r") as file:
+        with open(yaml_path, "r", encoding="utf-8") as file:
             existing_data = (
                 yaml.safe_load(file) or []
-            )  # Si está vacío, devuelve una lista vacía
+            )  # Carga una lista vacía si está vacío
     else:
-        # Si no existe, creamos una nueva lista
         existing_data = []
 
-    # Añade la nueva entrada
+    # Añade la nueva entrada al log
     existing_data.append(log_entry)
 
-    # Guardamos los datos de vuelta en el archivo YAML
-    with open(yaml_path, "w") as file:
+    # Guarda los datos actualizados en el archivo YAML
+    with open(yaml_path, "w", encoding="utf-8") as file:
         yaml.dump(existing_data, file, default_flow_style=False)
 
-    # Si el modo debug está activado, imprime el prompt modificado en formato Markdown
+    # Imprime el prompt modificado en Markdown si el modo debug está activado
     if debug_state.is_debug():
         console.print(Markdown(modified_prompt))
 
     return modified_prompt
 
 
-# Define the structure for the book using NamedTuple
 class BookConfig(NamedTuple):
+    """
+    A NamedTuple representing the configuration of a book.
+
+    Attributes:
+        book_path (str): The path to the book's directory.
+        book_name (str): The name of the book.
+        primary_language (str): The primary language of the book.
+        alternate_languages (list): A list of alternate languages.
+        default_author (str): The default author of the book.
+        genre (str): The genre of the book.
+        license (str): The license type for the book.
+        reference_author (str): A reference author for style guidance.
+    """
+
     book_path: str
     book_name: str
     primary_language: str
@@ -61,15 +82,24 @@ class BookConfig(NamedTuple):
     reference_author: str
 
 
-# Function to load the JSON file and convert it into a BookConfig object
-def load_book_config(book_path):
+def load_book_config(book_path: str) -> BookConfig:
+    """
+    Loads the book's configuration from the storycraftr.json file.
+
+    Args:
+        book_path (str): The path to the book's directory.
+
+    Returns:
+        BookConfig: An instance of the BookConfig NamedTuple containing the book's settings.
+        None: If the storycraftr.json file is not found or is in an invalid directory.
+    """
+    config_file = os.path.join(book_path, "storycraftr.json")
+
     try:
-        with open(
-            os.path.join(book_path, "storycraftr.json"), "r", encoding="utf-8"
-        ) as file:
+        with open(config_file, "r", encoding="utf-8") as file:
             data = json.load(file)
-            # Create an instance of BookConfig with the values from the JSON
-            book_config = BookConfig(
+            # Devuelve una instancia de BookConfig con los valores del archivo JSON
+            return BookConfig(
                 book_path=data["book_path"],
                 book_name=data["book_name"],
                 primary_language=data["primary_language"],
@@ -79,21 +109,31 @@ def load_book_config(book_path):
                 license=data["license"],
                 reference_author=data["reference_author"],
             )
-    except FileNotFoundError or NotADirectoryError:
+    except (FileNotFoundError, NotADirectoryError):
         console.print(
             f"[bold red]⚠[/bold red] Folder '[bold]{book_path}[/bold]' is not a storycraftr project.",
             style="red",
         )
         return None
 
-    return book_config
 
+def file_has_more_than_three_lines(file_path: str) -> bool:
+    """
+    Check if a file has more than three lines.
 
-def file_has_more_than_three_lines(file_path):
-    """Check if a file has more than three lines."""
-    with open(file_path, "r") as file:
-        # Iterate through the first 4 lines and stop if we reach 4 lines
-        for i, _ in enumerate(file, 1):
-            if i > 3:
-                return True
+    Args:
+        file_path (str): The path to the file.
+
+    Returns:
+        bool: True if the file has more than three lines, False otherwise.
+    """
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            # Itera sobre las primeras 4 líneas y devuelve True si hay más de 3 líneas
+            for i, _ in enumerate(file, start=1):
+                if i > 3:
+                    return True
+    except FileNotFoundError:
+        console.print(f"[red bold]Error:[/red bold] File not found: {file_path}")
+        return False
     return False

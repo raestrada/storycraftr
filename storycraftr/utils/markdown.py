@@ -8,17 +8,27 @@ from rich.progress import Progress
 console = Console()
 
 
-# Function to save content to a markdown file with optional task for progress updates
 def save_to_markdown(
     book_path, file_name, header, content, progress: Progress = None, task=None
-):
-    """Save the generated content to the specified markdown file, creating a backup if the file exists.
-    Optionally updates a progress task.
+) -> str:
+    """
+    Save the generated content to a specified markdown file, creating a backup if the file exists.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        file_name (str): The name of the markdown file to save.
+        header (str): The header to add at the beginning of the content.
+        content (str): The content to save in the file.
+        progress (Progress, optional): Rich Progress object for updating progress.
+        task (optional): Task associated with progress for updates.
+
+    Returns:
+        str: The path to the saved markdown file.
     """
     file_path = os.path.join(book_path, file_name)
     backup_path = file_path + ".back"
 
-    # If the file exists, create a backup
+    # Create a backup if the file exists
     if os.path.exists(file_path):
         if progress and task:
             progress.update(task, description=f"Backing up {file_name}")
@@ -32,11 +42,9 @@ def save_to_markdown(
     if progress and task:
         progress.update(task, description=f"Saving content to {file_name}")
     else:
-        console.print(
-            f"[bold blue]Saving content to {file_path}...[/bold blue]"
-        )  # Progress message
+        console.print(f"[bold blue]Saving content to {file_path}...[/bold blue]")
 
-    with open(file_path, "w") as f:
+    with open(file_path, "w", encoding="utf-8") as f:
         f.write(f"# {header}\n\n{content}")
 
     if progress and task:
@@ -44,33 +52,55 @@ def save_to_markdown(
     else:
         console.print(
             f"[bold green]Content saved successfully to {file_path}[/bold green]"
-        )  # Success message
+        )
 
-    return file_path  # Return the path for reuse
+    return file_path
 
 
-# Function to append content to an existing markdown file
 def append_to_markdown(book_path, folder_name, file_name, content):
-    """Append content to an existing markdown file."""
+    """
+    Append content to an existing markdown file.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        folder_name (str): The folder where the file is located.
+        file_name (str): The name of the markdown file to append to.
+        content (str): The content to append.
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+    """
     file_path = os.path.join(book_path, folder_name, file_name)
 
     if os.path.exists(file_path):
-        with open(file_path, "a") as f:
+        with open(file_path, "a", encoding="utf-8") as f:
             f.write(f"\n\n{content}")
-        print(f"Appended content to {file_path}")
+        console.print(f"Appended content to {file_path}")
     else:
         raise FileNotFoundError(f"File {file_path} does not exist.")
 
 
-# Function to read content from a markdown file
-def read_from_markdown(book_path, folder_name, file_name):
-    """Read content from the specified markdown file."""
+def read_from_markdown(book_path, folder_name, file_name) -> str:
+    """
+    Read content from the specified markdown file.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        folder_name (str): The folder where the file is located.
+        file_name (str): The name of the markdown file to read from.
+
+    Returns:
+        str: The content of the markdown file.
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+    """
     file_path = os.path.join(book_path, folder_name, file_name)
 
     if os.path.exists(file_path):
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
-        print(f"Read content from {file_path}")
+        console.print(f"Read content from {file_path}")
         return content
     else:
         raise FileNotFoundError(f"File {file_path} does not exist.")
@@ -79,6 +109,17 @@ def read_from_markdown(book_path, folder_name, file_name):
 def consolidate_book_md(
     book_path: str, primary_language: str, translate: str = None
 ) -> str:
+    """
+    Consolidate all chapters of a book into a single markdown file.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        primary_language (str): The primary language of the book.
+        translate (str, optional): If provided, translates the content to the specified language.
+
+    Returns:
+        str: The path to the consolidated markdown file.
+    """
     chapters_dir = os.path.join(book_path, "chapters")
     output_file_name = (
         f"book-{primary_language}.md" if not translate else f"book-{translate}.md"
@@ -86,95 +127,87 @@ def consolidate_book_md(
     output_file_path = os.path.join(book_path, "book", output_file_name)
 
     # Ensure the "book" folder exists
-    book_dir = os.path.join(book_path, "book")
-    os.makedirs(book_dir, exist_ok=True)
+    os.makedirs(os.path.join(book_path, "book"), exist_ok=True)
 
-    # Create or get the assistant and thread
+    # Create or get the assistant and thread for translation (if needed)
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    # Files to process in the specified order
+    # Collect chapters to process
     files_to_process = []
 
-    # Add cover.md and back-cover.md
-    if os.path.exists(os.path.join(chapters_dir, "cover.md")):
-        files_to_process.append("cover.md")
-    if os.path.exists(os.path.join(chapters_dir, "back-cover.md")):
-        files_to_process.append("back-cover.md")
+    # Add cover and back-cover if they exist
+    for section in ["cover.md", "back-cover.md"]:
+        section_path = os.path.join(chapters_dir, section)
+        if os.path.exists(section_path):
+            files_to_process.append(section)
 
-    # Add chapters in chapter-[number].md format in ascending order
-    chapter_files = [
-        f for f in os.listdir(chapters_dir) if re.match(r"chapter-\d+\.md", f)
-    ]
-    chapter_files.sort(
-        key=lambda x: int(re.findall(r"\d+", x)[0])
-    )  # Sort by chapter number
+    # Add chapters in order
+    chapter_files = sorted(
+        [f for f in os.listdir(chapters_dir) if re.match(r"chapter-\d+\.md", f)],
+        key=lambda x: int(re.findall(r"\d+", x)[0]),
+    )
     files_to_process.extend(chapter_files)
 
-    # Add epilogue.md
+    # Add epilogue if it exists
     if os.path.exists(os.path.join(chapters_dir, "epilogue.md")):
         files_to_process.append("epilogue.md")
 
-    # Log start of consolidation and translation status
+    # Log start of consolidation
     if translate:
         console.print(
-            f"Consolidating chapters for [bold]{book_path}[/bold] and translating to [bold]{translate}[/bold]..."
+            f"Consolidating and translating to [bold]{translate}[/bold] for [bold]{book_path}[/bold]..."
         )
     else:
         console.print(
             f"Consolidating chapters for [bold]{book_path}[/bold] without translation..."
         )
 
-    # Create Progress object with two tasks
+    # Process files and consolidate into one markdown file
     with Progress() as progress:
         task_chapters = progress.add_task(
             "[cyan]Processing chapters...", total=len(files_to_process)
         )
-        if translate:
-            task_translation = progress.add_task(
-                "[cyan]Translating content...", total=50
-            )  # Arbitrary total for translation
-        else:
-            task_translation = None
+        task_translation = (
+            progress.add_task("[cyan]Translating content...", total=50)
+            if translate
+            else None
+        )
+        task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
 
         with open(output_file_path, "w", encoding="utf-8") as consolidated_md:
-            # Process each file in the specified order
             for chapter_file in files_to_process:
                 chapter_path = os.path.join(chapters_dir, chapter_file)
 
-                if chapter_file.endswith(".md"):
-                    progress.update(
-                        task_chapters, description=f"Processing {chapter_file}..."
-                    )
-                    with open(chapter_path, "r", encoding="utf-8") as chapter_md:
-                        content = chapter_md.read()
+                progress.update(
+                    task_chapters, description=f"Processing {chapter_file}..."
+                )
+                with open(chapter_path, "r", encoding="utf-8") as chapter_md:
+                    content = chapter_md.read()
 
-                        # If 'translate' is not None, translate the content using OpenAI
-                        if translate:
-                            progress.update(
-                                task_translation,
-                                description=f"Translating {chapter_file} to {translate}...",
-                            )
-                            if translate:
-                                progress.reset(task_translation)
-                            content = create_message(
-                                book_path,
-                                thread_id=thread.id,
-                                content=content,
-                                assistant=assistant,
-                                progress=progress,
-                                task_id=task_translation,
-                            )
+                    # Translate content if translation is requested
+                    if translate:
+                        progress.update(
+                            task_translation,
+                            description=f"Translating {chapter_file}...",
+                        )
+                        content = create_message(
+                            book_path,
+                            thread_id=thread.id,
+                            content=content,
+                            assistant=assistant,
+                            progress=progress,
+                            task_id=task_openai,
+                        )
 
-                        # Write the (translated or original) content into the consolidated file
-                        consolidated_md.write(content)
-                        consolidated_md.write("\n\\newpage\n")
+                    # Write (translated or original) content to consolidated file
+                    consolidated_md.write(content)
+                    consolidated_md.write("\n\\newpage\n")
 
-                    # Update the progress for processing chapters
-                    progress.update(task_chapters, advance=1)
+                # Update progress for chapters
+                progress.update(task_chapters, advance=1)
 
-    # Log the completion of the consolidation
-    # Al final de la consolidación, en lugar de console.print:
+    # Log completion of consolidation
     progress.update(
         task_chapters,
         description=f"[green bold]Book consolidated[/green bold] at {output_file_path}",

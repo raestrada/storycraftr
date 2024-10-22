@@ -16,14 +16,19 @@ client = OpenAI()
 console = Console()
 
 
-def get_vector_store_id_by_name(assistant_name):
-    """Retrieve the vector store ID by name."""
+def get_vector_store_id_by_name(assistant_name: str) -> str:
+    """
+    Retrieve the vector store ID by the assistant's name.
+
+    Args:
+        assistant_name (str): The name of the assistant.
+
+    Returns:
+        str: The ID of the vector store associated with the assistant's name, or None if not found.
+    """
     vector_stores = client.beta.vector_stores.list()
 
-    # Construir el nombre predecible del vector store
     expected_name = f"{assistant_name} Docs"
-
-    # Buscar el vector store cuyo nombre coincida con el esperado
     for vector_store in vector_stores.data:
         if vector_store.name == expected_name:
             return vector_store.id
@@ -35,41 +40,41 @@ def get_vector_store_id_by_name(assistant_name):
 
 
 def upload_markdown_files_to_vector_store(
-    vector_store_id, book_path, progress=None, task=None
+    vector_store_id: str, book_path: str, progress: Progress = None, task=None
 ):
     """
-    Function to upload all markdown files from the book path to the specified vector store.
+    Upload all Markdown files from the book directory to the specified vector store.
 
-    Parameters:
-    vector_store_id (str): ID of the vector store to which files will be uploaded.
-    book_path (str): Path to the book directory containing markdown files.
-    progress (Progress, optional): Progress bar object for tracking progress.
-    task (Task, optional): Task ID for progress tracking.
+    Args:
+        vector_store_id (str): ID of the vector store to upload files to.
+        book_path (str): Path to the book's directory containing markdown files.
+        progress (Progress, optional): Progress bar object for tracking progress.
+        task (Task, optional): Task ID for progress tracking.
+
+    Returns:
+        None
     """
     console.print(
         f"[bold blue]Uploading all knowledge files from '{book_path}'...[/bold blue]"
     )
-
-    # Cargar los archivos markdown
     md_files = load_markdown_files(book_path)
 
-    if len(md_files) == 0:
+    if not md_files:
         console.print("[bold yellow]No Markdown files found to upload.[/bold yellow]")
         return
 
     file_streams = [open(file_path, "rb") for file_path in md_files]
-
-    # Subir los archivos al vector store
     file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
         vector_store_id=vector_store_id, files=file_streams
     )
 
-    # Monitorear el progreso
-    while file_batch.status == "queued" or file_batch.status == "in_progress":
+    # Monitor progress
+    while file_batch.status in ["queued", "in_progress"]:
+        status_message = f"{file_batch.status}..."
         if progress and task:
-            progress.update(task, description=f"{file_batch.status}...")
+            progress.update(task, description=status_message)
         else:
-            console.print(f"[bold yellow]{file_batch.status}...[/bold yellow]")
+            console.print(f"[bold yellow]{status_message}[/bold yellow]")
         time.sleep(1)
 
     console.print(
@@ -77,36 +82,47 @@ def upload_markdown_files_to_vector_store(
     )
 
 
-def load_markdown_files(book_path):
-    """Load all Markdown files from the book's directory and subdirectories."""
+def load_markdown_files(book_path: str) -> list:
+    """
+    Load all Markdown files from the book's directory.
+
+    Args:
+        book_path (str): Path to the book directory.
+
+    Returns:
+        list: A list of valid Markdown file paths.
+    """
     console.print(
         f"[bold blue]Loading all Markdown files from '{book_path}'...[/bold blue]"
-    )  # Progress message
-
-    # Find all Markdown files in the directory
+    )
     md_files = glob.glob(f"{book_path}/**/*.md", recursive=True)
 
-    # Filter out files with less than 3 lines
-    valid_md_files = []
-    for file_path in md_files:
-        with open(file_path, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-            if len(lines) > 3:
-                valid_md_files.append(file_path)
+    # Filter files with more than 3 lines
+    valid_md_files = [
+        file_path for file_path in md_files if sum(1 for _ in open(file_path)) > 3
+    ]
 
     console.print(
         f"[bold green]Loaded {len(valid_md_files)} Markdown files with more than 3 lines.[/bold green]"
-    )  # Success message
-
+    )
     return valid_md_files
 
 
-# Function to delete an existing assistant
-def delete_assistant(book_path):
-    name = book_path.split("/")[-1]
+def delete_assistant(book_path: str):
+    """
+    Delete an assistant if it exists.
+
+    Args:
+        book_path (str): Path to the book directory.
+
+    Returns:
+        None
+    """
+    name = os.path.basename(book_path)
     console.print(
         f"[bold blue]Checking if assistant '{name}' exists for deletion...[/bold blue]"
-    )  # Progress message
+    )
+
     assistants = client.beta.assistants.list()
     for assistant in assistants.data:
         if assistant.name == name:
@@ -114,14 +130,23 @@ def delete_assistant(book_path):
             client.beta.assistants.delete(assistant_id=assistant.id)
             console.print(
                 f"[bold green]Assistant {name} deleted successfully.[/bold green]"
-            )  # Success message
+            )
             break
 
 
-# Function to create or get an assistant with optional progress task
-def create_or_get_assistant(book_path, progress: Progress = None, task=None):
-    name = book_path.split("/")[-1]
+def create_or_get_assistant(book_path: str, progress: Progress = None, task=None):
+    """
+    Create or retrieve an assistant for the given book.
 
+    Args:
+        book_path (str): Path to the book directory.
+        progress (Progress, optional): Progress object for tracking.
+        task (Task, optional): Task ID for progress tracking.
+
+    Returns:
+        Assistant: The created or retrieved assistant object.
+    """
+    name = os.path.basename(book_path)
     if progress and task:
         progress.update(
             task, description=f"Searching for existing assistant '{name}'..."
@@ -131,26 +156,18 @@ def create_or_get_assistant(book_path, progress: Progress = None, task=None):
             f"[bold blue]Searching for existing assistant '{name}'...[/bold blue]"
         )
 
-    assistant = None
     assistants = client.beta.assistants.list()
-
     for assistant in assistants.data:
         if assistant.name == name:
-            if progress and task:
-                progress.update(task, description=f"Assistant {name} already exists.")
-            else:
-                console.print(
-                    f"[bold yellow]Assistant {name} already exists.[/bold yellow]"
-                )
+            console.print(
+                f"[bold yellow]Assistant {name} already exists.[/bold yellow]"
+            )
             return assistant
 
-    # Crear vector store
     vector_store = client.beta.vector_stores.create(name=f"{name} Docs")
-
-    # Subir archivos markdown al vector store usando la función común
     upload_markdown_files_to_vector_store(vector_store.id, book_path, progress, task)
 
-    # Crear el asistente
+    # Read instructions from behaviors
     with open(os.path.join(book_path, "behaviors", "default.txt"), "r") as file:
         instructions = file.read()
 
@@ -161,53 +178,46 @@ def create_or_get_assistant(book_path, progress: Progress = None, task=None):
         model="gpt-4o",
     )
 
-    # Asociar el asistente con el vector store
-    assistant = client.beta.assistants.update(
+    client.beta.assistants.update(
         assistant_id=assistant.id,
         tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
     )
 
     console.print(f"[bold green]Assistant '{name}' created successfully.[/bold green]")
-
     return assistant
 
 
 def create_message(
-    book_path,
-    thread_id,
-    content,
+    book_path: str,
+    thread_id: str,
+    content: str,
     assistant,
-    file_path=None,
-    progress=None,
+    file_path: str = None,
+    progress: Progress = None,
     task_id=None,
-):
+) -> str:
     """
     Create a message in the thread and process it asynchronously.
 
-    Parameters:
-        thread_id (str): The ID of the thread where the message will be created.
+    Args:
+        book_path (str): Path to the book directory.
+        thread_id (str): ID of the thread where the message will be created.
         content (str): The content of the message.
         assistant (object): The assistant object with an ID.
         file_path (str, optional): The path to a file to attach as an attachment. Defaults to None.
-        progress (rich.progress.Progress, optional): Progress object for tracking. Defaults to None.
-        task_id (int, optional): Task ID for the progress bar. Required if progress is passed.
+        progress (Progress, optional): Progress object for tracking. Defaults to None.
+        task_id (int, optional): Task ID for the progress bar.
 
-    Raises:
-        : Custom exception if a problem occurs during the OpenAI request.
+    Returns:
+        str: The generated response text from the assistant.
     """
-
     config = load_book_config(book_path)
-
-    # Flag to determine if we should print to the console
     should_print = progress is None
 
-    # Use the provided progress or create a new one if not passed
     internal_progress = False
     if progress is None:
         progress = Progress()
-        task_id = progress.add_task(
-            "[cyan]Waiting for assistant response...", total=500
-        )
+        task_id = progress.add_task("[cyan]Waiting for assistant response...", total=50)
         internal_progress = True
 
     if should_print:
@@ -215,7 +225,6 @@ def create_message(
             f"[bold blue]Creating message in thread {thread_id}...[/bold blue]"
         )
 
-    # Prepare the base prompt
     if file_path and os.path.exists(file_path):
         if should_print:
             console.print(
@@ -223,7 +232,6 @@ def create_message(
             )
         with open(file_path, "r", encoding="utf-8") as f:
             file_content = f.read()
-            # Append the file content to the prompt asking for improvement
             content = (
                 f"{content}\n\nHere is the existing content to improve:\n{file_content}"
             )
@@ -234,28 +242,22 @@ def create_message(
             )
 
     try:
-        # Send prompt to OpenAI API
-        avoid_cache_content = generate_prompt_with_hash(
+        prompt_with_hash = generate_prompt_with_hash(
             f"{FORMAT_OUTPUT.format(reference_author=config.reference_author, language=config.primary_language)}\n\n{content}",
             datetime.now().strftime("%B %d, %Y"),
             book_path=book_path,
         )
         client.beta.threads.messages.create(
-            thread_id=thread_id, role="user", content=avoid_cache_content
+            thread_id=thread_id, role="user", content=prompt_with_hash
         )
 
-        # Start the assistant run
         run = client.beta.threads.runs.create(
             thread_id=thread_id, assistant_id=assistant.id
         )
-        if should_print:
-            console.print("[bold blue]Sending prompt to OpenAI API...[/bold blue]")
-
         if internal_progress:
             progress.start()
 
-        # Wait for the assistant response while updating the progress bar
-        while run.status == "queued" or run.status == "in_progress":
+        while run.status in ["queued", "in_progress"]:
             run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
             progress.update(task_id, advance=1)
             time.sleep(0.5)
@@ -263,82 +265,34 @@ def create_message(
         if internal_progress:
             progress.stop()
 
-        if should_print:
-            console.print(f"[bold green]Generated content received.[/bold green]")
+        console.print(f"[bold green]Generated content received.[/bold green]")
 
-        # Retrieve the list of messages in the thread
         messages = client.beta.threads.messages.list(thread_id=thread_id)
-
         response_text = messages.data[0].content[0].text.value
 
-        # Check if the response is the same as the original prompt (potential issue with credits)
         if response_text.strip() == content.strip():
             console.print(
                 "[bold yellow]Warning: The response matches the original prompt. You might be out of credit.[/bold yellow]"
             )
-            raise (
+            raise Exception(
                 "The response matches the original prompt. Check your account for credit availability."
             )
 
         return response_text
 
-    except openai.APITimeoutError as e:
-        console.print(f"[bold red]OpenAI API request timed out: {e}[/bold red]")
-        raise Exception("OpenAI API request timed out. Please try again.")
-    except openai.InternalServerError as e:
-        console.print(
-            f"[bold red]OpenAI API returned an Internal Server Error: {e}[/bold red]"
-        )
-        raise Exception(f"OpenAI API returned an Internal Server Error: {e}")
-    except openai.APIConnectionError as e:
-        console.print(f"[bold red]OpenAI API request failed to connect: {e}[/bold red]")
-        raise Exception(
-            f"OpenAI API request failed to connect. Please check your network connection: {e}"
-        )
-    except openai.BadRequestError as e:
-        console.print(f"[bold red]OpenAI API request was invalid: {e}[/bold red]")
-        raise Exception(
-            f"OpenAI API request was invalid. Please check your request parameters: {e}"
-        )
-    except openai.AuthenticationError as e:
-        console.print(
-            f"[bold red]OpenAI API request was not authorized: {e}[/bold red]"
-        )
-        raise Exception(
-            "OpenAI API request was not authorized. Please check your API key or credentials."
-        )
-    except openai.PermissionDeniedError as e:
-        console.print(f"[bold red]OpenAI API request was not permitted: {e}[/bold red]")
-        raise Exception(
-            "OpenAI API request was not permitted. Please check your permissions or access level."
-        )
-    except openai.RateLimitError as e:
-        console.print(
-            f"[bold red]OpenAI API request exceeded rate limit: {e}[/bold red]"
-        )
-        raise Exception(
-            "OpenAI API request exceeded rate limit. Please wait and try again."
-        )
-    except openai.UnprocessableEntityError as e:
-        console.print(
-            f"[bold red]OpenAI API request could not be processed: {e}[/bold red]"
-        )
-        raise Exception(
-            "OpenAI API request could not be processed. Please check the format and try again."
-        )
+    except Exception as e:
+        console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        raise
 
 
-# Function to get a new thread
-def get_thread():
+def get_thread() -> object:
+    """Retrieve or create a new thread."""
     return client.beta.threads.create()
 
 
-# Function to update the assistant's knowledge with new files
-def update_agent_files(book_path, assistant):
-    # Obtener el nombre del asistente
+def update_agent_files(book_path: str, assistant):
+    """Update the assistant's knowledge with new files from the book path."""
     assistant_name = assistant.name
-
-    # Obtener el vector_store_id por nombre
     vector_store_id = get_vector_store_id_by_name(assistant_name)
 
     if not vector_store_id:
@@ -347,9 +301,74 @@ def update_agent_files(book_path, assistant):
         )
         return
 
-    # Usar la función común para subir los archivos al vector store correspondiente
     upload_markdown_files_to_vector_store(vector_store_id, book_path)
-
     console.print(
         f"[bold green]Files updated successfully in assistant '{assistant.name}'.[/bold green]"
     )
+
+
+def process_chapters(
+    save_to_markdown,
+    book_path: str,
+    prompt_template: str,
+    task_description: str,
+    file_suffix: str,
+    **prompt_kwargs,
+):
+    """
+    Process each chapter of the book with the given prompt template and generate output.
+
+    Args:
+        book_path (str): Path to the book directory.
+        prompt_template (str): The template for the prompt.
+        task_description (str): Description of the task for progress display.
+        file_suffix (str): Suffix for the output file.
+        **prompt_kwargs: Additional arguments for the prompt template.
+    """
+    chapters_dir = os.path.join(book_path, "chapters")
+    if not os.path.exists(chapters_dir):
+        raise FileNotFoundError(
+            f"The chapter directory '{chapters_dir}' does not exist."
+        )
+
+    files_to_process = [f for f in os.listdir(chapters_dir) if f.endswith(".md")]
+    if not files_to_process:
+        raise FileNotFoundError(
+            "No Markdown (.md) files were found in the chapter directory."
+        )
+
+    with Progress() as progress:
+        task_chapters = progress.add_task(
+            f"[cyan]{task_description}", total=len(files_to_process)
+        )
+        task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
+
+        for chapter_file in files_to_process:
+            chapter_path = os.path.join(chapters_dir, chapter_file)
+            prompt = prompt_template.format(**prompt_kwargs)
+
+            assistant = create_or_get_assistant(book_path)
+            thread = get_thread()
+
+            progress.reset(task_openai)
+            refined_text = create_message(
+                book_path,
+                thread_id=thread.id,
+                content=prompt,
+                assistant=assistant,
+                progress=progress,
+                task_id=task_openai,
+                file_path=chapter_path,
+            )
+
+            save_to_markdown(
+                book_path,
+                os.path.join("chapters", chapter_file),
+                file_suffix,
+                refined_text,
+                progress=progress,
+                task=task_chapters,
+            )
+            progress.update(task_chapters, advance=1)
+
+    update_agent_files(book_path, assistant)

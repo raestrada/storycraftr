@@ -11,255 +11,74 @@ from storycraftr.prompts.iterate import (
     INSERT_FLASHBACK_CHAPTER_PROMPT,
     REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT,
     CHECK_CHAPTER_CONSISTENCY_PROMPT,
+    INSERT_SPLIT_CHAPTER_PROMPT,
+    REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT,
 )
 from storycraftr.agent.agents import (
     update_agent_files,
     create_message,
     get_thread,
     create_or_get_assistant,
+    process_chapters,
 )
 from storycraftr.utils.markdown import save_to_markdown
 
 console = Console()
 
 
-def check_character_names_consistency(
-    book_path, chapter_path, progress, task_id, assistant
-):
+def iterate_check_names(book_path: str):
     """
-    Checks for character name consistency in a chapter file.
-    Uses an OpenAI assistant to perform the review.
+    Check for name consistency across all chapters in the book.
+
+    Args:
+        book_path (str): The path to the book's directory.
+
+    Returns:
+        Corrections made to ensure name consistency.
     """
-
-    # Create the prompt with the chapter content
-    prompt = CHECK_NAMES_PROMPT
-
-    # Get or create the assistant and the thread
-    thread = get_thread()
-
-    # Create the message with the thread_id and assistant
-    response = create_message(
+    corrections = process_chapters(
+        save_to_markdown,
         book_path,
-        thread_id=thread.id,
-        content=prompt,
-        assistant=assistant,
-        progress=progress,
-        task_id=task_id,
-        file_path=chapter_path,
+        prompt_template=CHECK_NAMES_PROMPT,
+        task_description="Checking name consistency...",
+        file_suffix="Name Consistency Check",
     )
-
-    # Advance the task in the OpenAI progress
-    progress.update(task_id, advance=1)
-
-    return response
-
-
-def iterate_check_names(book_path):
-    """
-    Iterates over all chapters in the directory and checks for name consistency.
-    """
-    corrections = {}
-
-    # Verificar si el directorio del libro existe
-    if not os.path.exists(book_path):
-        console.print(
-            f"[bold red]El directorio del libro '{book_path}' no existe.[/bold red]"
-        )
-        return
-
-    chapters_dir = os.path.join(book_path, "chapters")
-
-    # Verificar si el directorio de capítulos existe
-    if not os.path.exists(chapters_dir):
-        console.print(
-            f"[bold red]El directorio de capítulos '{chapters_dir}' no existe.[/bold red]"
-        )
-        return
-
-    # Get all .md files in the chapters directory
-    files_to_process = [f for f in os.listdir(chapters_dir) if f.endswith(".md")]
-
-    if not files_to_process:
-        console.print(
-            "[bold red]No Markdown (.md) files found in the directory.[/bold red]"
-        )
-        return corrections
-
-    # Create a rich progress bar
-    assistant = create_or_get_assistant(book_path)
-    with Progress() as progress:
-        # Task to process chapters
-        task_chapters = progress.add_task(
-            "[cyan]Processing chapters...", total=len(files_to_process)
-        )
-
-        for chapter_file in files_to_process:
-            chapter_path = os.path.join(chapters_dir, chapter_file)
-
-            # Task for calling OpenAI for each chapter
-            task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
-
-            progress.reset(task_openai)
-
-            # Call the function to check name consistency in the chapter
-            corrections[chapter_file] = check_character_names_consistency(
-                book_path, chapter_path, progress, task_openai, assistant=assistant
-            )
-
-            # Save to markdown
-            save_to_markdown(
-                chapters_dir,
-                chapter_file,
-                "Character Summary",
-                corrections[chapter_file],
-                progress,
-                task_openai,
-            )
-
-            # Advance the chapter processing task
-            progress.update(task_chapters, advance=1)
-
-    update_agent_files(book_path, assistant)
-
     return corrections
 
 
-def fix_name_in_chapters(book_path, original_name, new_name):
+def fix_name_in_chapters(book_path: str, original_name: str, new_name: str):
     """
-    Function to update character names across all chapters in a book.
-    """
-    chapters_dir = os.path.join(book_path, "chapters")
+    Update character names across all chapters.
 
-    if not os.path.exists(chapters_dir):
-        raise FileNotFoundError(
-            f"The chapter directory '{chapters_dir}' does not exist."
-        )
-
-    files_to_process = [f for f in os.listdir(chapters_dir) if f.endswith(".md")]
-
-    if not files_to_process:
-        raise FileNotFoundError(
-            "No Markdown (.md) files were found in the chapter directory."
-        )
-
-    # Create progress bar
-    with Progress() as progress:
-        task_chapters = progress.add_task(
-            "[cyan]Processing chapters...", total=len(files_to_process)
-        )
-        # Task for calling OpenAI for each chapter
-        task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
-
-        # Iterate over each chapter file
-        for chapter_file in files_to_process:
-            chapter_path = os.path.join(chapters_dir, chapter_file)
-
-            # Create the prompt using the defined format
-            prompt = FIX_NAME_PROMPT.format(
-                original_name=original_name, new_name=new_name
-            )
-
-            # Get the assistant and thread
-            assistant = create_or_get_assistant(book_path)
-            thread = get_thread()
-
-            progress.reset(task_openai)
-            # Send the message to perform the name change
-            corrected_text = create_message(
-                book_path,
-                thread_id=thread.id,
-                content=prompt,
-                assistant=assistant,
-                progress=progress,
-                task_id=task_openai,
-                file_path=chapter_path,
-            )
-
-            # Save the corrected chapter
-            save_to_markdown(
-                book_path,
-                os.path.join("chapters", chapter_file),
-                "Character Name Update",
-                corrected_text,
-                progress=progress,
-                task=task_openai,
-            )
-
-            # Advance the progress bar
-            progress.update(task_chapters, advance=1)
-    update_agent_files(book_path, assistant)
-    return
-
-
-def process_chapters(
-    book_path, prompt_template, task_description, file_suffix, **prompt_kwargs
-):
-    """
-    Generic function to process chapters in a book with a given prompt template.
-    """
-    chapters_dir = os.path.join(book_path, "chapters")
-
-    if not os.path.exists(chapters_dir):
-        raise FileNotFoundError(
-            f"The chapter directory '{chapters_dir}' does not exist."
-        )
-
-    files_to_process = [f for f in os.listdir(chapters_dir) if f.endswith(".md")]
-
-    if not files_to_process:
-        raise FileNotFoundError(
-            "No Markdown (.md) files were found in the chapter directory."
-        )
-
-    # Create progress bar
-    with Progress() as progress:
-        task_chapters = progress.add_task(
-            f"[cyan]{task_description}", total=len(files_to_process)
-        )
-        task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
-
-        for chapter_file in files_to_process:
-            chapter_path = os.path.join(chapters_dir, chapter_file)
-
-            # Create the prompt using the provided template and kwargs
-            prompt = prompt_template.format(**prompt_kwargs)
-
-            # Get the assistant and thread
-            assistant = create_or_get_assistant(book_path)
-            thread = get_thread()
-
-            progress.reset(task_openai)
-            refined_text = create_message(
-                book_path,
-                thread_id=thread.id,
-                content=prompt,
-                assistant=assistant,
-                progress=progress,
-                task_id=task_openai,
-                file_path=chapter_path,
-            )
-
-            # Save the refined chapter
-            save_to_markdown(
-                book_path,
-                os.path.join("chapters", chapter_file),
-                file_suffix,
-                refined_text,
-                progress=progress,
-                task=task_chapters,
-            )
-
-            progress.update(task_chapters, advance=1)
-
-    update_agent_files(book_path, assistant)
-    return
-
-
-def refine_character_motivation(book_path, character_name, story_context):
-    """
-    Function to refine character motivations across all chapters in a book.
+    Args:
+        book_path (str): The path to the book's directory.
+        original_name (str): The original name to be replaced.
+        new_name (str): The new name to replace the original.
     """
     process_chapters(
+        save_to_markdown,
+        book_path,
+        prompt_template=FIX_NAME_PROMPT,
+        task_description="Updating character names...",
+        file_suffix="Character Name Update",
+        original_name=original_name,
+        new_name=new_name,
+    )
+
+
+def refine_character_motivation(
+    book_path: str, character_name: str, story_context: str
+):
+    """
+    Refine the motivations of a character across all chapters.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        character_name (str): The name of the character to refine.
+        story_context (str): The story context to guide the refinement.
+    """
+    process_chapters(
+        save_to_markdown,
         book_path,
         prompt_template=REFINE_MOTIVATION_PROMPT,
         task_description="Refining character motivations...",
@@ -269,11 +88,16 @@ def refine_character_motivation(book_path, character_name, story_context):
     )
 
 
-def strengthen_core_argument(book_path, argument):
+def strengthen_core_argument(book_path: str, argument: str):
     """
-    Function to strengthen the core argument across all chapters in a book.
+    Strengthen the core argument across all chapters.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        argument (str): The core argument to strengthen across the story.
     """
     process_chapters(
+        save_to_markdown,
         book_path,
         prompt_template=STRENGTHEN_ARGUMENT_PROMPT,
         task_description="Strengthening core argument across chapters...",
@@ -282,11 +106,16 @@ def strengthen_core_argument(book_path, argument):
     )
 
 
-def check_consistency_across(book_path, consistency_type):
+def check_consistency_across(book_path: str, consistency_type: str):
     """
-    Function to check the consistency of chapters in a book.
+    Check for overall consistency across chapters.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        consistency_type (str): The type of consistency to check (e.g., plot, character).
     """
     process_chapters(
+        save_to_markdown,
         book_path,
         prompt_template=CHECK_CHAPTER_CONSISTENCY_PROMPT,
         task_description=f"Checking {consistency_type} consistency across chapters...",
@@ -295,12 +124,24 @@ def check_consistency_across(book_path, consistency_type):
     )
 
 
-def insert_new_chapter(book_path, position, prompt, flashback=False):
+def insert_new_chapter(
+    book_path: str,
+    position: int,
+    prompt: str,
+    flashback: bool = False,
+    split: bool = False,
+):
     """
-    Function to insert a new chapter at the specified position, renaming chapters and adjusting content accordingly.
+    Insert a new chapter at the specified position and adjust subsequent chapters.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        position (int): The position to insert the new chapter.
+        prompt (str): The prompt to guide chapter generation.
+        flashback (bool, optional): If True, the new chapter will be a flashback. Defaults to False.
+        split (bool, optional): If True, the new chapter will be a split. Defaults to False.
     """
     chapters_dir = os.path.join(book_path, "chapters")
-
     if not os.path.exists(chapters_dir):
         raise FileNotFoundError(
             f"The chapter directory '{chapters_dir}' does not exist."
@@ -319,140 +160,139 @@ def insert_new_chapter(book_path, position, prompt, flashback=False):
             f"Invalid position: {position}. Position must be between 1 and {len(files_to_process)}."
         )
 
-    # Create progress bar
+    # Create progress bar for chapter renaming and content insertion
     with Progress() as progress:
         task_chapters = progress.add_task(
             "[cyan]Inserting new chapter and renaming chapters...",
             total=len(files_to_process) + 2,
         )
 
-        # Task for calling OpenAI for each chapter
-        task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
-
-        # Adjust the names of the chapters from the insert point onwards
-        i = len(files_to_process) - 1
-        while i >= position:
+        # Renaming chapters from the insert point onward
+        for i in range(len(files_to_process) - 1, position - 1, -1):
             old_chapter_path = os.path.join(chapters_dir, files_to_process[i])
             new_chapter_path = os.path.join(chapters_dir, f"chapter-{i + 2}.md")
             os.rename(old_chapter_path, new_chapter_path)
             progress.update(task_chapters, advance=1)
-            i -= 1
 
         # Get or create the assistant and thread
         assistant = create_or_get_assistant(book_path)
         thread = get_thread()
 
-        prompt = INSERT_FLASHBACK_CHAPTER_PROMPT if flashback else INSERT_CHAPTER_PROMPT
+        # Determine prompt type (flashback or regular chapter)
+        prompt_text = (
+            INSERT_FLASHBACK_CHAPTER_PROMPT
+            if flashback
+            else INSERT_SPLIT_CHAPTER_PROMPT
+            if split
+            else INSERT_CHAPTER_PROMPT
+        ).format(prompt=prompt, position=position)
 
-        # Generate new chapter content using context
-        prompt_text = prompt.format(prompt=prompt, position=position)
+        # Generate new chapter content
         new_chapter_text = create_message(
             book_path,
             thread_id=thread.id,
             content=prompt_text,
             assistant=assistant,
             progress=progress,
-            task_id=task_openai,
-            file_path=None,
+            task_id=task_chapters,
         )
 
-        # Save the new chapter as the new chapter-{position}.md
+        # Save the new chapter
         new_chapter_path = os.path.join(chapters_dir, f"chapter-{position}.md")
         save_to_markdown(
             book_path,
-            os.path.join("chapters", f"chapter-{position}.md"),
+            new_chapter_path,
             f"Chapter {position}",
             new_chapter_text,
-            progress=progress,
-            task=task_chapters,
+            progress,
+            task_chapters,
         )
 
         progress.update(task_chapters, advance=1)
 
-        # Upload files to retrieval system
+        # Upload updated files to the agent's retrieval system
         update_agent_files(book_path, assistant)
 
-        # Handle the chapters before and after the insertion point, if they exist
-        prev_chapter = None if position == 1 else position - 1
-        next_chapter = None if position == len(files_to_process) else position + 1
-
-        # Handle the chapters before and after the insertion point, if they exist
-        prev_chapter_path = (
-            None
-            if position == 1
-            else os.path.join(chapters_dir, f"chapter-{position-1}.md")
-        )
-        next_chapter_path = (
-            None
-            if position == len(files_to_process)
-            else os.path.join(chapters_dir, f"chapter-{position + 1}.md")
-        )
-
-        # Rewriting previous and next chapters using retrieval system
-        if prev_chapter:
-            progress.reset(task_openai)
-            rewrite_chapters(
+        # Rewrite adjacent chapters for consistency
+        if position > 1:
+            prev_chapter_path = os.path.join(chapters_dir, f"chapter-{position - 1}.md")
+            rewrite_surrounding_chapter(
                 book_path,
                 prev_chapter_path,
-                prev_chapter,
+                position - 1,
                 position,
-                prompt,
-                progress,
-                task_openai,
                 flashback,
+                split,
+                progress,
+                task_chapters,
             )
 
-        if next_chapter:
-            progress.reset(task_openai)
-            rewrite_chapters(
+        if position < len(files_to_process):
+            next_chapter_path = os.path.join(chapters_dir, f"chapter-{position + 1}.md")
+            rewrite_surrounding_chapter(
                 book_path,
                 next_chapter_path,
-                next_chapter,
+                position + 1,
                 position,
-                prompt,
-                progress,
-                task_openai,
                 flashback,
+                split,
+                progress,
+                task_chapters,
             )
 
 
-def rewrite_chapters(
-    book_path, path, num, position, prompt, progress, task_chapters, flashback=False
+def rewrite_surrounding_chapter(
+    book_path: str,
+    chapter_path: str,
+    chapter_num: int,
+    position: int,
+    flashback: bool,
+    split: bool,
+    progress: Progress,
+    task_chapters,
 ):
     """
-    Function to rewrite the chapters before and after the inserted chapter to ensure consistency with the new chapter.
-    Utilizes the retrieval system to access the full context of the book without loading chapter contents directly.
+    Rewrite chapters adjacent to the inserted chapter for consistency.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        chapter_path (str): The path to the chapter file.
+        chapter_num (int): The chapter number to rewrite.
+        position (int): The position of the inserted chapter.
+        flashback (bool): Whether the inserted chapter is a flashback.
+        progress (Progress): Progress object for tracking progress.
+        task_chapters (Task): Task ID for tracking chapter rewrites.
     """
-    # Get the assistant and thread
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
     prompt = (
         REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT
         if flashback
+        else REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT
+        if split
         else REWRITE_SURROUNDING_CHAPTERS_PROMPT
-    )
+    ).format(prompt=chapter_num, position=position)
 
-    # Rewrite chapters using retrieval context
-    rewrite_prompt = prompt.format(prompt=prompt, position=position, chapter=num)
-
-    updated_chapters = create_message(
+    # Generate the rewritten chapter content
+    updated_chapter_text = create_message(
         book_path,
         thread_id=thread.id,
-        content=rewrite_prompt,
+        content=prompt,
         assistant=assistant,
         progress=progress,
         task_id=task_chapters,
-        file_path=path,
+        file_path=chapter_path,
     )
 
-    # Save the updated chapters back to the markdown files
+    # Save the rewritten chapter content
     save_to_markdown(
         book_path,
-        os.path.join("chapters", f"chapter-{num}.md"),
-        "Updated chapters with retrieval context",
-        updated_chapters,
-        progress=progress,
-        task=task_chapters,
+        chapter_path,
+        f"Chapter {chapter_num} (Updated)",
+        updated_chapter_text,
+        progress,
+        task_chapters,
     )
+
     progress.update(task_chapters, advance=1)

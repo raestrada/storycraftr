@@ -5,19 +5,25 @@ from rich.progress import Progress
 console = Console()
 
 
-def summarize_content(assistant, original_prompt):
+def summarize_content(assistant, original_prompt: str) -> str:
     """
-    Summarizes the prompt or content to reduce input size, generating a new thread for the summary step.
+    Summarizes the original prompt to reduce its size and complexity.
+
+    Args:
+        assistant: The assistant object to handle the interaction.
+        original_prompt (str): The prompt or content to be summarized.
+
+    Returns:
+        str: The summarized content, or an empty string if summarization fails.
     """
-    thread = get_thread()  # Generar un nuevo thread
+    thread = get_thread()
     content = f"Summarize the following prompt to make it more concise:\n\nPrompt:\n{original_prompt}"
 
-    # Log de inicio
     console.print("[cyan]Summarizing the prompt...[/cyan]")
 
-    # Enviar el mensaje a través del asistente y obtener la respuesta
+    # Send the summarization request to the assistant
     summary_response = create_message(
-        book_path, thread_id=thread.id, content=content, assistant=assistant
+        book_path=None, thread_id=thread.id, content=content, assistant=assistant
     )
 
     if summary_response:
@@ -28,19 +34,25 @@ def summarize_content(assistant, original_prompt):
         return ""
 
 
-def optimize_query_with_summary(assistant, summarized_prompt):
+def optimize_query_with_summary(assistant, summarized_prompt: str) -> str:
     """
-    Uses the summarized prompt to optimize it for a better response, generating a new thread for optimization.
+    Optimizes the summarized prompt for the best response.
+
+    Args:
+        assistant: The assistant object to handle the interaction.
+        summarized_prompt (str): The summarized prompt to optimize.
+
+    Returns:
+        str: The optimized content, or an empty string if optimization fails.
     """
-    thread = get_thread()  # Generar un nuevo thread
+    thread = get_thread()
     content = f"Using the following summarized prompt, optimize it for the best result:\n\nSummarized Prompt: {summarized_prompt}"
 
-    # Log de inicio
     console.print("[cyan]Optimizing the summarized prompt...[/cyan]")
 
-    # Enviar el mensaje a través del asistente
+    # Send the optimization request to the assistant
     optimized_response = create_message(
-        book_path, thread_id=thread.id, content=content, assistant=assistant
+        book_path=None, thread_id=thread.id, content=content, assistant=assistant
     )
 
     if optimized_response:
@@ -51,18 +63,25 @@ def optimize_query_with_summary(assistant, summarized_prompt):
         return ""
 
 
-def final_query(assistant, optimized_prompt):
+def final_query(assistant, optimized_prompt: str) -> str:
     """
-    Executes the final query with the optimized prompt, generating a new thread for the final query.
+    Executes the final query using the optimized prompt.
+
+    Args:
+        assistant: The assistant object to handle the interaction.
+        optimized_prompt (str): The optimized prompt for the final query.
+
+    Returns:
+        str: The response to the final query, or an empty string if the query fails.
     """
-    thread = get_thread()  # Generar un nuevo thread
+    thread = get_thread()
     content = f"Answer the following query:\n\nQuery: {optimized_prompt}"
 
-    # Log de inicio
     console.print("[cyan]Executing the final query...[/cyan]")
 
+    # Send the final query to the assistant
     final_response = create_message(
-        book_path, thread_id=thread.id, content=content, assistant=assistant
+        book_path=None, thread_id=thread.id, content=content, assistant=assistant
     )
 
     if final_response:
@@ -73,46 +92,56 @@ def final_query(assistant, optimized_prompt):
         return ""
 
 
-def handle_failed_prompt(assistant, original_prompt):
+def handle_failed_prompt(assistant, original_prompt: str) -> str:
     """
-    The complete process to optimize a failed prompt using heuristic steps. Each step generates its own thread.
-    1. Summarize the original prompt.
-    2. Optimize the summarized prompt.
-    3. Execute the final query using the optimized prompt.
+    Full process to handle a failed prompt by summarizing, optimizing, and re-executing it.
+
+    Args:
+        assistant: The assistant object to handle the interaction.
+        original_prompt (str): The original prompt that needs handling.
+
+    Returns:
+        str: The final response to the processed prompt, or an empty string if the process fails.
     """
     with Progress() as progress:
         task = progress.add_task("[yellow]Processing failed prompt...", total=3)
 
         # Step 1: Summarize the original prompt
-        console.print("Step 1: Summarizing the original prompt...")
+        console.print(
+            "[bold blue]Step 1: Summarizing the original prompt...[/bold blue]"
+        )
         summarized_prompt = summarize_content(assistant, original_prompt)
         progress.update(task, advance=1)
 
         # Step 2: Optimize the summarized prompt
-        console.print("Step 2: Optimizing the summarized prompt...")
+        console.print(
+            "[bold blue]Step 2: Optimizing the summarized prompt...[/bold blue]"
+        )
         optimized_prompt = optimize_query_with_summary(assistant, summarized_prompt)
         progress.update(task, advance=1)
 
         # Step 3: Execute the final query
-        console.print("Step 3: Executing the final query...")
+        console.print("[bold blue]Step 3: Executing the final query...[/bold blue]")
         final_response = final_query(assistant, optimized_prompt)
         progress.update(task, advance=1)
 
     return final_response
 
 
-# Ejemplo de uso
+# Example usage
 if __name__ == "__main__":
     from storycraftr.agent.agents import create_or_get_assistant
 
-    assistant = create_or_get_assistant()  # Obtener o crear el asistente
+    # Initialize or retrieve the assistant
+    assistant = create_or_get_assistant(book_path=None)
 
     original_prompt = "What are the key points of this content related to X?"
 
+    # Handle the failed prompt and get the final response
     result = handle_failed_prompt(assistant, original_prompt)
 
     if result:
-        console.print(f"[green]Final response received successfully![/green]")
+        console.print("[green]Final response received successfully![/green]")
         print(result)
     else:
-        console.print(f"[red]Failed to process the prompt.[/red]")
+        console.print("[red]Failed to process the prompt.[/red]")

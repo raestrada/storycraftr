@@ -7,7 +7,7 @@ Welcome to [**StoryCraftr**](https://storycraftr.app), the open-source project d
 
 ## Release Notes v0.7.0-alpha3
 
-You can find the release notes for version `v0.7.0-alpha3` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.7.0-alpha3).
+You can find the release notes for version `v0.7.0-alpha3` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.7.1-alpha3).
 
 ## Step 1: Install StoryCraftr
 

@@ -1,12 +1,11 @@
 import os
-from storycraftr.utils.core import load_book_config
+from storycraftr.utils.core import load_book_config, file_has_more_than_three_lines
 from storycraftr.agent.agents import (
     create_or_get_assistant,
     get_thread,
     create_message,
     update_agent_files,
 )
-from storycraftr.utils.core import load_book_config, file_has_more_than_three_lines
 from storycraftr.utils.markdown import save_to_markdown
 from storycraftr.prompts.outline import (
     GENERAL_OUTLINE_PROMPT_NEW,
@@ -23,202 +22,204 @@ from rich.console import Console
 console = Console()
 
 
-# Function to generate the general outline of the book
-def generate_general_outline(book_path, prompt):
-    """Generate the general outline of the book."""
-    console.print(
-        "[bold blue]Generating general outline...[/bold blue]"
-    )  # Progress message
-    language = load_book_config(book_path).primary_language
+def generate_general_outline(book_path: str, prompt: str) -> str:
+    """
+    Generate or refine the general outline of the book.
+
+    Args:
+        book_path (str): Path to the book's directory.
+        prompt (str): The prompt to guide the outline generation.
+
+    Returns:
+        str: The generated or refined general outline.
+    """
+    console.print("[bold blue]Generating general outline...[/bold blue]")
+
+    # Load the book configuration and setup
+    config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
-    book_name = book_path.split("/")[-1]
-    # File path for the general outline
     file_path = os.path.join(book_path, "outline", "general_outline.md")
+    book_name = os.path.basename(book_path)
 
-    # Check if the file exists and pass it as an attachment
+    # Check if the outline already exists and choose the appropriate prompt
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
-        console.print(
-            f"[yellow]Existing general outline found at {file_path}. Attaching for further refinement...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Refining existing general outline...[/yellow]")
         content = GENERAL_OUTLINE_PROMPT_REFINE.format(
-            prompt=prompt, language=language, book_name=book_name
-        )
-        general_outline_content = create_message(
-            book_path,
-            thread_id=thread.id,
-            content=content,
-            assistant=assistant,
-            file_path=file_path,
+            prompt=prompt, language=config.primary_language, book_name=book_name
         )
     else:
-        console.print(
-            "[yellow]No existing general outline found. Generating a new one...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Generating new general outline...[/yellow]")
         content = GENERAL_OUTLINE_PROMPT_NEW.format(
-            prompt=prompt, language=language, book_name=book_name
-        )
-        general_outline_content = create_message(
-            book_path, thread_id=thread.id, content=content, assistant=assistant
+            prompt=prompt, language=config.primary_language, book_name=book_name
         )
 
-    # Save to markdown
+    # Generate the outline using the assistant
+    general_outline_content = create_message(
+        book_path,
+        thread_id=thread.id,
+        content=content,
+        assistant=assistant,
+        file_path=file_path,
+    )
+
+    # Save the result to a markdown file
     save_to_markdown(
         book_path,
         "outline/general_outline.md",
         "General Outline",
         general_outline_content,
     )
-    console.print(
-        "[bold green]✔ General outline generated successfully[/bold green]"
-    )  # Success message
+    console.print("[bold green]✔ General outline generated successfully[/bold green]")
+
     update_agent_files(book_path, assistant)
     return general_outline_content
 
 
-# Function to generate the character summary of the book
-def generate_character_summary(book_path, prompt):
-    """Generate the character summary for the book."""
-    console.print(
-        "[bold blue]Generating character summary...[/bold blue]"
-    )  # Progress message
-    language = load_book_config(book_path).primary_language
+def generate_character_summary(book_path: str, prompt: str) -> str:
+    """
+    Generate or refine the character summary of the book.
+
+    Args:
+        book_path (str): Path to the book's directory.
+        prompt (str): The prompt to guide the character summary generation.
+
+    Returns:
+        str: The generated or refined character summary.
+    """
+    console.print("[bold blue]Generating character summary...[/bold blue]")
+
+    config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
-    book_name = book_path.split("/")[-1]
-    # File path for the character summary
     file_path = os.path.join(book_path, "outline", "character_summary.md")
+    book_name = os.path.basename(book_path)
 
-    # Check if the file exists and pass it as an attachment
+    # Check if the character summary already exists and choose the appropriate prompt
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
-        console.print(
-            f"[yellow]Existing character summary found at {file_path}. Attaching for further refinement...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Refining existing character summary...[/yellow]")
         content = CHARACTER_SUMMARY_PROMPT_REFINE.format(
-            prompt=prompt, language=language, book_name=book_name
-        )
-        character_summary_content = create_message(
-            book_path,
-            thread_id=thread.id,
-            content=content,
-            assistant=assistant,
-            file_path=file_path,
+            prompt=prompt, language=config.primary_language, book_name=book_name
         )
     else:
-        console.print(
-            "[yellow]No existing character summary found. Generating a new one...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Generating new character summary...[/yellow]")
         content = CHARACTER_SUMMARY_PROMPT_NEW.format(
-            prompt=prompt, language=language, book_name=book_name
-        )
-        character_summary_content = create_message(
-            book_path, thread_id=thread.id, content=content, assistant=assistant
+            prompt=prompt, language=config.primary_language, book_name=book_name
         )
 
-    # Save to markdown
+    # Generate the character summary using the assistant
+    character_summary_content = create_message(
+        book_path,
+        thread_id=thread.id,
+        content=content,
+        assistant=assistant,
+        file_path=file_path,
+    )
+
+    # Save the result to a markdown file
     save_to_markdown(
         book_path,
         "outline/character_summary.md",
         "Character Summary",
         character_summary_content,
     )
-    console.print(
-        "[bold green]✔ Character summary generated successfully[/bold green]"
-    )  # Success message
+    console.print("[bold green]✔ Character summary generated successfully[/bold green]")
+
     update_agent_files(book_path, assistant)
     return character_summary_content
 
 
-# Function to generate the main plot points of the book
-def generate_plot_points(book_path, prompt):
-    """Generate the main plot points for the book."""
-    console.print(
-        "[bold blue]Generating main plot points...[/bold blue]"
-    )  # Progress message
-    language = load_book_config(book_path).primary_language
+def generate_plot_points(book_path: str, prompt: str) -> str:
+    """
+    Generate or refine the main plot points of the book.
+
+    Args:
+        book_path (str): Path to the book's directory.
+        prompt (str): The prompt to guide the plot points generation.
+
+    Returns:
+        str: The generated or refined plot points.
+    """
+    console.print("[bold blue]Generating main plot points...[/bold blue]")
+
+    config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
-    book_name = book_path.split("/")[-1]
-    # File path for the plot points
     file_path = os.path.join(book_path, "outline", "plot_points.md")
+    book_name = os.path.basename(book_path)
 
-    # Check if the file exists and pass it as an attachment
+    # Check if the plot points already exist and choose the appropriate prompt
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
-        console.print(
-            f"[yellow]Existing plot points found at {file_path}. Attaching for further refinement...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Refining existing plot points...[/yellow]")
         content = PLOT_POINTS_PROMPT_REFINE.format(
-            prompt=prompt, language=language, book_name=book_name
-        )
-        plot_points_content = create_message(
-            book_path,
-            thread_id=thread.id,
-            content=content,
-            assistant=assistant,
-            file_path=file_path,
+            prompt=prompt, language=config.primary_language, book_name=book_name
         )
     else:
-        console.print(
-            "[yellow]No existing plot points found. Generating new ones...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Generating new plot points...[/yellow]")
         content = PLOT_POINTS_PROMPT_NEW.format(
-            prompt=prompt, language=language, book_name=book_name
-        )
-        plot_points_content = create_message(
-            book_path, thread_id=thread.id, content=content, assistant=assistant
+            prompt=prompt, language=config.primary_language, book_name=book_name
         )
 
-    # Save to markdown
+    # Generate the plot points using the assistant
+    plot_points_content = create_message(
+        book_path,
+        thread_id=thread.id,
+        content=content,
+        assistant=assistant,
+        file_path=file_path,
+    )
+
+    # Save the result to a markdown file
     save_to_markdown(
         book_path, "outline/plot_points.md", "Main Plot Points", plot_points_content
     )
-    console.print(
-        "[bold green]✔ Main plot points generated successfully[/bold green]"
-    )  # Success message
+    console.print("[bold green]✔ Main plot points generated successfully[/bold green]")
+
     update_agent_files(book_path, assistant)
     return plot_points_content
 
 
-# Function to generate the chapter-by-chapter synopsis of the book
-def generate_chapter_synopsis(book_path, prompt):
-    """Generate the chapter-by-chapter synopsis for the book."""
-    console.print(
-        "[bold blue]Generating chapter-by-chapter synopsis...[/bold blue]"
-    )  # Progress message
-    language = load_book_config(book_path).primary_language
+def generate_chapter_synopsis(book_path: str, prompt: str) -> str:
+    """
+    Generate or refine the chapter-by-chapter synopsis of the book.
+
+    Args:
+        book_path (str): Path to the book's directory.
+        prompt (str): The prompt to guide the chapter synopsis generation.
+
+    Returns:
+        str: The generated or refined chapter synopsis.
+    """
+    console.print("[bold blue]Generating chapter-by-chapter synopsis...[/bold blue]")
+
+    config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
-    book_name = book_path.split("/")[-1]
-    # File path for the chapter synopsis
     file_path = os.path.join(book_path, "outline", "chapter_synopsis.md")
+    book_name = os.path.basename(book_path)
 
-    # Check if the file exists and pass it as an attachment
+    # Check if the synopsis already exists and choose the appropriate prompt
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
-        console.print(
-            f"[yellow]Existing chapter synopsis found at {file_path}. Attaching for further refinement...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Refining existing chapter synopsis...[/yellow]")
         content = CHAPTER_SYNOPSIS_PROMPT_REFINE.format(
-            prompt=prompt, language=language, book_name=book_name
-        )
-        chapter_synopsis_content = create_message(
-            book_path,
-            thread_id=thread.id,
-            content=content,
-            assistant=assistant,
-            file_path=file_path,
+            prompt=prompt, language=config.primary_language, book_name=book_name
         )
     else:
-        console.print(
-            "[yellow]No existing chapter synopsis found. Generating a new one...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Generating new chapter synopsis...[/yellow]")
         content = CHAPTER_SYNOPSIS_PROMPT_NEW.format(
-            prompt=prompt, language=language, book_name=book_name
-        )
-        chapter_synopsis_content = create_message(
-            book_path, thread_id=thread.id, content=content, assistant=assistant
+            prompt=prompt, language=config.primary_language, book_name=book_name
         )
 
-    # Save to markdown
+    # Generate the chapter synopsis using the assistant
+    chapter_synopsis_content = create_message(
+        book_path,
+        thread_id=thread.id,
+        content=content,
+        assistant=assistant,
+        file_path=file_path,
+    )
+
+    # Save the result to a markdown file
     save_to_markdown(
         book_path,
         "outline/chapter_synopsis.md",
@@ -227,6 +228,7 @@ def generate_chapter_synopsis(book_path, prompt):
     )
     console.print(
         "[bold green]✔ Chapter-by-chapter synopsis generated successfully[/bold green]"
-    )  # Success message
+    )
+
     update_agent_files(book_path, assistant)
     return chapter_synopsis_content

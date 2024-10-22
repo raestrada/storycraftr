@@ -14,62 +14,96 @@ console = Console()
 
 @click.group()
 def chapters():
-    """Manage chapters of the book."""
+    """
+    Manage chapters of the book.
+
+    This command group provides functionality to generate chapters, covers,
+    and the epilogue of the book by interacting with the storycraftr agent.
+    """
     pass
 
 
 @chapters.command()
 @click.argument("chapter_number", type=int)
-@click.argument("prompt")
+@click.argument("prompt", type=str)
 @click.option("--book-path", type=click.Path(), help="Path to the book directory")
-def chapter(chapter_number, prompt, book_path=None):
-    """Generate a new chapter for the book."""
-    if not book_path:
-        book_path = os.getcwd()
+def chapter(chapter_number: int, prompt: str, book_path: str = None):
+    """
+    Generate a new chapter for the book.
 
+    Args:
+        chapter_number (int): The number of the chapter to generate.
+        prompt (str): The prompt to guide the generation of the chapter.
+        book_path (str, optional): The path to the book's directory. Defaults to the current working directory.
+    """
+    book_path = book_path or os.getcwd()
+
+    # Load book configuration and proceed only if successful
     if not load_book_config(book_path):
-        return None
+        console.print("[red bold]Error:[/red bold] Failed to load book configuration.")
+        return
 
     generate_chapter(book_path, chapter_number, prompt)
 
 
 @chapters.command()
+@click.argument("prompt", type=str)
 @click.option("--book-path", type=click.Path(), help="Path to the book directory")
-@click.argument("prompt")
-def cover(prompt, book_path=None):
-    """Generate the cover of the book."""
-    if not book_path:
-        book_path = os.getcwd()
+def cover(prompt: str, book_path: str = None):
+    """
+    Generate the cover of the book.
 
+    Args:
+        prompt (str): The prompt to guide the generation of the cover.
+        book_path (str, optional): The path to the book's directory. Defaults to the current working directory.
+    """
+    book_path = book_path or os.getcwd()
+
+    # Load book configuration and proceed only if successful
     if not load_book_config(book_path):
-        return None
+        console.print("[red bold]Error:[/red bold] Failed to load book configuration.")
+        return
 
     generate_cover(book_path, prompt)
 
 
 @chapters.command()
+@click.argument("prompt", type=str)
 @click.option("--book-path", type=click.Path(), help="Path to the book directory")
-@click.argument("prompt")
-def back_cover(prompt, book_path=None):
-    """Generate the back cover of the book."""
-    if not book_path:
-        book_path = os.getcwd()
+def back_cover(prompt: str, book_path: str = None):
+    """
+    Generate the back cover of the book.
 
+    Args:
+        prompt (str): The prompt to guide the generation of the back cover.
+        book_path (str, optional): The path to the book's directory. Defaults to the current working directory.
+    """
+    book_path = book_path or os.getcwd()
+
+    # Load book configuration and proceed only if successful
     if not load_book_config(book_path):
-        return None
+        console.print("[red bold]Error:[/red bold] Failed to load book configuration.")
+        return
 
     generate_back_cover(book_path, prompt)
 
 
 @chapters.command()
+@click.argument("prompt", type=str)
 @click.option("--book-path", type=click.Path(), help="Path to the book directory")
-@click.argument("prompt")
-def epilogue(prompt, book_path=None):
-    """Generate the epilogue of the book."""
-    if not book_path:
-        book_path = os.getcwd()
+def epilogue(prompt: str, book_path: str = None):
+    """
+    Generate the epilogue of the book.
 
+    Args:
+        prompt (str): The prompt to guide the generation of the epilogue.
+        book_path (str, optional): The path to the book's directory. Defaults to the current working directory.
+    """
+    book_path = book_path or os.getcwd()
+
+    # Load book configuration and proceed only if successful
     if not load_book_config(book_path):
-        return None
+        console.print("[red bold]Error:[/red bold] Failed to load book configuration.")
+        return
 
     generate_epilogue(book_path, prompt)

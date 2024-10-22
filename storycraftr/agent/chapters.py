@@ -5,7 +5,7 @@ from storycraftr.agent.agents import (
     create_message,
     update_agent_files,
 )
-from storycraftr.utils.core import load_book_config, load_book_config
+from storycraftr.utils.core import load_book_config
 from storycraftr.utils.markdown import save_to_markdown
 from storycraftr.prompts.chapters import (
     CHAPTER_PROMPT_NEW,
@@ -20,70 +20,82 @@ from rich.console import Console
 console = Console()
 
 
-# Function to generate a new chapter based on a prompt
-def generate_chapter(book_path, chapter_number, prompt):
-    """Generate a new chapter based on a prompt."""
-    console.print(
-        f"[bold blue]Generating chapter {chapter_number}...[/bold blue]"
-    )  # Progress message
+def generate_chapter(book_path: str, chapter_number: int, prompt: str) -> str:
+    """
+    Generate a new or refined chapter based on the provided prompt.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        chapter_number (int): The number of the chapter to generate.
+        prompt (str): The prompt to guide the chapter generation.
+
+    Returns:
+        str: The content of the generated or refined chapter.
+    """
+    console.print(f"[bold blue]Generating chapter {chapter_number}...[/bold blue]")
+
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    # Prepare the chapter file path
     chapter_file = f"chapter-{chapter_number}.md"
     file_path = os.path.join(book_path, "chapters", chapter_file)
 
-    # Check if the file exists and pass it as an attachment
+    # Check if the chapter already exists to decide between new or refined content
     if os.path.exists(file_path):
-        console.print(
-            f"[yellow]Existing chapter found at {file_path}. Attaching for further refinement...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Existing chapter found. Refining...[/yellow]")
         content = CHAPTER_PROMPT_REFINE.format(
             prompt=prompt, language=load_book_config(book_path).primary_language
         )
-        chapter_content = create_message(
-            book_path,
-            thread_id=thread.id,
-            content=content,
-            assistant=assistant,
-            file_path=file_path,
-        )
     else:
         console.print(
-            "[yellow]No existing chapter found. Generating new content...[/yellow]"
-        )  # Progress message
+            f"[yellow]No existing chapter found. Generating new content...[/yellow]"
+        )
         content = CHAPTER_PROMPT_NEW.format(
             prompt=prompt, language=load_book_config(book_path).primary_language
         )
-        chapter_content = create_message(
-            book_path, thread_id=thread.id, content=content, assistant=assistant
-        )
 
-    # Save the updated chapter content to markdown
+    chapter_content = create_message(
+        book_path,
+        thread_id=thread.id,
+        content=content,
+        assistant=assistant,
+        file_path=file_path,
+    )
+
+    # Save the generated chapter to markdown
     save_to_markdown(
         book_path,
-        "chapters/" + chapter_file,
+        f"chapters/{chapter_file}",
         f"Chapter {chapter_number}",
         chapter_content,
     )
     console.print(
         f"[bold green]✔ Chapter {chapter_number} generated successfully[/bold green]"
-    )  # Success message
+    )
+
+    # Update assistant with new chapter information
     update_agent_files(book_path, assistant)
+
     return chapter_content
 
 
-def generate_cover(book_path, prompt):
+def generate_cover(book_path: str, prompt: str) -> str:
     """
-    Generate a professional book cover in markdown format using the book's metadata
-    and a prompt for additional guidance.
+    Generate the book cover based on the book's metadata and the given prompt.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        prompt (str): The prompt to guide the cover generation.
+
+    Returns:
+        str: The content of the generated book cover.
     """
-    console.print("[bold blue]Generating book cover...[/bold blue]")  # Progress message
+    console.print("[bold blue]Generating book cover...[/bold blue]")
+
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    # Generate the cover content
     prompt_content = COVER_PROMPT.format(
         title=config.book_name,
         author=config.default_author,
@@ -97,90 +109,95 @@ def generate_cover(book_path, prompt):
         book_path, thread_id=thread.id, content=prompt_content, assistant=assistant
     )
 
-    # Save the cover content to markdown
     save_to_markdown(book_path, "chapters/cover.md", "Cover", cover_content)
-    console.print(
-        "[bold green]✔ Cover generated successfully[/bold green]"
-    )  # Success message
+    console.print("[bold green]✔ Cover generated successfully[/bold green]")
+
     update_agent_files(book_path, assistant)
     return cover_content
 
 
-# Function to generate the back cover page
-def generate_back_cover(book_path, prompt):
-    """Generate the back cover page for the book."""
-    console.print("[bold blue]Generating back cover...[/bold blue]")  # Progress message
+def generate_back_cover(book_path: str, prompt: str) -> str:
+    """
+    Generate the back cover content based on the book's metadata and the given prompt.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        prompt (str): The prompt to guide the back cover generation.
+
+    Returns:
+        str: The content of the generated back cover.
+    """
+    console.print("[bold blue]Generating back cover...[/bold blue]")
+
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    # Generate the back cover content
-    back_cover_content = create_message(
-        book_path,
-        thread_id=thread.id,
-        content=BACK_COVER_PROMPT.format(
-            title=config.book_name,
-            author=config.default_author,
-            genre=config.genre,
-            alternate_languages=", ".join(config.alternate_languages),
-            prompt=prompt,
-            language=config.primary_language,
-            license=config.license,
-        ),
-        assistant=assistant,
+    prompt_content = BACK_COVER_PROMPT.format(
+        title=config.book_name,
+        author=config.default_author,
+        genre=config.genre,
+        alternate_languages=", ".join(config.alternate_languages),
+        prompt=prompt,
+        language=config.primary_language,
+        license=config.license,
     )
 
-    # Save to markdown
+    back_cover_content = create_message(
+        book_path, thread_id=thread.id, content=prompt_content, assistant=assistant
+    )
+
     save_to_markdown(
         book_path, "chapters/back-cover.md", "Back Cover", back_cover_content
     )
-    console.print(
-        "[bold green]✔ Back cover generated successfully[/bold green]"
-    )  # Success message
+    console.print("[bold green]✔ Back cover generated successfully[/bold green]")
+
     update_agent_files(book_path, assistant)
     return back_cover_content
 
 
-# Function to generate the epilogue of the book
-def generate_epilogue(book_path, prompt):
-    """Generate the epilogue for the book."""
-    console.print("[bold blue]Generating epilogue...[/bold blue]")  # Progress message
+def generate_epilogue(book_path: str, prompt: str) -> str:
+    """
+    Generate or refine the book's epilogue based on the provided prompt.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        prompt (str): The prompt to guide the epilogue generation.
+
+    Returns:
+        str: The content of the generated or refined epilogue.
+    """
+    console.print("[bold blue]Generating epilogue...[/bold blue]")
+
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    # Prepare the epilogue file path
     file_path = os.path.join(book_path, "chapters", "epilogue.md")
 
-    # Check if the file exists and pass it as an attachment
+    # Determine if refining an existing epilogue or generating a new one
     if os.path.exists(file_path):
-        console.print(
-            f"[yellow]Existing epilogue found at {file_path}. Attaching for further refinement...[/yellow]"
-        )  # Progress message
+        console.print(f"[yellow]Existing epilogue found. Refining...[/yellow]")
         content = EPILOGUE_PROMPT_REFINE.format(
             prompt=prompt, language=load_book_config(book_path).primary_language
         )
-        epilogue_content = create_message(
-            book_path,
-            thread_id=thread.id,
-            content=content,
-            assistant=assistant,
-            file_path=file_path,
-        )
     else:
         console.print(
-            "[yellow]No existing epilogue found. Generating new content...[/yellow]"
-        )  # Progress message
+            f"[yellow]No existing epilogue found. Generating new content...[/yellow]"
+        )
         content = EPILOGUE_PROMPT_NEW.format(
             prompt=prompt, language=load_book_config(book_path).primary_language
         )
-        epilogue_content = create_message(
-            book_path, thread_id=thread.id, content=content, assistant=assistant
-        )
 
-    # Save the updated epilogue content to markdown
+    epilogue_content = create_message(
+        book_path,
+        thread_id=thread.id,
+        content=content,
+        assistant=assistant,
+        file_path=file_path,
+    )
+
     save_to_markdown(book_path, "chapters/epilogue.md", "Epilogue", epilogue_content)
-    console.print(
-        "[bold green]✔ Epilogue generated successfully[/bold green]"
-    )  # Success message
+    console.print("[bold green]✔ Epilogue generated successfully[/bold green]")
+
     update_agent_files(book_path, assistant)
     return epilogue_content

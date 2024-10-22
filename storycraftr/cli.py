@@ -4,47 +4,30 @@ import sys
 import json
 import requests
 from rich.console import Console
+from pathlib import Path
 
 console = Console()
 
 
-def download_file(url, save_path, filename):
-    os.makedirs(save_path, exist_ok=True)
-    save_path = os.path.join(save_path, filename)
-    try:
-        response = requests.get(url, timeout=10, verify=True)
-        response.raise_for_status()
-        with open(save_path, "w", encoding="utf-8") as f:
-            f.write(response.text)
-        console.print(
-            f"[bold green]File successfully downloaded from {url}[/bold green]"
-        )
-    except requests.exceptions.RequestException as e:
-        console.print(
-            f"[bold red]Error downloading the file from {url}: {e}[/bold red]"
-        )
-        sys.exit(1)
-
-
 def load_openai_api_key():
-    # Path to the API key file
-    api_key_file = os.path.expanduser("~/.storycraftr/openai_api_key.txt")
+    """
+    Loads the OpenAI API key from the expected file path and sets it
+    as an environment variable. Provides feedback on success or failure.
+    """
+    api_key_file = Path.home() / ".storycraftr" / "openai_api_key.txt"
 
-    # Check if the file exists
-    if os.path.exists(api_key_file):
-        # Read the content of the file
-        with open(api_key_file, "r") as file:
-            api_key = file.read().strip()  # Strip any whitespace or newlines
-
-        # Set the API key as an environment variable
+    if api_key_file.exists():
+        with api_key_file.open("r") as file:
+            api_key = file.read().strip()
         os.environ["OPENAI_API_KEY"] = api_key
-        console.print("[green]OPENAI_API_KEY has been successfully loaded.[/green]")
+        console.print("[green]OPENAI_API_KEY loaded successfully.[/green]")
     else:
         console.print(f"[red]The file {api_key_file} does not exist.[/red]")
 
 
 load_openai_api_key()
 
+# Import statements grouped together for clarity
 import storycraftr.templates.folder
 from storycraftr.state import debug_state
 from storycraftr.cmd.worldbuilding import worldbuilding
@@ -57,34 +40,79 @@ from storycraftr.templates.tex import TEMPLATE_TEX
 from storycraftr.agent.agents import create_or_get_assistant
 
 
-def verify_book_path(book_path=None):
-    """Verify if the book path is valid and contains storycraftr.json."""
-    if not book_path:
-        book_path = (
-            os.getcwd()
-        )  # Use the current directory if --book-path is not provided
-    storycraftr_file = os.path.join(book_path, "storycraftr.json")
+def download_file(url, save_dir, filename):
+    """
+    Downloads a file from a URL and saves it to the specified directory.
 
-    if not os.path.exists(storycraftr_file):
+    Args:
+        url (str): The URL to download the file from.
+        save_dir (str): The directory where the file will be saved.
+        filename (str): The name of the file.
+
+    Raises:
+        SystemExit: If the file download fails.
+    """
+    save_dir = Path(save_dir)
+    save_dir.mkdir(parents=True, exist_ok=True)
+    save_path = save_dir / filename
+
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        save_path.write_text(response.text, encoding="utf-8")
+        console.print(f"[green]File downloaded successfully from {url}[/green]")
+    except requests.exceptions.RequestException as e:
+        console.print(f"[red]Error downloading the file from {url}: {e}[/red]")
+        sys.exit(1)
+
+
+def verify_book_path(book_path=None):
+    """
+    Verifies if the given book path is valid and contains storycraftr.json.
+
+    Args:
+        book_path (str): The path to the book directory.
+
+    Returns:
+        str: The verified book path.
+
+    Raises:
+        ClickException: If the storycraftr.json file is not found in the directory.
+    """
+    book_path = book_path or os.getcwd()
+    storycraftr_file = Path(book_path) / "storycraftr.json"
+
+    if not storycraftr_file.exists():
         raise click.ClickException(
-            f"The file storycraftr.json was not found in the path: {book_path}"
+            f"The file storycraftr.json was not found in: {book_path}"
         )
 
     return book_path
 
 
 def is_initialized(book_path):
-    """Check if the book structure is already initialized."""
-    storycraftr_file = os.path.join(book_path, "storycraftr.json")
-    return os.path.exists(storycraftr_file)
+    """
+    Checks if the book project is already initialized.
+
+    Args:
+        book_path (str): The path to the book project.
+
+    Returns:
+        bool: True if the project is initialized, False otherwise.
+    """
+    return (Path(book_path) / "storycraftr.json").exists()
 
 
-# Function to show error if project is not initialized
 def project_not_initialized_error(book_path):
+    """
+    Displays an error message if the project is not initialized.
+
+    Args:
+        book_path (str): The path to the book project.
+    """
     console.print(
-        f"[bold red]✖[/bold red] Project '[bold]{book_path}[/bold]' is not initialized. "
-        f"Run '[bold]storycraftr init {book_path}[/bold]' first.",
-        style="bold red",
+        f"[red]✖ Project '{book_path}' is not initialized. "
+        "Run 'storycraftr init {book_path}' first.[/red]"
     )
 
 
@@ -98,27 +126,30 @@ def init_structure(
     behavior_content,
     reference_author,
 ):
-    # Show initialization start
-    console.print(f"[bold blue]Initializing book structure: {book_path}[/bold blue]")
+    """
+    Initializes the book project structure by creating necessary files and directories.
 
-    book_name = book_path.split("/")[-1]
+    Args:
+        book_path (str): Path to the book project.
+        license (str): License type for the project.
+        primary_language (str): Primary language of the book.
+        alternate_languages (list): List of alternate languages.
+        default_author (str): Default author name.
+        genre (str): Genre of the book.
+        behavior_content (str): Behavior configuration content.
+        reference_author (str): Reference author for writing style.
+    """
+    book_name = Path(book_path).name
+    console.print(f"[blue]Initializing book structure: {book_name}[/blue]")
 
-    # Iterate over the list and create each file, showing progress
+    # Create project structure based on templates
     for file in storycraftr.templates.folder.files_to_create:
-        # Build the full file path
-        file_path = os.path.join(book_path, file["folder"], file["filename"])
+        file_path = Path(book_path) / file["folder"] / file["filename"]
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(file["content"], encoding="utf-8")
+        console.print(f"[green]File created: {file_path}[/green]")
 
-        # Ensure the directory exists
-        os.makedirs(os.path.join(book_path, file["folder"]), exist_ok=True)
-
-        # Write the content to the file
-        with open(file_path, "w") as f:
-            f.write(file["content"])
-
-        # Log the created file
-        console.print(f"[green]File created:[/green] {file_path}")
-
-    # Create the storycraftr.json file
+    # Generate the storycraftr.json configuration file
     config_data = {
         "book_path": book_path,
         "book_name": book_name,
@@ -129,113 +160,61 @@ def init_structure(
         "license": license,
         "reference_author": reference_author,
     }
+    config_file = Path(book_path) / "storycraftr.json"
+    config_file.write_text(json.dumps(config_data, indent=4), encoding="utf-8")
+    console.print(f"[green]Configuration file created: {config_file}[/green]")
 
-    config_file = os.path.join(book_path, "storycraftr.json")
-    with open(config_file, "w") as f:
-        json.dump(config_data, f, indent=4)
+    # Create behavior file
+    behaviors_dir = Path(book_path) / "behaviors"
+    behaviors_dir.mkdir(exist_ok=True)
+    behavior_file = behaviors_dir / "default.txt"
+    behavior_file.write_text(behavior_content, encoding="utf-8")
+    console.print(f"[green]Behavior file created: {behavior_file}[/green]")
 
-    # Log configuration file creation
-    console.print(
-        f"[green]Configuration file created:[/green] {config_file}", style="green"
-    )
+    # Initialize LaTeX template
+    template_dir = Path(book_path) / "templates"
+    template_dir.mkdir(exist_ok=True)
+    template_file = template_dir / "template.tex"
+    template_file.write_text(TEMPLATE_TEX, encoding="utf-8")
+    console.print(f"[green]LaTeX template created: {template_file}[/green]")
 
-    # Create 'behaviors' folder inside the root book_path directory
-    behaviors_dir = os.path.join(book_path, "behaviors")
-    os.makedirs(behaviors_dir, exist_ok=True)
-
-    # Create the default.txt file inside the 'behaviors' folder with the behavior content
-    behavior_file = os.path.join(behaviors_dir, "default.txt")
-    with open(behavior_file, "w") as f:
-        f.write(behavior_content)
-
-    # Log behavior file creation
-    console.print(
-        f"[green]Behavior file created:[/green] {behavior_file}", style="green"
-    )
-
-    # Confirm completion
-    console.print(
-        f"[bold green]✔[/bold green] Project '[bold]{book_path}[/bold]' initialized successfully.",
-        style="bold green",
-    )
-
-    # Ruta donde se creará la nueva carpeta de book_path/templates/
-    new_template_dir = os.path.join(book_path, "templates")
-
-    # Log: Creación de la carpeta
-    console.log(f"Creando el directorio: {new_template_dir}", style="bold blue")
-
-    # Crear la carpeta si no existe
-    os.makedirs(new_template_dir, exist_ok=True)
-
-    # Ruta completa del archivo template.tex
-    new_template_path = os.path.join(new_template_dir, "template.tex")
-
-    # Log: Escribiendo el archivo
-    console.log(f"Writing LaTex file: {new_template_path}", style="bold green")
-
-    # Escribir el contenido del template en el archivo
-    with open(new_template_path, "w") as f:
-        f.write(TEMPLATE_TEX)
-
-    # Log: Proceso completado
-    console.log(f"LaTex template copied: {new_template_path}", style="bold magenta")
-
-    # Lista de URLs para descargar los archivos
+    # Download additional documentation files
     urls = [
         "https://raw.githubusercontent.com/raestrada/storycraftr/refs/heads/main/docs/getting_started.md",
         "https://raw.githubusercontent.com/raestrada/storycraftr/refs/heads/main/docs/iterate.md",
         "https://raw.githubusercontent.com/raestrada/storycraftr/refs/heads/main/docs/chat.md",
     ]
-
-    # Nombres de archivo correspondientes para cada URL
     filenames = ["getting_started.md", "iterate.md", "chat.md"]
-
-    # Descargar cada archivo en la carpeta 'storycraftr'
     for url, filename in zip(urls, filenames):
-        file_path = os.path.join(book_path, "storycraftr")
-        download_file(url, file_path, filename)
+        download_file(url, Path(book_path) / "storycraftr", filename)
 
     create_or_get_assistant(book_path)
 
 
 @click.group()
-@click.option("--debug", is_flag=True, help="Enable debug mode")
+@click.option("--debug", is_flag=True, help="Enable debug mode.")
 def cli(debug):
-    """StoryCraftr CLI - A tool to help you write books using OpenAI."""
-    debug_state.set_debug(debug)  # Configura el estado de debug
+    """
+    StoryCraftr CLI - A tool to assist in writing books using AI tools.
+    """
+    debug_state.set_debug(debug)
     if debug:
-        click.echo("Debug mode is ON")
+        console.print("[yellow]Debug mode is ON[/yellow]")
 
 
 @click.command()
 @click.argument("book_path")
-@click.option(
-    "--license",
-    default="CC BY-NC-SA",
-    help="Define the type of Creative Commons license to use. Options include 'CC BY', 'CC BY-SA', 'CC BY-ND', 'CC BY-NC', 'CC BY-NC-SA', 'CC BY-NC-ND'. The default is 'CC BY-NC-SA'.",
-)
-@click.option(
-    "--primary-language",
-    default="en",
-    help="The primary language for the book (default: 'en').",
-)
+@click.option("--license", default="CC BY-NC-SA", help="Define the license type.")
+@click.option("--primary-language", default="en", help="Primary language of the book.")
 @click.option(
     "--alternate-languages",
     default="",
-    help="Comma-separated list of alternate languages (e.g., 'es,fr').",
+    help="Comma-separated list of alternate languages.",
 )
-@click.option("--author", default="Author Name", help="The default author of the book.")
-@click.option(
-    "--genre", default="fantasy", help="The genre of the book (default: 'fantasy')."
-)
-@click.option(
-    "--behavior", help="Behavior content, either as a string or a path to a file."
-)
-@click.option(
-    "--reference-author",
-    help="Behavior content, either as a string or a path to a file.",
-)
+@click.option("--author", default="Author Name", help="Default author name.")
+@click.option("--genre", default="fantasy", help="Genre of the book.")
+@click.option("--behavior", required=True, help="Path to behavior content file.")
+@click.option("--reference-author", default="None", help="Reference author for style.")
 def init(
     book_path,
     license,
@@ -244,9 +223,11 @@ def init(
     author,
     genre,
     behavior,
-    reference_author="(None: use all your knwoledge to assume writing style )",
+    reference_author,
 ):
-    """Initialize the book structure with relevant configuration and behavior content."""
+    """
+    Initialize the book structure with configuration and behavior content.
+    """
     if not is_initialized(book_path):
         alternate_languages_list = (
             [lang.strip() for lang in alternate_languages.split(",")]
@@ -254,12 +235,12 @@ def init(
             else []
         )
 
-        # Verificamos si el contenido de behavior es un archivo o un string directo
-        if os.path.isfile(behavior):
-            with open(behavior, "r") as f:
-                behavior_content = f.read()
+        # Load behavior content from file
+        behavior_path = Path(behavior)
+        if behavior_path.is_file():
+            behavior_content = behavior_path.read_text(encoding="utf-8")
         else:
-            console.print(f"[bold red] Behavior MUST be a file [/bold red]")
+            console.print("[red]Behavior must be a file.[/red]")
             sys.exit(1)
 
         init_structure(
@@ -273,22 +254,16 @@ def init(
             reference_author,
         )
     else:
-        console.print(
-            f"[bold yellow]⚠[/bold yellow] Project '[bold]{book_path}[/bold]' is already initialized.",
-            style="yellow",
-        )
+        console.print(f"[yellow]Project '{book_path}' is already initialized.[/yellow]")
 
 
 cli.add_command(init)
-
-# Add the worldbuilding, outline, chapters, and iterate commands from their respective modules
-cli.add_command(worldbuilding)
 cli.add_command(outline)
+cli.add_command(worldbuilding)
 cli.add_command(chapters)
 cli.add_command(iterate)
 cli.add_command(publish)
 cli.add_command(chat)
 
 if __name__ == "__main__":
-    # Run the function
     cli()

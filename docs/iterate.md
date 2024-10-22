@@ -29,7 +29,7 @@ storycraftr iterate fix-name Zevid Rhaedin
 Characters need strong motivations, and sometimes these evolve as you write. This command will **refine character motivations** throughout the book, ensuring consistency and depth.
 
 ```bash
-storycraftr iterate refine-motivation "Rahedin ""Refine its motivations in a story about rebellion against gods."
+storycraftr iterate refine-motivation "Rahedin" "Refine its motivations in a story about rebellion against gods."
 ```
 
 ### 3. Strengthen Story Argument
