@@ -218,7 +218,7 @@ Once the process is complete, the PDF file will be available in your project fol
 
 ## Step 7: Chat with Your Assistant
 
-StoryCraftr now includes a command to chat directly with your AI assistant. This allows you to ask questions, brainstorm ideas, or request improvements to your book's content in an interactive session, all from the comfort of your terminal.
+StoryCraftr now includes a command to chat directly with your AI assistant. This allows you to ask questions, brainstorm ideas, or request improvements to your book's content in an interactive session, all from the comfort of your terminal. **Even better, the chat has StoryCraftr's documentation embedded**, so you can ask for help with commands and parameters without leaving the chat!
 
 ### How to Start a Chat
 
@@ -232,19 +232,47 @@ Replace `"book_path"` with the actual name of your book. This will open an inter
 
 ### Example Chat Session
 
-Here's an example of how a typical chat might look:
+In this interactive chat, you can ask the assistant to help with both your book and StoryCraftr’s commands. Here are three examples:
+
+1. **Asking about your book:**
+    ```bash
+    [You]: "Explain how Captain Blackmane uses deception to take control of the hidden pirate fleet."
+    ```
+    ```bash
+    [Assistant]: "Captain Blackmane’s cunning involves luring rival pirate factions into a false alliance. He promises them access to the treasure they’ve long sought, only to reveal his true plan of betrayal, securing the fleet for himself."
+    ```
+
+2. **Running a command:**
+    ```bash
+    [You]: "Generate the character summary for Captain Blackmane."
+    ```
+    ```bash
+    [Assistant]: "To generate a character summary for Captain Blackmane, use the following command:
+    `storycraftr outline character-summary "Summarize Captain Blackmane, a ruthless pirate leader with a talent for deception."`"
+    ```
+
+3. **Executing any StoryCraftr command directly in the chat:**
+
+    ```bash
+    [You]: !iterate check-names "Check character names for consistency."
+    ```
+
+In this session, you can seamlessly combine book content with command generation and execution, streamlining your writing process and giving you real-time insights.
 
 ![chat](https://res.cloudinary.com/dyknhuvxt/image/upload/v1729551304/chat-example_hdo9yu.png)
 
-In this session, you ask for ideas for the next chapter, and the assistant responds with a detailed outline formatted in Markdown.
+You can ask the assistant for suggestions like chapter ideas, worldbuilding elements, or even help refining your story’s plot using StoryCraftr’s built-in tools.
 
-#### How to Exit the Chat
+### How to Exit the Chat
 
 You can exit the chat at any time by typing:
 
-`exit()`
+```bash
+exit()
+```
 
 This will gracefully close the chat session and return you to your terminal.
+
 
 ## Learn More About Writing
 
