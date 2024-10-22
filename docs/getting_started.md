@@ -235,27 +235,31 @@ Replace `"book_path"` with the actual name of your book. This will open an inter
 In this interactive chat, you can ask the assistant to help with both your book and StoryCraftr’s commands. Here are three examples:
 
 1. **Asking about your book:**
-    ```bash
-    [You]: "Explain how Captain Blackmane uses deception to take control of the hidden pirate fleet."
-    ```
-    ```bash
-    [Assistant]: "Captain Blackmane’s cunning involves luring rival pirate factions into a false alliance. He promises them access to the treasure they’ve long sought, only to reveal his true plan of betrayal, securing the fleet for himself."
-    ```
+
+   ```bash
+   [You]: "Explain how Captain Blackmane uses deception to take control of the hidden pirate fleet."
+   ```
+
+   ```bash
+   [Assistant]: "Captain Blackmane’s cunning involves luring rival pirate factions into a false alliance. He promises them access to the treasure they’ve long sought, only to reveal his true plan of betrayal, securing the fleet for himself."
+   ```
 
 2. **Running a command:**
-    ```bash
-    [You]: "Generate the character summary for Captain Blackmane."
-    ```
-    ```bash
-    [Assistant]: "To generate a character summary for Captain Blackmane, use the following command:
-    `storycraftr outline character-summary "Summarize Captain Blackmane, a ruthless pirate leader with a talent for deception."`"
-    ```
+
+   ```bash
+   [You]: "Generate the character summary for Captain Blackmane."
+   ```
+
+   ```bash
+   [Assistant]: "To generate a character summary for Captain Blackmane, use the following command:
+   `storycraftr outline character-summary "Summarize Captain Blackmane, a ruthless pirate leader with a talent for deception."`"
+   ```
 
 3. **Executing any StoryCraftr command directly in the chat:**
 
-    ```bash
-    [You]: !iterate check-names "Check character names for consistency."
-    ```
+   ```bash
+   [You]: !iterate check-names "Check character names for consistency."
+   ```
 
 In this session, you can seamlessly combine book content with command generation and execution, streamlining your writing process and giving you real-time insights.
 
@@ -272,7 +276,6 @@ exit()
 ```
 
 This will gracefully close the chat session and return you to your terminal.
-
 
 ## Learn More About Writing
 

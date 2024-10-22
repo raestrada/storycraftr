@@ -59,7 +59,7 @@ const Documentation = {
     Object.assign(Documentation.TRANSLATIONS, catalog.messages);
     Documentation.PLURAL_EXPR = new Function(
       "n",
-      `return (${catalog.plural_expr})`
+      `return (${catalog.plural_expr})`,
     );
     Documentation.LOCALE = catalog.locale;
   },
@@ -89,7 +89,7 @@ const Documentation = {
 
     const togglerElements = document.querySelectorAll("img.toggler");
     togglerElements.forEach((el) =>
-      el.addEventListener("click", (event) => toggler(event.currentTarget))
+      el.addEventListener("click", (event) => toggler(event.currentTarget)),
     );
     togglerElements.forEach((el) => (el.style.display = ""));
     if (DOCUMENTATION_OPTIONS.COLLAPSE_INDEX) togglerElements.forEach(toggler);
@@ -105,7 +105,8 @@ const Documentation = {
 
     document.addEventListener("keydown", (event) => {
       // bail for input elements
-      if (BLACKLISTED_KEY_CONTROL_ELEMENTS.has(document.activeElement.tagName)) return;
+      if (BLACKLISTED_KEY_CONTROL_ELEMENTS.has(document.activeElement.tagName))
+        return;
       // bail with special keys
       if (event.altKey || event.ctrlKey || event.metaKey) return;
 

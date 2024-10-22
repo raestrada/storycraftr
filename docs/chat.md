@@ -16,16 +16,15 @@ This will provide a list of available commands and their usage.
 
 When interacting with the StoryCraftr assistant, it's important to enclose multi-word inputs in quotes to ensure they are processed as a single cohesive prompt. For example:
 
-```[You]: "Explain how Zevid manipulates the elite using their own biotechnology in the rebellion."```
+`[You]: "Explain how Zevid manipulates the elite using their own biotechnology in the rebellion."`
 
 This ensures that the assistant treats the entire input as one argument rather than splitting it into separate terms.
 
 **Bonus!** The assistant is pre-loaded with the full StoryCraftr documentation, so you can ask it about any command or feature. For example, if you need help with a specific command:
 
-```[You]: "Show me how to use the insert-chapter command and its parameters."```
+`[You]: "Show me how to use the insert-chapter command and its parameters."`
 
 This will provide you with clear guidance directly within the chat, ensuring you have everything you need to use StoryCraftr to its full potential!
-
 
 ## Overview
 
