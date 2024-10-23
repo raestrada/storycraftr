@@ -32,8 +32,7 @@ Ensure that 'Chapter' remains as 'Chapter,' and the same applies for 'cover,' 'b
 """
 
 INSERT_CHAPTER_PROMPT = """
-Insert a new chapter at position {position} in the book. When a new chapter is inserted at position {position}, 
-all subsequent chapters will be renumbered accordingly. 
+Insert a new chapter at position {position} in the book. When a new chapter is inserted at position {position}, all subsequent chapters will be renumbered accordingly. 
 For example, if a new chapter is inserted at position 3, the current chapter 3 will become chapter 4, chapter 4 will become chapter 5, and so on.
 Use the retrieval system to access the chapters before and after this position, ensuring that the new chapter fits seamlessly with the narrative, themes, and character arcs.
 Generate content only for the newly inserted chapter, not for the surrounding chapters.
@@ -48,7 +47,8 @@ Ensure that 'Chapter' remains as 'Chapter,' and the same applies for 'cover,' 'b
 """
 
 INSERT_FLASHBACK_CHAPTER_PROMPT = """
-Insert a new chapter at position {position} in the book, ensuring that the inserted chapter serves as a meaningful flashback.
+Insert a new chapter at position {position} in the book. When a new chapter is inserted at position {position}, all subsequent chapters will be renumbered accordingly. 
+Ensure that the inserted chapter serves as a meaningful flashback.
 The flashback should provide essential backstory or context that deepens the reader's understanding of the characters, themes, or events. 
 All subsequent chapters will be renumbered accordingly. 
 For example, if a new chapter is inserted at position 3, the current chapter 3 will become chapter 4, chapter 4 will become chapter 5, and so on.
@@ -78,10 +78,11 @@ Ensure that the writing style and tone remain consistent throughout.
 
 INSERT_SPLIT_CHAPTER_PROMPT = """
 Split chapter {position} at the appropriate point, ensuring that both resulting chapters maintain their coherence and flow.
+Insert a new chapter at position {position} in the book containing the first half of the split. When a new chapter is inserted at position {position}, all subsequent chapters will be renumbered accordingly. 
 The newly created chapters should complement each other, with both parts containing essential narrative elements that enhance character development, themes, or plot progression.
 Use the retrieval system to access the context of the chapter, making sure the split fits seamlessly within the overall story structure.
 Ensure the tone, style, and character arcs remain consistent in both parts, preserving the integrity of the original chapter.
-Generate content only for the two resulting chapters, not for the surrounding chapters.
+Generate content only for the new resulting chapters, not for the surrounding chapters.
 Review and enhance the content while preserving its original format, structure, and intent.
 Ensure that 'Chapter' remains as 'Chapter,' and the same applies for 'cover,' 'back-cover,' and 'epilogue.'
 """
