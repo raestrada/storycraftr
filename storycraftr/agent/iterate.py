@@ -147,12 +147,19 @@ def insert_new_chapter(
             f"The chapter directory '{chapters_dir}' does not exist."
         )
 
+    # Función para extraer el número del capítulo
+    def extract_chapter_number(filename):
+        # Esto supone que los archivos tienen el formato "chapter-<numero>.md"
+        return int(filename.split("-")[1].split(".")[0])
+
+    # Ordenar los archivos por el número del capítulo
     files_to_process = sorted(
         [
             f
             for f in os.listdir(chapters_dir)
             if f.endswith(".md") and f.startswith("chapter-")
-        ]
+        ],
+        key=extract_chapter_number,
     )
 
     if len(files_to_process) < position or position < 1:
