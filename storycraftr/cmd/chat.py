@@ -6,6 +6,8 @@ from rich.markdown import Markdown
 from storycraftr.utils.core import load_book_config
 from storycraftr.agent.agents import get_thread, create_or_get_assistant, create_message
 from storycraftr.cmd import iterate, outline, worldbuilding, chapters
+from prompt_toolkit import PromptSession
+from prompt_toolkit.history import InMemoryHistory
 
 console = Console()
 
@@ -39,37 +41,53 @@ def chat(book_path=None):
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
+    session = PromptSession(history=InMemoryHistory())
+
     console.print("[bold green]USE help() to get help and exit() to exit[/bold green]")
 
     while True:
-        user_input = console.input("[bold blue]You:[/bold blue] ")
+        try:
+            # Capture user input with prompt_toolkit
+            user_input = session.prompt("You: ")
 
-        if user_input.lower() == "exit()":
+            if user_input.lower() == "exit()":
+                console.print("[bold red]Exiting chat...[/bold red]")
+                break
+
+            if user_input.lower() == "help()":
+                display_help()
+                continue
+
+            if user_input.startswith("!"):
+                execute_cli_command(user_input[1:])
+                continue
+
+            # Pass the user input to the assistant for processing
+            user_input = (
+                f"Answer the next prompt formatted on markdown (text): {user_input}"
+            )
+
+            try:
+                # Generate the response
+                response = create_message(
+                    book_path,
+                    thread_id=thread.id,
+                    content=user_input,
+                    assistant=assistant,
+                )
+
+                # Render Markdown response
+                markdown_response = Markdown(response)
+                console.print(markdown_response)
+
+            except Exception as e:
+                console.print(f"[bold red]Error: {str(e)}[/bold red]")
+
+        except KeyboardInterrupt:
             console.print("[bold red]Exiting chat...[/bold red]")
             break
-
-        if user_input.lower() == "help()":
-            display_help()
-            continue
-
-        if user_input.startswith("!"):
-            execute_cli_command(user_input[1:])
-            continue
-
-        user_input = (
-            f"Answer the next prompt formatted on markdown (text): {user_input}"
-        )
-
-        try:
-            response = create_message(
-                book_path, thread_id=thread.id, content=user_input, assistant=assistant
-            )
         except Exception as e:
             console.print(f"[bold red]Error: {str(e)}[/bold red]")
-            continue
-
-        markdown_response = Markdown(response)
-        console.print(markdown_response)
 
 
 def execute_cli_command(user_input):

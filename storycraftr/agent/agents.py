@@ -174,8 +174,10 @@ def create_or_get_assistant(book_path: str, progress: Progress = None, task=None
     assistant = client.beta.assistants.create(
         instructions=instructions,
         name=name,
-        tools=[{"type": "code_interpreter"}, {"type": "file_search"}],
+        tools=[{"type": "file_search"}],
         model="gpt-4o",
+        temperature=0.7,  # Nivel de creatividad balanceado
+        top_p=1.0,  # Considerar todas las opciones
     )
 
     client.beta.assistants.update(
