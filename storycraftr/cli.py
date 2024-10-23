@@ -37,7 +37,8 @@ from storycraftr.cmd.iterate import iterate
 from storycraftr.cmd.publish import publish
 from storycraftr.cmd.chat import chat
 from storycraftr.templates.tex import TEMPLATE_TEX
-from storycraftr.agent.agents import create_or_get_assistant
+from storycraftr.agent.agents import create_or_get_assistant, update_agent_files
+from storycraftr.utils.core import load_book_config
 
 
 def download_file(url, save_dir, filename):
@@ -257,7 +258,32 @@ def init(
         console.print(f"[yellow]Project '{book_path}' is already initialized.[/yellow]")
 
 
+@click.command()
+@click.option(
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+)
+def reload_files(book_path):
+    """
+    Reloads the agent files for the given book path.
+
+    Args:
+        book_path (str): Path to the book project.
+    """
+    book_path = book_path or os.getcwd()
+    if not load_book_config(book_path):
+        return
+    if is_initialized(book_path):
+        assistant = create_or_get_assistant(book_path)
+        update_agent_files(book_path, assistant)
+        console.print(
+            f"[green]Agent files reloaded successfully for project: {book_path}[/green]"
+        )
+    else:
+        project_not_initialized_error(book_path)
+
+
 cli.add_command(init)
+cli.add_command(reload_files)
 cli.add_command(outline)
 cli.add_command(worldbuilding)
 cli.add_command(chapters)
