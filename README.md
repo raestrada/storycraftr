@@ -1,13 +1,21 @@
-[![GitHub Actions Status](https://github.com/raestrada/storycraftr/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/raestrada/storycraftr/actions)
+[![GitHub Actions Status](https://github.com/raestrada/storycraftr/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/raestrada/storycraftr/actions)  
 [![GitHub Actions Status](https://github.com/raestrada/storycraftr/actions/workflows/pytest.yml/badge.svg)](https://github.com/raestrada/storycraftr/actions)
 
-# <img src="https://storycraftr.app/img/logo.png" alt="StoryCraftr Logo" width="100" height="100"> StoryCraftr - Your AI-powered Book Creation Assistant 📚🤖
+# <img src="https://res.cloudinary.com/dyknhuvxt/image/upload/f_auto,q_auto/ofhhkf6f7bryfgvbxxwc" alt="StoryCraftr Logo" width="100" height="100"> StoryCraftr - Your AI-powered Book Creation Assistant 📚🤖
 
 Welcome to [**StoryCraftr**](https://storycraftr.app), the open-source project designed to revolutionize how books are written. With the power of AI and a streamlined command-line interface (CLI), StoryCraftr helps you craft your story, manage worldbuilding, structure your book, and generate chapters — all while keeping you in full control.
 
+---
+
+## What's New? Discover AI Craftr 🌐
+
+**[AI Craftr](https://aicraftr.app)** is now available as a powerful suite for AI-assisted writing, featuring specialized tools like **StoryCraftr** for novelists and **[PaperCraftr](https://papercraftr.app)** for researchers. Each tool is designed to simplify your writing process with unique features catered to different types of content. Explore **PaperCraftr** for structuring academic papers, or stay tuned as we add more tools to the AI Craftr suite, such as **LegalCraftr** for legal documents and **EduCraftr** for educational materials.
+
+---
+
 ## Release Notes v0.7.0-alpha3
 
-You can find the release notes for version `v0.7.0-alpha3` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.7.0-alpha3).
+You can find the release notes for version `v0.7.0-alpha3` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.7.-alpha3).
 
 ## Step 1: Install StoryCraftr
 
@@ -15,18 +23,18 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 
 To install **StoryCraftr**, run the following command:
 
-```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.7.3-alpha3
-```
+@@bash
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.7.1-alpha3
+@@
 
 ### Important: Before using StoryCraftr, make sure to set your OpenAI API key:
 
-Store the key in a text file located at ~/.storycraftr/openai_api_key.txt for convenience.
+Store the key in a text file located at `~/.storycraftr/openai_api_key.txt` for convenience.
 
-```bash
+@@bash
 mkdir -p ~/.storycraftr/
 echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
-```
+@@
 
 ## Quick Examples
 
@@ -34,15 +42,15 @@ Here are a few ways to get started with **StoryCraftr**:
 
 ### Initialize a new book project:
 
-```bash
+@@bash
 storycraftr init "La purga de los dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt"
-```
+@@
 
 ### Generate a general outline:
 
-```bash
+@@bash
 storycraftr outline general-outline "Summarize the overall plot of a dystopian science fiction where advanced technology, resembling magic, has led to the fall of humanity’s elite and the rise of a manipulative villain who seeks to destroy both the ruling class and the workers."
-```
+@@
 
 ## 💬 Introducing Chat!!! – A Simple Yet Powerful Tool to Supercharge Your Conversations! 💥
 
@@ -77,41 +85,42 @@ The **StoryCraftr Chat** feature allows users to engage directly with an AI assi
 - **Iterate**: Refine character names, motivations, and even insert new chapters mid-book.  
   Example:
 
-  ```bash
+  @@bash
   !iterate insert-chapter 3 "Add a flashback between chapters 2 and 3."
-  ```
+  @@
 
 - **Outline**: Generate the general plot, chapter summaries, or key plot points.  
   Example:
 
-  ```bash
+  @@bash
   !outline general-outline "Summarize the overall plot of a dystopian sci-fi novel."
-  ```
+  @@
 
 - **Worldbuilding**: Build the world’s history, geography, and technology, or develop the magic system.  
   Example:
 
-  ```bash
+  @@bash
   !worldbuilding magic-system "Describe the 'magic' system based on advanced technology."
-  ```
+  @@
 
 - **Chapters**: Write new chapters or adjust existing ones and generate cover text.  
   Example:
-  ```bash
+  
+  @@bash
   !chapters chapter 1 "Write chapter 1 based on the synopsis."
-  ```
+  @@
 
 You can start a chat session with the assistant using:
 
-```bash
+@@bash
 storycraftr chat --book-path /path/to/your/book
-```
+@@
 
 For help with available commands during the session, simply type:
 
-```bash
+@@bash
 help()
-```
+@@
 
 ## VSCode Extension
 
@@ -146,9 +155,9 @@ We welcome contributions of all kinds! Whether you’re a developer, writer, or 
 
 1. **Fork the repository** and create your branch:
 
-```bash
+@@bash
 git checkout -b feature/YourFeature
-```
+@@
 
 2. **Make your changes**, ensuring all tests pass.
 
