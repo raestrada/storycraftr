@@ -1,7 +1,7 @@
 import os
 import click
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.outline import (
+from storycraftr.agent.story.outline import (
     generate_general_outline,
     generate_character_summary,
     generate_plot_points,

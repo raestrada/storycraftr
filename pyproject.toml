@@ -1,17 +1,17 @@
 [tool.poetry]
 name = "storycraftr"
 version = "0.7.3-alpha3"
-description = "A CLI tool for writing books using OpenAI."
-authors = ["Tu nombre <tuemail@example.com>"]
+description = "A CLI tool for writing books and research papers using OpenAI."
+authors = ["Rodrigo Estrada <rodrigo.estrada@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-openai = "1.51.2"  # Especificando la versión de OpenAI
-click = "8.1"      # Especificando la versión de Click
-markdown = "3.7"   # Especificando la versión de Markdown
-pandoc = "2.4"     # Especificando la versión de Pandoc
+openai = "1.51.2"
+click = "8.1"
+markdown = "3.7"
+pandoc = "2.4"
 rich = "^13.9.2"
 python-dotenv = "^1.0.1"
 pyyaml = "^6.0.2"
@@ -23,6 +23,7 @@ pytest = "^6.2.4"
 
 [tool.poetry.scripts]
 storycraftr = "storycraftr.cli:cli"
+papercraftr = "storycraftr.cli:cli"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.2.4"

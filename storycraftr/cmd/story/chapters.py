@@ -1,7 +1,7 @@
 import os
 import click
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.chapters import (
+from storycraftr.agent.story.chapters import (
     generate_chapter,
     generate_cover,
     generate_back_cover,

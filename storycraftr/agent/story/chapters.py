@@ -1,5 +1,5 @@
 import os
-from storycraftr.agent.agents import (
+from storycraftr.agent.story.agents import (
     create_or_get_assistant,
     get_thread,
     create_message,
@@ -7,7 +7,7 @@ from storycraftr.agent.agents import (
 )
 from storycraftr.utils.core import load_book_config
 from storycraftr.utils.markdown import save_to_markdown
-from storycraftr.prompts.chapters import (
+from storycraftr.prompts.story.chapters import (
     CHAPTER_PROMPT_NEW,
     CHAPTER_PROMPT_REFINE,
     COVER_PROMPT,

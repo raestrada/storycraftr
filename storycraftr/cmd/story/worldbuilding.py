@@ -1,7 +1,7 @@
 import os
 import click
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.worldbuilding import (
+from storycraftr.agent.story.worldbuilding import (
     generate_geography,
     generate_history,
     generate_culture,

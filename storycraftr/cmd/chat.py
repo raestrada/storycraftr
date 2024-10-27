@@ -4,8 +4,12 @@ import shlex
 from rich.console import Console
 from rich.markdown import Markdown
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.agents import get_thread, create_or_get_assistant, create_message
-from storycraftr.cmd import iterate, outline, worldbuilding, chapters
+from storycraftr.agent.story.agents import (
+    get_thread,
+    create_or_get_assistant,
+    create_message,
+)
+import storycraftr.cmd.story as story_cmd
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import InMemoryHistory
 
@@ -13,10 +17,10 @@ console = Console()
 
 # Dictionary of available command modules
 command_modules = {
-    "iterate": iterate,
-    "outline": outline,
-    "worldbuilding": worldbuilding,
-    "chapters": chapters,
+    "iterate": story_cmd.iterate,
+    "outline": story_cmd.outline,
+    "worldbuilding": story_cmd.worldbuilding,
+    "chapters": story_cmd.chapters,
 }
 
 

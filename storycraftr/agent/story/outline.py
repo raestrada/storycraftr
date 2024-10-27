@@ -1,13 +1,13 @@
 import os
 from storycraftr.utils.core import load_book_config, file_has_more_than_three_lines
-from storycraftr.agent.agents import (
+from storycraftr.agent.story.agents import (
     create_or_get_assistant,
     get_thread,
     create_message,
     update_agent_files,
 )
 from storycraftr.utils.markdown import save_to_markdown
-from storycraftr.prompts.outline import (
+from storycraftr.prompts.story.outline import (
     GENERAL_OUTLINE_PROMPT_NEW,
     GENERAL_OUTLINE_PROMPT_REFINE,
     CHARACTER_SUMMARY_PROMPT_NEW,

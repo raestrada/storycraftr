@@ -2,7 +2,7 @@ import os
 import click
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.iterate import (
+from storycraftr.agent.story.iterate import (
     iterate_check_names,
     fix_name_in_chapters,
     refine_character_motivation,

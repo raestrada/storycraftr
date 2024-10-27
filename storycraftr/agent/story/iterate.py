@@ -1,7 +1,7 @@
 import os
 from rich.progress import Progress
 from rich.console import Console
-from storycraftr.prompts.iterate import (
+from storycraftr.prompts.story.iterate import (
     CHECK_NAMES_PROMPT,
     FIX_NAME_PROMPT,
     REFINE_MOTIVATION_PROMPT,
@@ -14,7 +14,7 @@ from storycraftr.prompts.iterate import (
     INSERT_SPLIT_CHAPTER_PROMPT,
     REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT,
 )
-from storycraftr.agent.agents import (
+from storycraftr.agent.story.agents import (
     update_agent_files,
     create_message,
     get_thread,

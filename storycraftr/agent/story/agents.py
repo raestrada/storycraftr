@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from rich.console import Console
 from rich.progress import Progress
-from storycraftr.prompts.core import FORMAT_OUTPUT
+from storycraftr.prompts.story.core import FORMAT_OUTPUT
 from storycraftr.utils.core import load_book_config, generate_prompt_with_hash
 
 load_dotenv()
