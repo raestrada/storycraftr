@@ -23,18 +23,18 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 
 To install **StoryCraftr**, run the following command:
 
-@@bash
+```bash
 pipx install git+https://github.com/raestrada/storycraftr.git@v0.7.1-alpha3
-@@
+```
 
 ### Important: Before using StoryCraftr, make sure to set your OpenAI API key:
 
 Store the key in a text file located at `~/.storycraftr/openai_api_key.txt` for convenience.
 
-@@bash
+```bash
 mkdir -p ~/.storycraftr/
 echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
-@@
+```
 
 ## Quick Examples
 
@@ -42,15 +42,15 @@ Here are a few ways to get started with **StoryCraftr**:
 
 ### Initialize a new book project:
 
-@@bash
+```bash
 storycraftr init "La purga de los dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt"
-@@
+```
 
 ### Generate a general outline:
 
-@@bash
+```bash
 storycraftr outline general-outline "Summarize the overall plot of a dystopian science fiction where advanced technology, resembling magic, has led to the fall of humanity’s elite and the rise of a manipulative villain who seeks to destroy both the ruling class and the workers."
-@@
+```
 
 ## 💬 Introducing Chat!!! – A Simple Yet Powerful Tool to Supercharge Your Conversations! 💥
 
@@ -85,42 +85,42 @@ The **StoryCraftr Chat** feature allows users to engage directly with an AI assi
 - **Iterate**: Refine character names, motivations, and even insert new chapters mid-book.  
   Example:
 
-  @@bash
+  ```bash
   !iterate insert-chapter 3 "Add a flashback between chapters 2 and 3."
-  @@
+  ```
 
 - **Outline**: Generate the general plot, chapter summaries, or key plot points.  
   Example:
 
-  @@bash
+  ```bash
   !outline general-outline "Summarize the overall plot of a dystopian sci-fi novel."
-  @@
+  ```
 
 - **Worldbuilding**: Build the world’s history, geography, and technology, or develop the magic system.  
   Example:
 
-  @@bash
+  ```bash
   !worldbuilding magic-system "Describe the 'magic' system based on advanced technology."
-  @@
+  ```
 
 - **Chapters**: Write new chapters or adjust existing ones and generate cover text.  
   Example:
   
-  @@bash
+  ```bash
   !chapters chapter 1 "Write chapter 1 based on the synopsis."
-  @@
+  ```
 
 You can start a chat session with the assistant using:
 
-@@bash
+```bash
 storycraftr chat --book-path /path/to/your/book
-@@
+```
 
 For help with available commands during the session, simply type:
 
-@@bash
+```bash
 help()
-@@
+```
 
 ## VSCode Extension
 
@@ -155,9 +155,9 @@ We welcome contributions of all kinds! Whether you’re a developer, writer, or 
 
 1. **Fork the repository** and create your branch:
 
-@@bash
+```bash
 git checkout -b feature/YourFeature
-@@
+```
 
 2. **Make your changes**, ensuring all tests pass.
 
