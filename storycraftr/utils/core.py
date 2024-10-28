@@ -80,6 +80,8 @@ class BookConfig(NamedTuple):
     genre: str
     license: str
     reference_author: str
+    keywords: str
+    cli_name: str
 
 
 def load_book_config(book_path: str) -> BookConfig:
@@ -108,6 +110,8 @@ def load_book_config(book_path: str) -> BookConfig:
                 genre=data["genre"],
                 license=data["license"],
                 reference_author=data["reference_author"],
+                keywords=data["keywords"],
+                cli_name=data["cli_name"],
             )
     except (FileNotFoundError, NotADirectoryError):
         console.print(

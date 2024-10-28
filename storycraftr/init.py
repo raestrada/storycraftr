@@ -47,6 +47,7 @@ def init_structure_story(
     genre,
     behavior_content,
     reference_author,
+    cli_name,
 ):
     """
     Initializes the StoryCraftr project structure by creating necessary files and folders.
@@ -73,6 +74,7 @@ def init_structure_story(
         "genre": genre,
         "license": license,
         "reference_author": reference_author,
+        "cli_name": cli_name,
     }
     config_file = Path(book_path) / "storycraftr.json"
     config_file.write_text(json.dumps(config_data, indent=4), encoding="utf-8")
@@ -113,6 +115,7 @@ def init_structure_paper(
     reference_author,
     keywords,
     behavior_content,
+    cli_name,
 ):
     """
     Initializes the PaperCraftr project structure by creating necessary files and folders.
@@ -137,6 +140,7 @@ def init_structure_paper(
         "default_author": author,
         "reference_author": reference_author,
         "keywords": keywords,
+        "cli_name": cli_name,
     }
     config_file = Path(paper_path) / "papercraftr.json"
     config_file.write_text(json.dumps(config_data, indent=4), encoding="utf-8")

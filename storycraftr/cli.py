@@ -220,6 +220,7 @@ def init(
             genre=genre,
             behavior_content=behavior_content,
             reference_author=reference_author,
+            cli_name=cli_name,
         )
     elif cli_name == "papercraftr":
         init_structure_paper(
@@ -228,6 +229,7 @@ def init(
             author=author,
             keywords=keywords,
             behavior_content=behavior_content,
+            cli_name=cli_name,
         )
 
 
