@@ -1,5 +1,5 @@
 import os
-from storycraftr.agent.story.agents import (
+from storycraftr.agent.agents import (
     create_or_get_assistant,
     get_thread,
     create_message,

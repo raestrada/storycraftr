@@ -4,7 +4,7 @@ import requests
 from rich.console import Console
 from pathlib import Path
 import storycraftr.templates.folder_story
-from storycraftr.agent.story.agents import create_or_get_assistant
+from storycraftr.agent.agents import create_or_get_assistant
 from storycraftr.templates.tex import TEMPLATE_TEX
 
 console = Console()

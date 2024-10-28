@@ -41,7 +41,7 @@ load_openai_api_key()
 from storycraftr.state import debug_state
 from storycraftr.cmd.publish import publish
 from storycraftr.cmd.chat import chat
-from storycraftr.agent.story.agents import create_or_get_assistant, update_agent_files
+from storycraftr.agent.agents import create_or_get_assistant, update_agent_files
 from storycraftr.utils.core import load_book_config
 
 # Imports StoryCraftr in storycraftr.cmd.story

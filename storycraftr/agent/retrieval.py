@@ -1,4 +1,4 @@
-from storycraftr.agent.story.agents import create_message, get_thread
+from storycraftr.agent.agents import create_message, get_thread
 from rich.console import Console
 from rich.progress import Progress
 
@@ -130,7 +130,7 @@ def handle_failed_prompt(assistant, original_prompt: str) -> str:
 
 # Example usage
 if __name__ == "__main__":
-    from storycraftr.agent.story.agents import create_or_get_assistant
+    from storycraftr.agent.agents import create_or_get_assistant
 
     # Initialize or retrieve the assistant
     assistant = create_or_get_assistant(book_path=None)

@@ -110,7 +110,7 @@ def load_book_config(book_path: str) -> BookConfig:
                 genre=data["genre"],
                 license=data["license"],
                 reference_author=data["reference_author"],
-                keywords=data["keywords"],
+                keywords=data["keywords"] if "keywords" in data else "",
                 cli_name=data["cli_name"],
             )
     except (FileNotFoundError, NotADirectoryError):

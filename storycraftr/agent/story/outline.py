@@ -1,6 +1,6 @@
 import os
 from storycraftr.utils.core import load_book_config, file_has_more_than_three_lines
-from storycraftr.agent.story.agents import (
+from storycraftr.agent.agents import (
     create_or_get_assistant,
     get_thread,
     create_message,

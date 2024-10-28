@@ -14,7 +14,7 @@ from storycraftr.prompts.story.iterate import (
     INSERT_SPLIT_CHAPTER_PROMPT,
     REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT,
 )
-from storycraftr.agent.story.agents import (
+from storycraftr.agent.agents import (
     update_agent_files,
     create_message,
     get_thread,

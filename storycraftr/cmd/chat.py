@@ -4,7 +4,7 @@ import shlex
 from rich.console import Console
 from rich.markdown import Markdown
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.story.agents import (
+from storycraftr.agent.agents import (
     get_thread,
     create_or_get_assistant,
     create_message,
