@@ -75,6 +75,7 @@ def init_structure_story(
         "license": license,
         "reference_author": reference_author,
         "cli_name": cli_name,
+        "multiple_answer": True,
     }
     config_file = Path(book_path) / "storycraftr.json"
     config_file.write_text(json.dumps(config_data, indent=4), encoding="utf-8")
@@ -141,6 +142,7 @@ def init_structure_paper(
         "reference_author": reference_author,
         "keywords": keywords,
         "cli_name": cli_name,
+        "multiple_answer": True,
     }
     config_file = Path(paper_path) / "papercraftr.json"
     config_file.write_text(json.dumps(config_data, indent=4), encoding="utf-8")

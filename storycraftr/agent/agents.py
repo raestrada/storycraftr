@@ -197,9 +197,11 @@ def create_message(
     file_path: str = None,
     progress: Progress = None,
     task_id=None,
+    force_single_answer: bool = False,
 ) -> str:
     """
-    Create a message in the thread and process it asynchronously.
+    Create a message in the thread and process it asynchronously. If config.multiple_answer is true,
+    the assistant response will be requested in parts, iterating until the response is complete.
 
     Args:
         book_path (str): Path to the book directory.
@@ -209,9 +211,10 @@ def create_message(
         file_path (str, optional): The path to a file to attach as an attachment. Defaults to None.
         progress (Progress, optional): Progress object for tracking. Defaults to None.
         task_id (int, optional): Task ID for the progress bar.
+        force_single_answer (bool, optional): If true, forces a single response regardless of config.multiple_answer. Defaults to False.
 
     Returns:
-        str: The generated response text from the assistant.
+        str: The generated response text from the assistant, post-processed if multiple_answer is true.
     """
     config = load_book_config(book_path)
     should_print = progress is None
@@ -243,12 +246,22 @@ def create_message(
                 f"[bold blue]Using provided prompt to generate new content...[/bold blue]"
             )
 
-    try:
-        prompt_with_hash = generate_prompt_with_hash(
-            f"{FORMAT_OUTPUT.format(reference_author=config.reference_author, language=config.primary_language)}\n\n{content}",
-            datetime.now().strftime("%B %d, %Y"),
-            book_path=book_path,
+    # Add instructions for multiple answers if the flag is true and force_single_answer is false
+    if config.multiple_answer and not force_single_answer:
+        content = (
+            "Please provide the response in parts to avoid output token limitations. "
+            "Indicate 'END_OF_RESPONSE' when the response is complete. "
+            "Continue providing the next part of the response when you receive the prompt 'next'.\n\n"
+            + content
         )
+
+    prompt_with_hash = generate_prompt_with_hash(
+        f"{FORMAT_OUTPUT.format(reference_author=config.reference_author, language=config.primary_language)}\n\n{content}",
+        datetime.now().strftime("%B %d, %Y"),
+        book_path=book_path,
+    )
+
+    try:
         client.beta.threads.messages.create(
             thread_id=thread_id, role="user", content=prompt_with_hash
         )
@@ -259,18 +272,55 @@ def create_message(
         if internal_progress:
             progress.start()
 
+        response_text = ""
+        done_flag = "END_OF_RESPONSE"
+
+        # Initial run to get the first part of the response
         while run.status in ["queued", "in_progress"]:
             run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
             progress.update(task_id, advance=1)
             time.sleep(0.5)
 
+        messages = client.beta.threads.messages.list(thread_id=thread_id)
+        response_text = messages.data[0].content[0].text.value
+
+        # Continue iterating if the response is incomplete or if multiple_answer is true
+        iter = 0
+        while not force_single_answer and (done_flag not in response_text) and iter < 3:
+            console.print(
+                f"[bold blue]Requesting next part of the response...[/bold blue]"
+            )
+            client.beta.threads.messages.create(
+                thread_id=thread_id, role="user", content="next"
+            )
+            run = client.beta.threads.runs.create(
+                thread_id=thread_id, assistant_id=assistant.id
+            )
+
+            while run.status in ["queued", "in_progress"]:
+                run = client.beta.threads.runs.retrieve(
+                    thread_id=thread_id, run_id=run.id
+                )
+                progress.update(task_id, advance=1)
+                time.sleep(0.5)
+
+            messages = client.beta.threads.messages.list(thread_id=thread_id)
+            part_text = messages.data[0].content[0].text.value
+            response_text += part_text + "\n\n"
+
+            # Break after 3 iterations to avoid endless loops
+            if response_text.count(done_flag) >= 3:
+                console.print(
+                    "[bold yellow]Maximum response iterations reached.[/bold yellow]"
+                )
+                break
+
+            iter = iter + 1
+
         if internal_progress:
             progress.stop()
 
         console.print(f"[bold green]Generated content received.[/bold green]")
-
-        messages = client.beta.threads.messages.list(thread_id=thread_id)
-        response_text = messages.data[0].content[0].text.value
 
         if response_text.strip() == content.strip():
             console.print(
@@ -280,7 +330,34 @@ def create_message(
                 "The response matches the original prompt. Check your account for credit availability."
             )
 
-        return response_text
+        # Post-process response if multiple_answer is true and force_single_answer is false using another prompt
+        if config.multiple_answer and not force_single_answer and iter > 1:
+            console.print(
+                "[bold blue]Post-processing the response using an additional prompt...[/bold blue]"
+            )
+            post_process_prompt = (
+                "Please refine and clean up the following content to ensure it is suitable for use as a book chapter. "
+                "Remove any redundant instructions, clean up formatting, and provide the final output in a markdown format ready to use:\n\n"
+                f"{response_text}"
+            )
+            client.beta.threads.messages.create(
+                thread_id=thread_id, role="user", content=post_process_prompt
+            )
+            run = client.beta.threads.runs.create(
+                thread_id=thread_id, assistant_id=assistant.id
+            )
+
+            while run.status in ["queued", "in_progress"]:
+                run = client.beta.threads.runs.retrieve(
+                    thread_id=thread_id, run_id=run.id
+                )
+                progress.update(task_id, advance=1)
+                time.sleep(0.5)
+
+            messages = client.beta.threads.messages.list(thread_id=thread_id)
+            response_text = messages.data[0].content[0].text.value
+
+        return response_text.replace(done_flag, "")
 
     except Exception as e:
         console.print(f"[bold red]Error:[/bold red] {str(e)}")

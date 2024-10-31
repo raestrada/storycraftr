@@ -82,6 +82,7 @@ class BookConfig(NamedTuple):
     reference_author: str
     keywords: str
     cli_name: str
+    multiple_answer: bool
 
 
 def load_book_config(book_path: str) -> BookConfig:
@@ -112,6 +113,7 @@ def load_book_config(book_path: str) -> BookConfig:
                 reference_author=data["reference_author"],
                 keywords=data["keywords"] if "keywords" in data else "",
                 cli_name=data["cli_name"],
+                multiple_answer=data["multiple_answer"],
             )
     except (FileNotFoundError, NotADirectoryError):
         console.print(

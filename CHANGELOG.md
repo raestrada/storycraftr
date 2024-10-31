@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.8.0-alpha4] - 2024-10-30
+
+### Added
+
+- **Support for PaperCraftr**: Major refactor to extend support for PaperCraftr, a CLI aimed at academic paper writing. Users can now initialize paper projects with a dedicated structure, distinct from book projects, for enhanced productivity in academic writing.
+- **Multiple Prompt Support**: Implemented multi-purpose prompts for both book and paper creation, allowing users to generate and refine content for different aspects such as research questions, contributions, and outlines.
+- **Define Command Extensions**: Added new commands under the `define` group to generate key sections for papers, including defining research questions and contributions.
+- **Contribution Generation**: Added the `define_contribution` command to generate or refine the main contribution of a paper, supporting improved clarity and focus for academic projects.
+
+
 ## [0.7.0-alpha3] - 2024-03-14
 
 ### Added

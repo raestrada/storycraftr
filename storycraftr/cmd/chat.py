@@ -78,6 +78,7 @@ def chat(book_path=None):
                     thread_id=thread.id,
                     content=user_input,
                     assistant=assistant,
+                    force_single_answer=True,
                 )
 
                 # Render Markdown response

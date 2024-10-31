@@ -40,7 +40,7 @@ def generate_general_outline(book_path: str, prompt: str) -> str:
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
     file_path = os.path.join(book_path, "outline", "general_outline.md")
-    book_name = os.path.basename(book_path)
+    book_name = config.book_name
 
     # Check if the outline already exists and choose the appropriate prompt
     if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):

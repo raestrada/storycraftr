@@ -2,45 +2,63 @@ import click
 from rich.console import Console
 from pathlib import Path
 
+from storycraftr.agent.paper.define import define_core_question, define_contribution
+
 console = Console()
 
 
 @click.group()
-@click.option(
-    "--book_path",
-    type=click.Path(),
-    required=True,
-    help="Path to the paper project directory.",
-)
-def define(book_path):
+def define():
     """
     Group of commands for defining core elements of an academic paper (e.g., research question, contribution).
     """
     # Store book_path in context for file operations if needed
-    define.book_path = Path(book_path)
+    pass
 
 
 @define.command()
+@click.option(
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+)
 @click.argument("question", type=str)
-def core_question(question):
+def core_question(question: str, book_path: str = None):
     """
     Define the main research question or hypothesis of the paper.
 
     Args:
         question (str): The main research question or hypothesis.
+        book_path (str, optional): The path to the book's directory. Defaults to the current working directory.
     """
-    console.print(f"[green]Core Research Question defined:[/green] {question}")
-    # This command currently acts as a placeholder; no actual storage is implemented yet.
+    book_path = book_path or os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    console.print(
+        f"[bold blue]Defining core research question for the paper: {book_path}[/bold blue]"
+    )
+    define_core_question(book_path, question)
 
 
-@define.command()
-@click.argument("contribution", type=str)
-def contribution(contribution):
+@click.command()
+@click.option(
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+)
+@click.argument("prompt", type=str)
+def contribution(prompt: str, book_path: str = None):
     """
-    Define the main contribution or novelty of the paper.
+    Define the main contribution of the paper.
 
     Args:
-        contribution (str): The unique contribution or impact that the paper aims to bring to the field.
+        prompt (str): The prompt to guide the contribution definition.
+        book_path (str, optional): The path to the book's directory. Defaults to the current working directory.
     """
-    console.print(f"[green]Main Contribution defined:[/green] {contribution}")
-    # This command currently acts as a placeholder; no actual storage is implemented yet.
+    book_path = book_path or os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    console.print(
+        f"[bold blue]Defining contribution for the paper: {book_path}[/bold blue]"
+    )
+    define_contribution(book_path, prompt)
