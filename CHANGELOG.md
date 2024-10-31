@@ -9,7 +9,6 @@
 - **Define Command Extensions**: Added new commands under the `define` group to generate key sections for papers, including defining research questions and contributions.
 - **Contribution Generation**: Added the `define_contribution` command to generate or refine the main contribution of a paper, supporting improved clarity and focus for academic projects.
 
-
 ## [0.7.0-alpha3] - 2024-03-14
 
 ### Added

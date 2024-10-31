@@ -105,7 +105,7 @@ The **StoryCraftr Chat** feature allows users to engage directly with an AI assi
 
 - **Chapters**: Write new chapters or adjust existing ones and generate cover text.  
   Example:
-  
+
   ```bash
   !chapters chapter 1 "Write chapter 1 based on the synopsis."
   ```
