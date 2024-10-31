@@ -164,3 +164,11 @@ git checkout -b feature/YourFeature
 3. **Submit a pull request** detailing your changes.
 
 Join us on this journey to create an amazing open-source tool for writers everywhere. Together, we can make StoryCraftr the go-to AI writing assistant! 💡
+
+## Powered by AI Craftr
+
+![AI Craftr Logo](https://res.cloudinary.com/dyknhuvxt/image/upload/v1730059761/aicraftr_qzknf4.png)
+
+**StoryCraftr** es parte de la suite **AI Craftr**, un conjunto de herramientas de código abierto diseñadas para asistir en la escritura creativa y académica. AI Craftr potencia la productividad de escritores, investigadores y educadores, proporcionando herramientas avanzadas para la creación de contenido.
+
+Puedes explorar más sobre **AI Craftr** y descubrir otras herramientas como **PaperCraftr** para la escritura académica en [https://aicraftr.app](https://aicraftr.app).
