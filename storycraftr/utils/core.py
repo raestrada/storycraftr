@@ -70,6 +70,11 @@ class BookConfig(NamedTuple):
         genre (str): The genre of the book.
         license (str): The license type for the book.
         reference_author (str): A reference author for style guidance.
+        keywords (str): Keywords for the paper (optional).
+        cli_name (str): The name of the CLI tool used.
+        openai_url (str): The URL of the OpenAI API.
+        openai_model (str): The OpenAI model to use.
+        multiple_answer (bool): Whether multiple answers are allowed.
     """
 
     book_path: str
@@ -82,6 +87,8 @@ class BookConfig(NamedTuple):
     reference_author: str
     keywords: str
     cli_name: str
+    openai_url: str
+    openai_model: str
     multiple_answer: bool
 
 
@@ -113,6 +120,8 @@ def load_book_config(book_path: str) -> BookConfig:
                 reference_author=data["reference_author"],
                 keywords=data["keywords"] if "keywords" in data else "",
                 cli_name=data["cli_name"],
+                openai_url=data["openai_url"],
+                openai_model=data["openai_model"],
                 multiple_answer=data["multiple_answer"],
             )
     except (FileNotFoundError, NotADirectoryError):

@@ -162,6 +162,12 @@ def cli(debug):
     help="Reference author for style (StoryCraftr only).",
 )
 @click.option("--keywords", help="Keywords for the paper (PaperCraftr only).")
+@click.option(
+    "--openai-url", default="https://api.openai.com/v1", help="URL of the OpenAI API."
+)
+@click.option(
+    "--openai-model", default="gpt-4o", help="OpenAI model to use."
+)
 def init(
     project_path,
     license,
@@ -172,6 +178,8 @@ def init(
     behavior,
     reference_author,
     keywords,
+    openai_url,
+    openai_model,
 ):
     """
     Initialize the project structure with configuration and behavior content.
@@ -221,6 +229,8 @@ def init(
             behavior_content=behavior_content,
             reference_author=reference_author,
             cli_name=cli_name,
+            openai_url=openai_url,
+            openai_model=openai_model,
         )
     elif cli_name == "papercraftr":
         init_structure_paper(
@@ -230,6 +240,8 @@ def init(
             keywords=keywords,
             behavior_content=behavior_content,
             cli_name=cli_name,
+            openai_url=openai_url,
+            openai_model=openai_model,
         )
 
 

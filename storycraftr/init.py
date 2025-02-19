@@ -48,6 +48,8 @@ def init_structure_story(
     behavior_content,
     reference_author,
     cli_name,
+    openai_url,
+    openai_model,
 ):
     """
     Initializes the StoryCraftr project structure by creating necessary files and folders.
@@ -75,6 +77,8 @@ def init_structure_story(
         "license": license,
         "reference_author": reference_author,
         "cli_name": cli_name,
+        "openai_url": openai_url,
+        "openai_model": openai_model,
         "multiple_answer": True,
     }
     config_file = Path(book_path) / "storycraftr.json"
@@ -113,10 +117,11 @@ def init_structure_paper(
     paper_path,
     primary_language,
     author,
-    reference_author,
     keywords,
     behavior_content,
     cli_name,
+    openai_url,
+    openai_model,
 ):
     """
     Initializes the PaperCraftr project structure by creating necessary files and folders.
@@ -139,9 +144,10 @@ def init_structure_paper(
         "book_name": paper_name,
         "primary_language": primary_language,
         "default_author": author,
-        "reference_author": reference_author,
         "keywords": keywords,
         "cli_name": cli_name,
+        "openai_url": openai_url,
+        "openai_model": openai_model,
         "multiple_answer": True,
     }
     config_file = Path(paper_path) / "papercraftr.json"

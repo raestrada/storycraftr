@@ -12,16 +12,27 @@ from storycraftr.utils.core import load_book_config, generate_prompt_with_hash
 
 load_dotenv()
 
-client = OpenAI()
 console = Console()
 
+def initialize_openai_client(book_path: str):
+    """
+    Initialize the OpenAI client with the configuration from the book.
 
-def get_vector_store_id_by_name(assistant_name: str) -> str:
+    Args:
+        book_path (str): Path to the book directory.
+    """
+    config = load_book_config(book_path)
+    openai.api_base = config.openai_url
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), api_base=config.openai_url)
+    return client
+
+def get_vector_store_id_by_name(assistant_name: str, client) -> str:
     """
     Retrieve the vector store ID by the assistant's name.
 
     Args:
         assistant_name (str): The name of the assistant.
+        client (OpenAI): The OpenAI client.
 
     Returns:
         str: The ID of the vector store associated with the assistant's name, or None if not found.
@@ -38,9 +49,8 @@ def get_vector_store_id_by_name(assistant_name: str) -> str:
     )
     return None
 
-
 def upload_markdown_files_to_vector_store(
-    vector_store_id: str, book_path: str, progress: Progress = None, task=None
+    vector_store_id: str, book_path: str, client, progress: Progress = None, task=None
 ):
     """
     Upload all Markdown files from the book directory to the specified vector store.
@@ -48,6 +58,7 @@ def upload_markdown_files_to_vector_store(
     Args:
         vector_store_id (str): ID of the vector store to upload files to.
         book_path (str): Path to the book's directory containing markdown files.
+        client (OpenAI): The OpenAI client.
         progress (Progress, optional): Progress bar object for tracking progress.
         task (Task, optional): Task ID for progress tracking.
 
@@ -81,7 +92,6 @@ def upload_markdown_files_to_vector_store(
         f"[bold green]Files uploaded successfully to vector store '{vector_store_id}'.[/bold green]"
     )
 
-
 def load_markdown_files(book_path: str) -> list:
     """
     Load all Markdown files from the book's directory.
@@ -107,7 +117,6 @@ def load_markdown_files(book_path: str) -> list:
     )
     return valid_md_files
 
-
 def delete_assistant(book_path: str):
     """
     Delete an assistant if it exists.
@@ -118,6 +127,7 @@ def delete_assistant(book_path: str):
     Returns:
         None
     """
+    client = initialize_openai_client(book_path)
     name = os.path.basename(book_path)
     console.print(
         f"[bold blue]Checking if assistant '{name}' exists for deletion...[/bold blue]"
@@ -133,7 +143,6 @@ def delete_assistant(book_path: str):
             )
             break
 
-
 def create_or_get_assistant(book_path: str, progress: Progress = None, task=None):
     """
     Create or retrieve an assistant for the given book.
@@ -146,6 +155,8 @@ def create_or_get_assistant(book_path: str, progress: Progress = None, task=None
     Returns:
         Assistant: The created or retrieved assistant object.
     """
+    client = initialize_openai_client(book_path)
+    config = load_book_config(book_path)
     name = os.path.basename(book_path)
     if progress and task:
         progress.update(
@@ -165,7 +176,7 @@ def create_or_get_assistant(book_path: str, progress: Progress = None, task=None
             return assistant
 
     vector_store = client.beta.vector_stores.create(name=f"{name} Docs")
-    upload_markdown_files_to_vector_store(vector_store.id, book_path, progress, task)
+    upload_markdown_files_to_vector_store(vector_store.id, book_path, client, progress, task)
 
     # Read instructions from behaviors
     with open(os.path.join(book_path, "behaviors", "default.txt"), "r") as file:
@@ -175,7 +186,7 @@ def create_or_get_assistant(book_path: str, progress: Progress = None, task=None
         instructions=instructions,
         name=name,
         tools=[{"type": "file_search"}],
-        model="gpt-4o",
+        model=config.openai_model,
         temperature=0.7,  # Nivel de creatividad balanceado
         top_p=1.0,  # Considerar todas las opciones
     )
@@ -187,7 +198,6 @@ def create_or_get_assistant(book_path: str, progress: Progress = None, task=None
 
     console.print(f"[bold green]Assistant '{name}' created successfully.[/bold green]")
     return assistant
-
 
 def create_message(
     book_path: str,
@@ -216,6 +226,7 @@ def create_message(
     Returns:
         str: The generated response text from the assistant, post-processed if multiple_answer is true.
     """
+    client = initialize_openai_client(book_path)
     config = load_book_config(book_path)
     should_print = progress is None
 
@@ -363,16 +374,16 @@ def create_message(
         console.print(f"[bold red]Error:[/bold red] {str(e)}")
         raise
 
-
 def get_thread() -> object:
     """Retrieve or create a new thread."""
+    client = initialize_openai_client(book_path)
     return client.beta.threads.create()
-
 
 def update_agent_files(book_path: str, assistant):
     """Update the assistant's knowledge with new files from the book path."""
+    client = initialize_openai_client(book_path)
     assistant_name = assistant.name
-    vector_store_id = get_vector_store_id_by_name(assistant_name)
+    vector_store_id = get_vector_store_id_by_name(assistant_name, client)
 
     if not vector_store_id:
         console.print(
@@ -380,11 +391,10 @@ def update_agent_files(book_path: str, assistant):
         )
         return
 
-    upload_markdown_files_to_vector_store(vector_store_id, book_path)
+    upload_markdown_files_to_vector_store(vector_store_id, book_path, client)
     console.print(
         f"[bold green]Files updated successfully in assistant '{assistant.name}'.[/bold green]"
     )
-
 
 def process_chapters(
     save_to_markdown,
@@ -404,6 +414,7 @@ def process_chapters(
         file_suffix (str): Suffix for the output file.
         **prompt_kwargs: Additional arguments for the prompt template.
     """
+    client = initialize_openai_client(book_path)
     # Directories to process
     chapters_dir = os.path.join(book_path, "chapters")
     outline_dir = os.path.join(book_path, "outline")
