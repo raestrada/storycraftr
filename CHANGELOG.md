@@ -1,6 +1,15 @@
 # Changelog
 
-## [0.8.0-alpha4] - 2024-10-30
+## [0.9.1-beta2] - 2024-11-01
+
+### Added
+
+- **OpenAI Model and URL Configuration**: Added support for specifying the OpenAI model and URL in the configuration file and during project initialization.
+- **Supported LLMs Documentation**: Included documentation for various LLMs compatible with the OpenAI API, such as DeepSeek, Qwen, Gemini, Together AI, and DeepInfra.
+- **Behavior File Enhancements**: Improved the behavior file to guide the AI's writing process more effectively, ensuring alignment with the writer's vision.
+- **Interactive Chat Enhancements**: Enhanced the chat feature to support more dynamic interactions and command executions directly from the chat interface.
+
+## [0.9.0-beta1] - 2024-10-30
 
 ### Added
 

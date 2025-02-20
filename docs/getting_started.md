@@ -11,7 +11,7 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.8.0-alpha4
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.9.0-beta1
 ```
 
 ### Important: Before running the `storycraftr` command
@@ -24,6 +24,60 @@ echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
 ```
 
 Once installed and the API key is set, you can run the tool using the command `storycraftr`.
+
+### New: Specify OpenAI Model and URL
+
+StoryCraftr now allows you to specify the OpenAI model and URL, which can be any service that supports the OpenAI API with file search capabilities, such as DeepSeek or others. This is essential as StoryCraftr relies on file search for its functionality.
+
+To configure the model and URL, add the following lines to your configuration file located at `~/.storycraftr/config.json`:
+
+```json
+{
+  "openai_model": "your-preferred-model",
+  "openai_url": "https://api.your-preferred-service.com"
+}
+```
+
+Make sure to replace `"your-preferred-model"` with the model you want to use and `"https://api.your-preferred-service.com"` with the URL of the service that supports the OpenAI API with file search.
+
+### Supported LLMs
+
+Here are some examples of LLMs that are compatible with the OpenAI API:
+
+1. **OpenAI GPT Series**:
+    - Models: `gpt-3.5-turbo`, `gpt-4`
+    - URL Base: `https://api.openai.com/v1/`
+    - Documentation: [OpenAI API Models](https://beta.openai.com/docs/models)
+
+2. **Azure OpenAI Service**:
+    - Models: `gpt-3.5-turbo`, `gpt-4`
+    - URL Base: Depends on the region and configuration.
+    - Documentation: [Azure OpenAI Service](https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/)
+
+3. **DeepSeek**:
+    - Model: `DeepSeek-R1`
+    - URL Base: `https://api.deepseek.com/v1/`
+    - Documentation: [DeepSeek API Documentation](https://deepseek.com/docs)
+
+4. **Qwen (Alibaba Cloud)**:
+    - Models: `qwen-7b`, `qwen-13b`
+    - URL Base: `https://dashscope.aliyuncs.com/`
+    - Documentation: [DashScope API](https://dashscope.aliyuncs.com/docs)
+
+5. **Gemini (Google AI)**:
+    - Models: `gemini-1`, `gemini-1.5`
+    - URL Base: `https://api.gemini.google.com/v1/`
+    - Documentation: [Gemini API](https://gemini.google.com/docs)
+
+6. **Together AI**:
+    - Model: `together-gpt-neoxt-chat-20b`
+    - URL Base: `https://api.together.ai/v1/`
+    - Documentation: [Together AI API](https://together.ai/docs)
+
+7. **DeepInfra**:
+    - Model: `Qwen2.5-Coder-32B-Instruct`
+    - URL Base: `https://api.deepinfra.com/v1/`
+    - Documentation: [DeepInfra API](https://deepinfra.com/docs)
 
 ## Step 2: Create the Behavior File
 
@@ -74,16 +128,18 @@ Think of the behavior file as your way of ensuring the AI “understands” your
 
 The behavior file serves as the **creative guide** for your story. It helps the AI maintain consistency in **style**, **tone**, and **focus** as it develops the novel. It ensures the AI's writing process is in harmony with your initial vision and remains aligned with your intended **narrative** and **thematic direction** throughout the writing process.
 
-3.  **Initialize the book**: A clear definition of genre and structure aligns with Sanderson’s emphasis on creating consistent rules for your world and plot ([Sanderson's First Law](https://www.brandonsanderson.com/sandersons-first-law/)). We've added an optional parameter --reference-author. If you use it, the system will try to emulate the style of that author; if not, it will assume the style based on what you write.
+## Step 3: Initialize the Book
 
-        ```bash
-        storycraftr init "The Purge of the Gods" --primary-language "en" --alternate-languages "es" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt"  --reference-author "Brandon Sanderson"
-        cd "The Purge of the Gods"
-        ```
+A clear definition of genre and structure aligns with Sanderson’s emphasis on creating consistent rules for your world and plot ([Sanderson's First Law](https://www.brandonsanderson.com/sandersons-first-law/)). We've added an optional parameter `--reference-author`. If you use it, the system will try to emulate the style of that author; if not, it will assume the style based on what you write.
 
-    > **Note:** In the following commands, any modified files are always backed up with a _.back_ extension.
+```bash
+storycraftr init "The Purge of the Gods" --primary-language "en" --alternate-languages "es" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt" --reference-author "Brandon Sanderson" --openai-model "gpt-4" --openai-url "https://api.openai.com/v1/"
+cd "The Purge of the Gods"
+```
 
-## Step 3: Generate the Outline
+> **Note:** In the following commands, any modified files are always backed up with a _.back_ extension.
+
+## Step 4: Generate the Outline
 
 According to Sanderson, **strong outlines** provide the scaffolding for a story, ensuring that it remains structured and engaging throughout. Let's build the outline for **La Purga de los Dioses**.
 
@@ -110,7 +166,7 @@ According to Sanderson, **strong outlines** provide the scaffolding for a story,
    storycraftr outline chapter-synopsis "Outline each chapter of a dystopian society where an ancient elite class, ruling with advanced biotechnology that mimics magic, manipulates both workers and warriors. The protagonist, Zevid, aims to destroy both factions through manipulation, eventually leading to his own version of 'The Purge.'"
    ```
 
-## Step 4: Build Your World
+## Step 5: Build Your World
 
 Sanderson’s [Laws of Magic](https://www.brandonsanderson.com/sandersons-first-law/) stress the importance of **rules** and **limitations** in a story's world. Here, we will develop a solid world for **La Purga de los Dioses**.
 
@@ -143,7 +199,7 @@ Sanderson’s [Laws of Magic](https://www.brandonsanderson.com/sandersons-first-
    storycraftr worldbuilding magic-system "Describe the magic system in a dystopian world where advanced biotechnology and nanotechnology are mistaken for magic. Explain how the elite families use this 'magic' to control the population, and how the workers have developed their own beliefs around it."
    ```
 
-## Step 5: Write Your Chapters
+## Step 6: Write Your Chapters
 
 With a well-outlined story and a detailed world, we can now generate the chapters of **La Purga de los Dioses**. Sanderson’s principles of **progression** and **consistent conflict resolution** will guide us as we write.
 
@@ -170,7 +226,7 @@ With a well-outlined story and a detailed world, we can now generate the chapter
    storycraftr chapters back-cover "Generate a back-cover text for 'The Purge of the Gods,' a dystopian novel where advanced biotechnology is seen as magic, and a cunning villain manipulates both the elite and the workers to achieve ultimate control."
    ```
 
-## Step 6: Publish Your Book
+## Step 7: Publish Your Book
 
 StoryCraftr supports publishing your book to PDF, making it easy to share your work. To generate a PDF, you'll need to have **Pandoc** and **XeLaTeX** installed on your system.
 
@@ -216,7 +272,7 @@ storycraftr publish pdf en --translate es
 
 Once the process is complete, the PDF file will be available in your project folder, ready to be shared or printed.
 
-## Step 7: Chat with Your Assistant
+## Step 8: Chat with Your Assistant
 
 StoryCraftr now includes a command to chat directly with your AI assistant. This allows you to ask questions, brainstorm ideas, or request improvements to your book's content in an interactive session, all from the comfort of your terminal. **Even better, the chat has StoryCraftr's documentation embedded**, so you can ask for help with commands and parameters without leaving the chat!
 
