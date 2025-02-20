@@ -163,7 +163,7 @@ def insert_chapter(position: int, prompt: str, book_path: str = None):
     "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )
 @click.argument("position", type=int)
-@click.argument("prompt")
+@click.argument("prompt", type=str)
 def add_flashback(position: int, prompt: str, book_path: str = None):
     """
     Add a flashback scene between two chapters.
@@ -192,7 +192,7 @@ def add_flashback(position: int, prompt: str, book_path: str = None):
     "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )
 @click.argument("position", type=int)
-@click.argument("prompt")
+@click.argument("prompt", type=str)
 def split_chapter(position: int, prompt: str, book_path: str = None):
     """
     Split a chapter and adjust the numbering of subsequent chapters.
@@ -219,7 +219,7 @@ def split_chapter(position: int, prompt: str, book_path: str = None):
 @click.option(
     "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )
-@click.argument("prompt")
+@click.argument("prompt", type=str)
 def check_consistency(prompt: str, book_path: str = None):
     """
     Check the overall consistency of chapters in the book.

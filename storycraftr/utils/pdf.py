@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess  # nosec
+from pathlib import Path
 from storycraftr.utils.markdown import consolidate_book_md
 from rich.console import Console
 
@@ -77,8 +78,8 @@ def to_pdf(book_path: str, primary_language: str, translate: str = None) -> str:
     console.print(f"Markdown consolidated at [bold]{consolidated_md_path}[/bold]")
 
     # Check if LaTeX template exists
-    template_path = os.path.join(book_path, "templates", "template.tex")
-    if not os.path.exists(template_path):
+    template_path = Path(book_path) / "templates" / "template.tex"
+    if not template_path.exists():
         console.print(
             f"[red bold]Error:[/red bold] LaTeX template not found at {template_path}"
         )
