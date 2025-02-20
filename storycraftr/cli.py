@@ -15,13 +15,15 @@ def load_openai_api_key():
     """
     home_dir = Path.home()
     possible_paths = [
-        home_dir / ".storycraftr" / "openai_api_key.txt",
-        home_dir / ".papercraftr" / "openai_api_key.txt",
+        os.path.join(home_dir, ".storycraftr", "openai_api_key.txt"),
+        os.path.join(home_dir, ".papercraftr", "openai_api_key.txt"),
     ]
 
+    print(possible_paths)
+
     for api_key_file in possible_paths:
-        if api_key_file.exists():
-            with api_key_file.open("r") as file:
+        if os.path.exists(api_key_file):
+            with open(api_key_file, "r") as file:
                 api_key = file.read().strip()
             os.environ["OPENAI_API_KEY"] = api_key
             console.print(
@@ -87,9 +89,9 @@ def verify_book_path(book_path=None):
         ClickException: If `storycraftr.json` file is not found.
     """
     book_path = book_path or os.getcwd()
-    storycraftr_file = Path(book_path) / "storycraftr.json"
+    storycraftr_file = os.path.join(book_path, "storycraftr.json")
 
-    if not storycraftr_file.exists():
+    if not os.path.exists(storycraftr_file):
         raise click.ClickException(
             f"The file storycraftr.json was not found in: {book_path}"
         )
@@ -108,7 +110,7 @@ def is_initialized(book_path):
     Returns:
         bool: True if the project is initialized, False if not.
     """
-    return (Path(book_path) / "storycraftr.json").exists()
+    return os.path.exists(os.path.join(book_path, "storycraftr.json"))
 
 
 # Show an error if the project is not initialized
@@ -165,9 +167,7 @@ def cli(debug):
 @click.option(
     "--openai-url", default="https://api.openai.com/v1", help="URL of the OpenAI API."
 )
-@click.option(
-    "--openai-model", default="gpt-4o", help="OpenAI model to use."
-)
+@click.option("--openai-model", default="gpt-4o", help="OpenAI model to use.")
 def init(
     project_path,
     license,

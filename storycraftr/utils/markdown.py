@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+from pathlib import Path
 from storycraftr.agent.agents import (
     create_or_get_assistant,
     get_thread,
@@ -29,11 +30,11 @@ def save_to_markdown(
     Returns:
         str: The path to the saved markdown file.
     """
-    file_path = os.path.join(book_path, file_name)
-    backup_path = file_path + ".back"
+    file_path = Path(book_path) / file_name
+    backup_path = file_path.with_suffix(file_path.suffix + ".back")
 
     # Create a backup if the file exists
-    if os.path.exists(file_path):
+    if file_path.exists():
         if progress and task:
             progress.update(task, description=f"Backing up {file_name}")
         else:
@@ -48,7 +49,7 @@ def save_to_markdown(
     else:
         console.print(f"[bold blue]Saving content to {file_path}...[/bold blue]")
 
-    with open(file_path, "w", encoding="utf-8") as f:
+    with file_path.open("w", encoding="utf-8") as f:
         f.write(f"# {header}\n\n{content}")
 
     if progress and task:
@@ -58,7 +59,7 @@ def save_to_markdown(
             f"[bold green]Content saved successfully to {file_path}[/bold green]"
         )
 
-    return file_path
+    return str(file_path)
 
 
 def append_to_markdown(book_path, folder_name, file_name, content):
@@ -74,10 +75,10 @@ def append_to_markdown(book_path, folder_name, file_name, content):
     Raises:
         FileNotFoundError: If the file does not exist.
     """
-    file_path = os.path.join(book_path, folder_name, file_name)
+    file_path = Path(book_path) / folder_name / file_name
 
-    if os.path.exists(file_path):
-        with open(file_path, "a", encoding="utf-8") as f:
+    if file_path.exists():
+        with file_path.open("a", encoding="utf-8") as f:
             f.write(f"\n\n{content}")
         console.print(f"Appended content to {file_path}")
     else:
@@ -99,10 +100,10 @@ def read_from_markdown(book_path, folder_name, file_name) -> str:
     Raises:
         FileNotFoundError: If the file does not exist.
     """
-    file_path = os.path.join(book_path, folder_name, file_name)
+    file_path = Path(book_path) / folder_name / file_name
 
-    if os.path.exists(file_path):
-        with open(file_path, "r", encoding="utf-8") as f:
+    if file_path.exists():
+        with file_path.open("r", encoding="utf-8") as f:
             content = f.read()
         console.print(f"Read content from {file_path}")
         return content
@@ -124,14 +125,14 @@ def consolidate_book_md(
     Returns:
         str: The path to the consolidated markdown file.
     """
-    chapters_dir = os.path.join(book_path, "chapters")
+    chapters_dir = Path(book_path) / "chapters"
     output_file_name = (
         f"book-{primary_language}.md" if not translate else f"book-{translate}.md"
     )
-    output_file_path = os.path.join(book_path, "book", output_file_name)
+    output_file_path = Path(book_path) / "book" / output_file_name
 
     # Ensure the "book" folder exists
-    os.makedirs(os.path.join(book_path, "book"), exist_ok=True)
+    output_file_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Create or get the assistant and thread for translation (if needed)
     assistant = create_or_get_assistant(book_path)
@@ -142,20 +143,21 @@ def consolidate_book_md(
 
     # Add cover and back-cover if they exist
     for section in ["cover.md", "back-cover.md"]:
-        section_path = os.path.join(chapters_dir, section)
-        if os.path.exists(section_path):
-            files_to_process.append(section)
+        section_path = chapters_dir / section
+        if section_path.exists():
+            files_to_process.append(section_path)
 
     # Add chapters in order
     chapter_files = sorted(
-        [f for f in os.listdir(chapters_dir) if re.match(r"chapter-\d+\.md", f)],
-        key=lambda x: int(re.findall(r"\d+", x)[0]),
+        [f for f in chapters_dir.iterdir() if re.match(r"chapter-\d+\.md", f.name)],
+        key=lambda x: int(re.findall(r"\d+", x.name)[0]),
     )
     files_to_process.extend(chapter_files)
 
     # Add epilogue if it exists
-    if os.path.exists(os.path.join(chapters_dir, "epilogue.md")):
-        files_to_process.append("epilogue.md")
+    epilogue_path = chapters_dir / "epilogue.md"
+    if epilogue_path.exists():
+        files_to_process.append(epilogue_path)
 
     # Log start of consolidation
     if translate:
@@ -179,21 +181,19 @@ def consolidate_book_md(
         )
         task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
 
-        with open(output_file_path, "w", encoding="utf-8") as consolidated_md:
+        with output_file_path.open("w", encoding="utf-8") as consolidated_md:
             for chapter_file in files_to_process:
-                chapter_path = os.path.join(chapters_dir, chapter_file)
-
                 progress.update(
-                    task_chapters, description=f"Processing {chapter_file}..."
+                    task_chapters, description=f"Processing {chapter_file.name}..."
                 )
-                with open(chapter_path, "r", encoding="utf-8") as chapter_md:
+                with chapter_file.open("r", encoding="utf-8") as chapter_md:
                     content = chapter_md.read()
 
                     # Translate content if translation is requested
                     if translate:
                         progress.update(
                             task_translation,
-                            description=f"Translating {chapter_file}...",
+                            description=f"Translating {chapter_file.name}...",
                         )
                         content = create_message(
                             book_path,
@@ -217,4 +217,4 @@ def consolidate_book_md(
         description=f"[green bold]Book consolidated[/green bold] at {output_file_path}",
     )
 
-    return output_file_path
+    return str(output_file_path)

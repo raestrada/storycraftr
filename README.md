@@ -13,9 +13,9 @@ Welcome to [**StoryCraftr**](https://storycraftr.app), the open-source project d
 
 ---
 
-## Release Notes v0.8.0-alpha4
+## Release Notes v0.9.0-beta1
 
-You can find the release notes for version `v0.8.0-alpha4` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.7.-alpha3).
+You can find the release notes for version `v0.9.0-beta1` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.7.-alpha3).
 
 ## Step 1: Install StoryCraftr
 
@@ -24,7 +24,7 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.8.0-alpha4
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.9.0-beta1
 ```
 
 ### Important: Before using StoryCraftr, make sure to set your OpenAI API key:
@@ -36,6 +36,60 @@ mkdir -p ~/.storycraftr/
 echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
 ```
 
+### New: Specify OpenAI Model and URL
+
+StoryCraftr now allows you to specify the OpenAI model and URL, which can be any service that supports the OpenAI API with file search capabilities, such as DeepSeek or others. This is essential as StoryCraftr relies on file search for its functionality.
+
+To configure the model and URL, add the following lines to your configuration file located at `~/.storycraftr/config.json`:
+
+```json
+{
+  "openai_model": "your-preferred-model",
+  "openai_url": "https://api.your-preferred-service.com"
+}
+```
+
+Make sure to replace `"your-preferred-model"` with the model you want to use and `"https://api.your-preferred-service.com"` with the URL of the service that supports the OpenAI API with file search.
+
+### Supported LLMs
+
+Here are some examples of LLMs that are compatible with the OpenAI API:
+
+1. **OpenAI GPT Series**:
+    - Models: `gpt-3.5-turbo`, `gpt-4`
+    - URL Base: `https://api.openai.com/v1/`
+    - Documentation: [OpenAI API Models](https://beta.openai.com/docs/models)
+
+2. **Azure OpenAI Service**:
+    - Models: `gpt-3.5-turbo`, `gpt-4`
+    - URL Base: Depends on the region and configuration.
+    - Documentation: [Azure OpenAI Service](https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/)
+
+3. **DeepSeek**:
+    - Model: `DeepSeek-R1`
+    - URL Base: `https://api.deepseek.com/v1/`
+    - Documentation: [DeepSeek API Documentation](https://deepseek.com/docs)
+
+4. **Qwen (Alibaba Cloud)**:
+    - Models: `qwen-7b`, `qwen-13b`
+    - URL Base: `https://dashscope.aliyuncs.com/`
+    - Documentation: [DashScope API](https://dashscope.aliyuncs.com/docs)
+
+5. **Gemini (Google AI)**:
+    - Models: `gemini-1`, `gemini-1.5`
+    - URL Base: `https://api.gemini.google.com/v1/`
+    - Documentation: [Gemini API](https://gemini.google.com/docs)
+
+6. **Together AI**:
+    - Model: `together-gpt-neoxt-chat-20b`
+    - URL Base: `https://api.together.ai/v1/`
+    - Documentation: [Together AI API](https://together.ai/docs)
+
+7. **DeepInfra**:
+    - Model: `Qwen2.5-Coder-32B-Instruct`
+    - URL Base: `https://api.deepinfra.com/v1/`
+    - Documentation: [DeepInfra API](https://deepinfra.com/docs)
+
 ## Quick Examples
 
 Here are a few ways to get started with **StoryCraftr**:
@@ -43,7 +97,7 @@ Here are a few ways to get started with **StoryCraftr**:
 ### Initialize a new book project:
 
 ```bash
-storycraftr init "La purga de los dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt"
+storycraftr init "La purga de los dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt" --openai-model "gpt-4" --openai-url "https://api.openai.com/v1/"
 ```
 
 ### Generate a general outline:
@@ -172,4 +226,3 @@ Join us on this journey to create an amazing open-source tool for writers everyw
 ![AI Craftr Logo](https://res.cloudinary.com/dyknhuvxt/image/upload/v1730059761/aicraftr_qzknf4.png)
 
 You can learn more about **AI Craftr** and discover other tools like **PaperCraftr** for academic writing at [https://aicraftr.app](https://aicraftr.app).
-

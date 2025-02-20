@@ -7,6 +7,7 @@ from rich.console import Console
 from rich.markdown import Markdown  # Importar soporte de Markdown de Rich
 from storycraftr.prompts.permute import longer_date_formats
 from storycraftr.state import debug_state  # Importar el estado de debug
+from pathlib import Path
 
 console = Console()
 
@@ -29,14 +30,14 @@ def generate_prompt_with_hash(original_prompt: str, date: str, book_path: str) -
     modified_prompt = f"{random_phrase}\n\n{original_prompt}"
 
     # Define la ruta del archivo YAML
-    yaml_path = os.path.join(book_path, "prompts.yaml")
+    yaml_path = Path(book_path) / "prompts.yaml"
 
     # Nueva entrada de log con fecha y prompt original
     log_entry = {"date": str(date), "original_prompt": original_prompt}
 
     # Verifica si el archivo YAML existe y carga los datos
-    if os.path.exists(yaml_path):
-        with open(yaml_path, "r", encoding="utf-8") as file:
+    if yaml_path.exists():
+        with yaml_path.open("r", encoding="utf-8") as file:
             existing_data = (
                 yaml.safe_load(file) or []
             )  # Carga una lista vacía si está vacío
@@ -47,7 +48,7 @@ def generate_prompt_with_hash(original_prompt: str, date: str, book_path: str) -
     existing_data.append(log_entry)
 
     # Guarda los datos actualizados en el archivo YAML
-    with open(yaml_path, "w", encoding="utf-8") as file:
+    with yaml_path.open("w", encoding="utf-8") as file:
         yaml.dump(existing_data, file, default_flow_style=False)
 
     # Imprime el prompt modificado en Markdown si el modo debug está activado
@@ -103,10 +104,10 @@ def load_book_config(book_path: str) -> BookConfig:
         BookConfig: An instance of the BookConfig NamedTuple containing the book's settings.
         None: If the storycraftr.json file is not found or is in an invalid directory.
     """
-    config_file = os.path.join(book_path, "storycraftr.json")
+    config_file = Path(book_path) / "storycraftr.json"
 
     try:
-        with open(config_file, "r", encoding="utf-8") as file:
+        with config_file.open("r", encoding="utf-8") as file:
             data = json.load(file)
             # Devuelve una instancia de BookConfig con los valores del archivo JSON
             return BookConfig(
@@ -143,7 +144,7 @@ def file_has_more_than_three_lines(file_path: str) -> bool:
         bool: True if the file has more than three lines, False otherwise.
     """
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with Path(file_path).open("r", encoding="utf-8") as file:
             # Itera sobre las primeras 4 líneas y devuelve True si hay más de 3 líneas
             for i, _ in enumerate(file, start=1):
                 if i > 3:

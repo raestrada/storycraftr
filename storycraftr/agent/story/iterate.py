@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from rich.progress import Progress
 from rich.console import Console
 from storycraftr.prompts.story.iterate import (
@@ -141,8 +142,8 @@ def insert_new_chapter(
         flashback (bool, optional): If True, the new chapter will be a flashback. Defaults to False.
         split (bool, optional): If True, the new chapter will be a split. Defaults to False.
     """
-    chapters_dir = os.path.join(book_path, "chapters")
-    if not os.path.exists(chapters_dir):
+    chapters_dir = Path(book_path) / "chapters"
+    if not chapters_dir.exists():
         raise FileNotFoundError(
             f"The chapter directory '{chapters_dir}' does not exist."
         )
@@ -150,14 +151,14 @@ def insert_new_chapter(
     # Función para extraer el número del capítulo
     def extract_chapter_number(filename):
         # Esto supone que los archivos tienen el formato "chapter-<numero>.md"
-        return int(filename.split("-")[1].split(".")[0])
+        return int(filename.stem.split("-")[1])
 
     # Ordenar los archivos por el número del capítulo
     files_to_process = sorted(
         [
             f
-            for f in os.listdir(chapters_dir)
-            if f.endswith(".md") and f.startswith("chapter-")
+            for f in chapters_dir.iterdir()
+            if f.is_file() and f.suffix == ".md" and f.stem.startswith("chapter-")
         ],
         key=extract_chapter_number,
     )
@@ -176,9 +177,9 @@ def insert_new_chapter(
 
         # Renaming chapters from the insert point onward
         for i in range(len(files_to_process) - 1, position - 1, -1):
-            old_chapter_path = os.path.join(chapters_dir, files_to_process[i])
-            new_chapter_path = os.path.join(chapters_dir, f"chapter-{i + 2}.md")
-            os.rename(old_chapter_path, new_chapter_path)
+            old_chapter_path = chapters_dir / files_to_process[i]
+            new_chapter_path = chapters_dir / f"chapter-{i + 2}.md"
+            old_chapter_path.rename(new_chapter_path)
             progress.update(task_chapters, advance=1)
 
         # Get or create the assistant and thread
@@ -189,9 +190,7 @@ def insert_new_chapter(
         prompt_text = (
             INSERT_FLASHBACK_CHAPTER_PROMPT
             if flashback
-            else INSERT_SPLIT_CHAPTER_PROMPT
-            if split
-            else INSERT_CHAPTER_PROMPT
+            else INSERT_SPLIT_CHAPTER_PROMPT if split else INSERT_CHAPTER_PROMPT
         ).format(prompt=prompt, position=position)
 
         # Generate new chapter content
@@ -205,7 +204,7 @@ def insert_new_chapter(
         )
 
         # Save the new chapter
-        new_chapter_path = os.path.join(chapters_dir, f"chapter-{position}.md")
+        new_chapter_path = chapters_dir / f"chapter-{position}.md"
         save_to_markdown(
             book_path,
             new_chapter_path,
@@ -222,7 +221,7 @@ def insert_new_chapter(
 
         # Rewrite adjacent chapters for consistency
         if position > 1:
-            prev_chapter_path = os.path.join(chapters_dir, f"chapter-{position - 1}.md")
+            prev_chapter_path = chapters_dir / f"chapter-{position - 1}.md"
             rewrite_surrounding_chapter(
                 book_path,
                 prev_chapter_path,
@@ -235,7 +234,7 @@ def insert_new_chapter(
             )
 
         if position < len(files_to_process):
-            next_chapter_path = os.path.join(chapters_dir, f"chapter-{position + 1}.md")
+            next_chapter_path = chapters_dir / f"chapter-{position + 1}.md"
             rewrite_surrounding_chapter(
                 book_path,
                 next_chapter_path,
@@ -250,7 +249,7 @@ def insert_new_chapter(
 
 def rewrite_surrounding_chapter(
     book_path: str,
-    chapter_path: str,
+    chapter_path: Path,
     chapter_num: int,
     position: int,
     flashback: bool,
@@ -263,7 +262,7 @@ def rewrite_surrounding_chapter(
 
     Args:
         book_path (str): The path to the book's directory.
-        chapter_path (str): The path to the chapter file.
+        chapter_path (Path): The path to the chapter file.
         chapter_num (int): The chapter number to rewrite.
         position (int): The position of the inserted chapter.
         flashback (bool): Whether the inserted chapter is a flashback.
@@ -276,9 +275,11 @@ def rewrite_surrounding_chapter(
     prompt = (
         REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT
         if flashback
-        else REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT
-        if split
-        else REWRITE_SURROUNDING_CHAPTERS_PROMPT
+        else (
+            REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT
+            if split
+            else REWRITE_SURROUNDING_CHAPTERS_PROMPT
+        )
     ).format(prompt=chapter_num, position=position)
 
     # Generate the rewritten chapter content
@@ -289,7 +290,7 @@ def rewrite_surrounding_chapter(
         assistant=assistant,
         progress=progress,
         task_id=task_chapters,
-        file_path=chapter_path,
+        file_path=str(chapter_path),
     )
 
     # Save the rewritten chapter content

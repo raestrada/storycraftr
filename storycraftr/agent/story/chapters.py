@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from storycraftr.agent.agents import (
     create_or_get_assistant,
     get_thread,
@@ -38,10 +39,10 @@ def generate_chapter(book_path: str, chapter_number: int, prompt: str) -> str:
     thread = get_thread()
 
     chapter_file = f"chapter-{chapter_number}.md"
-    file_path = os.path.join(book_path, "chapters", chapter_file)
+    file_path = Path(book_path) / "chapters" / chapter_file
 
     # Check if the chapter already exists to decide between new or refined content
-    if os.path.exists(file_path):
+    if file_path.exists():
         console.print(f"[yellow]Existing chapter found. Refining...[/yellow]")
         content = CHAPTER_PROMPT_REFINE.format(
             prompt=prompt, language=load_book_config(book_path).primary_language
@@ -59,7 +60,7 @@ def generate_chapter(book_path: str, chapter_number: int, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save the generated chapter to markdown
@@ -172,10 +173,10 @@ def generate_epilogue(book_path: str, prompt: str) -> str:
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    file_path = os.path.join(book_path, "chapters", "epilogue.md")
+    file_path = Path(book_path) / "chapters" / "epilogue.md"
 
     # Determine if refining an existing epilogue or generating a new one
-    if os.path.exists(file_path):
+    if file_path.exists():
         console.print(f"[yellow]Existing epilogue found. Refining...[/yellow]")
         content = EPILOGUE_PROMPT_REFINE.format(
             prompt=prompt, language=load_book_config(book_path).primary_language
@@ -193,7 +194,7 @@ def generate_epilogue(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     save_to_markdown(book_path, "chapters/epilogue.md", "Epilogue", epilogue_content)

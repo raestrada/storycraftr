@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from storycraftr.utils.core import load_book_config, file_has_more_than_three_lines
 from storycraftr.agent.agents import (
     create_or_get_assistant,
@@ -38,12 +39,12 @@ def generate_general_outline(book_path: str, prompt: str) -> str:
     # Load the book configuration and setup
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
-    file_path = os.path.join(book_path, "outline", "general_outline.md")
+    thread = get_thread(book_path)
+    file_path = Path(book_path) / "outline" / "general_outline.md"
     book_name = config.book_name
 
     # Check if the outline already exists and choose the appropriate prompt
-    if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
+    if file_path.exists() and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Refining existing general outline...[/yellow]")
         content = GENERAL_OUTLINE_PROMPT_REFINE.format(
             prompt=prompt, language=config.primary_language, book_name=book_name
@@ -60,7 +61,7 @@ def generate_general_outline(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save the result to a markdown file
@@ -91,12 +92,12 @@ def generate_character_summary(book_path: str, prompt: str) -> str:
 
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
-    file_path = os.path.join(book_path, "outline", "character_summary.md")
-    book_name = os.path.basename(book_path)
+    thread = get_thread(book_path)
+    file_path = Path(book_path) / "outline" / "character_summary.md"
+    book_name = config.book_name
 
     # Check if the character summary already exists and choose the appropriate prompt
-    if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
+    if file_path.exists() and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Refining existing character summary...[/yellow]")
         content = CHARACTER_SUMMARY_PROMPT_REFINE.format(
             prompt=prompt, language=config.primary_language, book_name=book_name
@@ -113,7 +114,7 @@ def generate_character_summary(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save the result to a markdown file
@@ -144,12 +145,12 @@ def generate_plot_points(book_path: str, prompt: str) -> str:
 
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
-    file_path = os.path.join(book_path, "outline", "plot_points.md")
-    book_name = os.path.basename(book_path)
+    thread = get_thread(book_path)
+    file_path = Path(book_path) / "outline" / "plot_points.md"
+    book_name = config.book_name
 
     # Check if the plot points already exist and choose the appropriate prompt
-    if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
+    if file_path.exists() and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Refining existing plot points...[/yellow]")
         content = PLOT_POINTS_PROMPT_REFINE.format(
             prompt=prompt, language=config.primary_language, book_name=book_name
@@ -166,7 +167,7 @@ def generate_plot_points(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save the result to a markdown file
@@ -194,12 +195,12 @@ def generate_chapter_synopsis(book_path: str, prompt: str) -> str:
 
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
-    file_path = os.path.join(book_path, "outline", "chapter_synopsis.md")
-    book_name = os.path.basename(book_path)
+    thread = get_thread(book_path)
+    file_path = Path(book_path) / "outline" / "chapter_synopsis.md"
+    book_name = config.book_name
 
     # Check if the synopsis already exists and choose the appropriate prompt
-    if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
+    if file_path.exists() and file_has_more_than_three_lines(file_path):
         console.print(f"[yellow]Refining existing chapter synopsis...[/yellow]")
         content = CHAPTER_SYNOPSIS_PROMPT_REFINE.format(
             prompt=prompt, language=config.primary_language, book_name=book_name
@@ -216,7 +217,7 @@ def generate_chapter_synopsis(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save the result to a markdown file

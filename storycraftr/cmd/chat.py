@@ -12,6 +12,7 @@ from storycraftr.agent.agents import (
 import storycraftr.cmd.story as story_cmd
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import InMemoryHistory
+from pathlib import Path
 
 console = Console()
 

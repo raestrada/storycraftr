@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from storycraftr.agent.agents import (
     create_or_get_assistant,
     get_thread,
@@ -40,10 +41,10 @@ def generate_geography(book_path: str, prompt: str) -> str:
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    file_path = os.path.join(book_path, "worldbuilding", "geography.md")
+    file_path = Path(book_path) / "worldbuilding" / "geography.md"
 
     # Refining or generating new geography content
-    if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
+    if file_path.exists() and file_has_more_than_three_lines(file_path):
         console.print(
             f"[yellow]Existing geography found at {file_path}. Refining...[/yellow]"
         )
@@ -59,7 +60,7 @@ def generate_geography(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save content and update agent files
@@ -88,10 +89,10 @@ def generate_history(book_path: str, prompt: str) -> str:
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    file_path = os.path.join(book_path, "worldbuilding", "history.md")
+    file_path = Path(book_path) / "worldbuilding" / "history.md"
 
     # Refining or generating new history content
-    if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
+    if file_path.exists() and file_has_more_than_three_lines(file_path):
         console.print(
             f"[yellow]Existing history found at {file_path}. Refining...[/yellow]"
         )
@@ -107,7 +108,7 @@ def generate_history(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save content and update agent files
@@ -134,10 +135,10 @@ def generate_culture(book_path: str, prompt: str) -> str:
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    file_path = os.path.join(book_path, "worldbuilding", "culture.md")
+    file_path = Path(book_path) / "worldbuilding" / "culture.md"
 
     # Refining or generating new culture content
-    if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
+    if file_path.exists() and file_has_more_than_three_lines(file_path):
         console.print(
             f"[yellow]Existing culture found at {file_path}. Refining...[/yellow]"
         )
@@ -153,7 +154,7 @@ def generate_culture(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save content and update agent files
@@ -180,10 +181,10 @@ def generate_magic_system(book_path: str, prompt: str) -> str:
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    file_path = os.path.join(book_path, "worldbuilding", "magic_system.md")
+    file_path = Path(book_path) / "worldbuilding" / "magic_system.md"
 
     # Refining or generating new magic/science system content
-    if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
+    if file_path.exists() and file_has_more_than_three_lines(file_path):
         console.print(
             f"[yellow]Existing magic/science system found at {file_path}. Refining...[/yellow]"
         )
@@ -199,7 +200,7 @@ def generate_magic_system(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save content and update agent files
@@ -233,10 +234,10 @@ def generate_technology(book_path: str, prompt: str) -> str:
     assistant = create_or_get_assistant(book_path)
     thread = get_thread()
 
-    file_path = os.path.join(book_path, "worldbuilding", "technology.md")
+    file_path = Path(book_path) / "worldbuilding" / "technology.md"
 
     # Refining or generating new technology content
-    if os.path.exists(file_path) and file_has_more_than_three_lines(file_path):
+    if file_path.exists() and file_has_more_than_three_lines(file_path):
         console.print(
             f"[yellow]Existing technology found at {file_path}. Refining...[/yellow]"
         )
@@ -252,7 +253,7 @@ def generate_technology(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path,
+        file_path=str(file_path),
     )
 
     # Save content and update agent files
