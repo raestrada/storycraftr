@@ -198,8 +198,17 @@ run_command 'organize-lit concept-map "Create a concept map showing the relation
 run_command 'outline outline-sections "Create a detailed outline for a comprehensive review paper."' || exit 1
 run_command 'outline define-methods "Define the systematic review methodology."' || exit 1
 
+# Referencias y Bibliografía
+run_command 'references add "LeCun, Y., Bengio, Y., & Hinton, G. (2015). Deep learning. Nature, 521(7553), 436-444."' || exit 1
+run_command 'references add "Litjens, G., et al. (2017). A survey on deep learning in medical image analysis. Medical Image Analysis, 42, 60-88."' || exit 1
+run_command 'references format "IEEE"' || exit 1
+run_command 'references check "Verify all citations are properly formatted and consistently used throughout the paper."' || exit 1
+run_command 'references cite --format "IEEE" "LeCun et al. Deep Learning (2015)"' || exit 1
+
 # Generar secciones
+run_command 'generate abstract "Write an abstract summarizing the key findings and contributions of the paper."' || exit 1
 run_command 'generate introduction "Write an introduction that establishes the importance of deep learning."' || exit 1
+run_command 'generate background "Provide comprehensive background on deep learning and medical imaging."' || exit 1
 run_command 'generate methodology "Detail the systematic review methodology."' || exit 1
 run_command 'generate results "Present the findings on deep learning applications."' || exit 1
 run_command 'generate discussion "Discuss the implications of the findings."' || exit 1
@@ -208,18 +217,25 @@ run_command 'generate conclusion "Summarize the key findings."' || exit 1
 # Analizar resultados
 run_command 'analyze "Perform a comprehensive analysis of the findings."' || exit 1
 
-# Gestionar referencias
-run_command 'references "Organize and format references."' || exit 1
+# Iterar sobre secciones
+run_command 'iterate abstract "Refine the abstract to better highlight key contributions."' || exit 1
+run_command 'iterate introduction "Strengthen the motivation and research questions."' || exit 1
+run_command 'iterate background "Ensure comprehensive coverage of relevant concepts."' || exit 1
+run_command 'iterate methodology "Clarify the review methodology and criteria."' || exit 1
+run_command 'iterate results "Enhance the presentation of findings."' || exit 1
+run_command 'iterate discussion "Deepen the analysis and implications."' || exit 1
+run_command 'iterate conclusion "Strengthen the concluding remarks."' || exit 1
+
+# Generar bibliografía
+run_command 'generate bibliography --format "bibtex" --output "references.bib"' || exit 1
+
+# Generar PDF en inglés
+run_command 'generate pdf --language "en" --template "ieee" --output "deep_learning_medical_imaging.pdf"' || exit 1
+
+# Generar PDF en español
+run_command 'generate pdf --language "es" --template "ieee" --output "deep_learning_medical_imaging_es.pdf"' || exit 1
 
 # Finalizar paper
 run_command 'finalize "Review and polish the entire paper."' || exit 1
 
-# Publicar
-run_command 'publish pdf en' || exit 1
-
-# Iteración y mejoras
-run_command 'iterate reinforce-ideas "Strengthen the emphasis on interpretability throughout all sections"' || exit 1
-
-run_command 'chat "Review the methodology section and suggest improvements for clarity"' || exit 1
-
-echo -e "${GREEN}PaperCraftr example usage completed successfully${NC}" 
+echo -e "${GREEN}Example usage for PaperCraftr completed successfully${NC}" 

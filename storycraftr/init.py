@@ -6,6 +6,7 @@ from pathlib import Path
 import storycraftr.templates.folder_story
 from storycraftr.agent.agents import create_or_get_assistant
 from storycraftr.templates.tex import TEMPLATE_TEX
+from storycraftr.templates.paper_tex import TEMPLATE_PAPER_TEX
 
 console = Console()
 
@@ -163,6 +164,13 @@ def init_structure_paper(
     behavior_file = behaviors_dir / "default.txt"
     behavior_file.write_text(behavior_content, encoding="utf-8")
     console.print(f"[green]Behavior file created: {behavior_file}[/green]")
+
+    # Create LaTeX template
+    template_dir = Path(paper_path) / "templates"
+    template_dir.mkdir(exist_ok=True)
+    template_file = template_dir / "template.tex"
+    template_file.write_text(TEMPLATE_PAPER_TEX, encoding="utf-8")
+    console.print(f"[green]LaTeX template created: {template_file}[/green]")
 
     # Initialize the assistant
     create_or_get_assistant(paper_path)

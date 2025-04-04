@@ -61,6 +61,8 @@ from storycraftr.cmd.paper.finalize import finalize as paper_finalize
 from storycraftr.cmd.paper.generate_section import generate as paper_generate
 from storycraftr.cmd.paper.references import references as paper_references
 from storycraftr.cmd.paper.iterate import iterate as paper_iterate
+from storycraftr.cmd.paper.generate_bibliography import generate_bibliography
+from storycraftr.cmd.paper.generate_pdf import generate_pdf
 
 from storycraftr.init import init_structure_story, init_structure_paper
 
@@ -318,6 +320,8 @@ elif cli_name == "papercraftr":
     cli.add_command(paper_generate)
     cli.add_command(paper_references)
     cli.add_command(paper_iterate)
+    cli.add_command(generate_bibliography)
+    cli.add_command(generate_pdf)
 else:
     console.print(
         "[red]Unknown CLI tool name. Use 'storycraftr' or 'papercraftr'.[/red]"
