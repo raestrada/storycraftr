@@ -111,7 +111,56 @@ def finalize_paper_format(book_path: str, prompt: str) -> str:
     return formatting_report
 
 def generate_abstract(book_path: str, prompt: str) -> str:
-    # ... setup code ...
+    """
+    Generate or refine the abstract of the paper.
+
+    Args:
+        book_path (str): Path to the paper's directory.
+        prompt (str): The prompt to guide the abstract generation.
+
+    Returns:
+        str: The generated abstract.
+    """
+    console.print("[bold blue]Generating abstract...[/bold blue]")
+
+    # Load configuration and setup
+    config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
     thread = get_thread(book_path)
-    # ... rest of the code ... 
+    file_path = os.path.join(book_path, "abstracts", "abstract.md")
+    paper_title = config.book_name
+
+    # Check if abstract already exists
+    abstract_exists = os.path.exists(file_path)
+    
+    # Choose appropriate prompt based on whether abstract exists
+    if abstract_exists:
+        content = GENERATE_ABSTRACT_PROMPT_REFINE.format(
+            prompt=prompt
+        )
+    else:
+        content = GENERATE_ABSTRACT_PROMPT_NEW.format(
+            prompt=prompt,
+            paper_title=paper_title
+        )
+
+    # Generate abstract using the assistant
+    abstract_text = create_message(
+        book_path,
+        thread_id=thread.id,
+        content=content,
+        assistant=assistant,
+        file_path=file_path if abstract_exists else None
+    )
+
+    # Save the result
+    save_to_markdown(
+        book_path,
+        "abstracts/abstract.md",
+        "Abstract",
+        abstract_text
+    )
+    console.print("[bold green]✔ Abstract generated successfully[/bold green]")
+
+    update_agent_files(book_path, assistant)
+    return abstract_text 

@@ -186,19 +186,35 @@ def create_or_get_assistant(book_path: str):
         limit=100,
     )
 
-    name = f"Assistant for {Path(book_path).name}"
+    name = Path(book_path).name
     for assistant in assistants.data:
         if assistant.name == name:
+            console.print(
+                f"[bold yellow]Assistant {name} already exists.[/bold yellow]"
+            )
             return assistant
+
+    # Crear vector store para file_search
+    vector_store = client.beta.vector_stores.create(name=f"{name} Docs")
+    upload_markdown_files_to_vector_store(vector_store.id, book_path, client)
 
     # Si no existe, crear uno nuevo con las herramientas soportadas
     assistant = client.beta.assistants.create(
         name=name,
         instructions=behavior_content,
         model=openai_model,
-        tools=[{"type": "code_interpreter"}]  # Solo usamos code_interpreter por ahora
+        tools=[{"type": "code_interpreter"}, {"type": "file_search"}],
+        temperature=0.7,  # Nivel de creatividad balanceado
+        top_p=1.0,  # Considerar todas las opciones
     )
 
+    # Asociar el vector store con el asistente
+    client.beta.assistants.update(
+        assistant_id=assistant.id,
+        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
+    )
+
+    console.print(f"[bold green]Assistant '{name}' created successfully.[/bold green]")
     return assistant
 
 
@@ -380,24 +396,26 @@ def create_message(
 
 def get_thread(book_path: str):
     """
-    Create a new thread for the conversation.
-
+    Retrieve or create a new thread.
+    
     Args:
         book_path (str): Path to the book directory.
-
+        
     Returns:
-        Thread: The thread object.
+        object: The thread object.
     """
     client = initialize_openai_client(book_path)
-    # Create a new thread with book metadata
-    thread = client.beta.threads.create(
-        metadata={"book_path": book_path}
-    )
-    return thread
+    return client.beta.threads.create()
 
 
 def update_agent_files(book_path: str, assistant):
-    """Update the assistant's knowledge with new files from the book path."""
+    """
+    Update the assistant's knowledge with new files from the book path.
+    
+    Args:
+        book_path (str): Path to the book directory.
+        assistant (object): The assistant object.
+    """
     client = initialize_openai_client(book_path)
     assistant_name = assistant.name
     vector_store_id = get_vector_store_id_by_name(assistant_name, client)
@@ -426,13 +444,13 @@ def process_chapters(
     Process each chapter of the book with the given prompt template and generate output.
 
     Args:
+        save_to_markdown (function): Function to save the output to a markdown file.
         book_path (str): Path to the book directory.
         prompt_template (str): The template for the prompt.
         task_description (str): Description of the task for progress display.
         file_suffix (str): Suffix for the output file.
         **prompt_kwargs: Additional arguments for the prompt template.
     """
-    client = initialize_openai_client(book_path)
     # Directories to process
     chapters_dir = os.path.join(book_path, "chapters")
     outline_dir = os.path.join(book_path, "outline")
@@ -496,35 +514,3 @@ def process_chapters(
             progress.update(task_chapters, advance=1)
 
     update_agent_files(book_path, assistant)
-
-
-def update_assistant_files(book_path: str, assistant):
-    """
-    Update the assistant's files with any new content.
-
-    Args:
-        book_path (str): Path to the book directory.
-        assistant: The assistant object to update.
-    """
-    client = initialize_openai_client(book_path)
-    
-    # Obtener los IDs de archivos actuales
-    current_files = client.beta.assistants.files.list(assistant_id=assistant.id)
-    current_file_ids = [f.id for f in current_files.data]
-    
-    # Subir nuevos archivos
-    for root, _, files in os.walk(book_path):
-        for file in files:
-            if file.endswith('.md'):
-                file_path = Path(root) / file
-                with open(file_path, 'rb') as f:
-                    new_file = client.files.create(
-                        file=f,
-                        purpose="assistants"
-                    )
-                    # Agregar el nuevo archivo al asistente si no existe
-                    if new_file.id not in current_file_ids:
-                        client.beta.assistants.files.create(
-                            assistant_id=assistant.id,
-                            file_id=new_file.id
-                        )

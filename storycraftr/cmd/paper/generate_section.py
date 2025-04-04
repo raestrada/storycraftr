@@ -10,6 +10,7 @@ from storycraftr.agent.paper.generate_section import (
     generate_discussion,
     generate_conclusion
 )
+from storycraftr.agent.paper.finalize import generate_abstract
 
 console = Console()
 
@@ -19,6 +20,30 @@ def generate():
     Group of commands for generating different sections of the paper.
     """
     pass
+
+@generate.command()
+@click.option(
+    "--book-path",
+    type=click.Path(),
+    help="Path to the paper directory",
+    required=False
+)
+@click.argument("prompt", type=str)
+def abstract(prompt: str, book_path: str = None):
+    """
+    Generate or refine the abstract section.
+    Uses OpenAI to create a concise and informative abstract.
+
+    Args:
+        prompt (str): Instructions for the abstract content.
+        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
+    """
+    book_path = book_path or os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    generate_abstract(book_path, prompt)
 
 @generate.command()
 @click.option(
