@@ -1,50 +1,66 @@
+import os
 import click
 from rich.console import Console
 from pathlib import Path
+from storycraftr.utils.core import load_book_config
+from storycraftr.agent.paper.analyze import run_data_analysis, summarize_analysis_results
 
 console = Console()
 
 
 @click.group()
-@click.option(
-    "--book_path",
-    type=click.Path(),
-    required=True,
-    help="Path to the paper project directory.",
-)
-def analyze(book_path):
+def analyze():
     """
     Group of commands for running data analysis and summarizing results.
     """
-    # Store book_path for potential file operations
-    analyze.book_path = Path(book_path)
+    pass
 
 
 @analyze.command()
-@click.argument("prompt", type=str, required=True)
-def run_analysis(prompt):
+@click.option(
+    "--book-path",
+    type=click.Path(),
+    help="Path to the paper directory",
+    required=False
+)
+@click.argument("prompt", type=str)
+def run_analysis(prompt: str, book_path: str = None):
     """
-    Placeholder for running a data analysis based on the specified prompt.
+    Generate or refine a data analysis plan.
+    Uses OpenAI to create a comprehensive analysis strategy.
 
     Args:
-        prompt (str): Instructions detailing the analysis to perform on the data.
+        prompt (str): Instructions detailing the analysis to perform.
+        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
     """
-    console.print(f"[yellow]Running data analysis with prompt:[/yellow] {prompt}")
-    console.print(
-        "[yellow]The 'run_analysis' command is a placeholder and currently does nothing.[/yellow]"
-    )
+    book_path = book_path or os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    run_data_analysis(book_path, prompt)
 
 
 @analyze.command()
-@click.argument("prompt", type=str, required=True)
-def summarize_results(prompt):
+@click.option(
+    "--book-path",
+    type=click.Path(),
+    help="Path to the paper directory",
+    required=False
+)
+@click.argument("prompt", type=str)
+def summarize_results(prompt: str, book_path: str = None):
     """
-    Placeholder for summarizing results of the analysis based on the specified prompt.
+    Generate or refine a summary of analysis results.
+    Uses OpenAI to create a comprehensive results section.
 
     Args:
-        prompt (str): Instructions for customizing the summary of the results.
+        prompt (str): Instructions for customizing the results summary.
+        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
     """
-    console.print(f"[yellow]Summarizing results with prompt:[/yellow] {prompt}")
-    console.print(
-        "[yellow]The 'summarize_results' command is a placeholder and currently does nothing.[/yellow]"
-    )
+    book_path = book_path or os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    summarize_analysis_results(book_path, prompt)

@@ -1,52 +1,66 @@
+import os
 import click
 from rich.console import Console
 from pathlib import Path
+from storycraftr.utils.core import load_book_config
+from storycraftr.agent.paper.outline_sections import generate_outline, define_research_methods
 
 console = Console()
 
 
 @click.group()
-@click.option(
-    "--book_path",
-    type=click.Path(),
-    required=True,
-    help="Path to the paper project directory.",
-)
-def outline(book_path):
+def outline():
     """
     Group of commands for outlining the paper and defining research methods.
     """
-    # Store book_path for potential file operations
-    outline.book_path = Path(book_path)
+    pass
 
 
 @outline.command()
-@click.argument("prompt", type=str, required=False)
-def outline_sections(prompt):
+@click.option(
+    "--book-path",
+    type=click.Path(),
+    help="Path to the paper directory",
+    required=False
+)
+@click.argument("prompt", type=str)
+def outline_sections(prompt: str, book_path: str = None):
     """
-    Placeholder for generating an outline of the paper's sections.
-    In the future, this command will use OpenAI to create a structured outline.
+    Generate or refine the paper's outline.
+    Uses OpenAI to create a structured outline with all necessary sections.
 
     Args:
-        prompt (str): Additional instructions for customizing the outline generation.
+        prompt (str): Instructions to guide the outline generation.
+        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
     """
-    console.print(
-        "[yellow]The 'outline_sections' command is a placeholder and currently does nothing.[/yellow]"
-    )
-    console.print(f"Prompt: {prompt if prompt else 'No additional prompt provided.'}")
+    book_path = book_path or os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    generate_outline(book_path, prompt)
 
 
 @outline.command()
-@click.argument("prompt", type=str, required=False)
-def define_methods(prompt):
+@click.option(
+    "--book-path",
+    type=click.Path(),
+    help="Path to the paper directory",
+    required=False
+)
+@click.argument("prompt", type=str)
+def define_methods(prompt: str, book_path: str = None):
     """
-    Placeholder for defining the research methods of the paper.
-    In the future, this command will use OpenAI to generate a detailed methods section.
+    Define or refine the research methods section.
+    Uses OpenAI to generate a detailed methodology section.
 
     Args:
-        prompt (str): Additional instructions to customize the methods description.
+        prompt (str): Instructions to guide the methods definition.
+        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
     """
-    console.print(
-        "[yellow]The 'define_methods' command is a placeholder and currently does nothing.[/yellow]"
-    )
-    console.print(f"Prompt: {prompt if prompt else 'No additional prompt provided.'}")
+    book_path = book_path or os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    define_research_methods(book_path, prompt)
