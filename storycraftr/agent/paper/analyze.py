@@ -34,7 +34,7 @@ def run_data_analysis(book_path: str, prompt: str) -> str:
     # Load configuration and setup
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "sections", "analysis_plan.md")
     paper_title = config.book_name
 
@@ -89,7 +89,7 @@ def summarize_analysis_results(book_path: str, prompt: str) -> str:
     # Load configuration and setup
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "sections", "results.md")
     paper_title = config.book_name
 

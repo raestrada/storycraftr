@@ -25,7 +25,7 @@ files_to_create = [
     {
         "folder": "sections",
         "filename": "introduction.md",
-        "content": "# Introduction\n\nIntroduction to the paper’s subject and goals.",
+        "content": "# Introduction\n\nIntroduction to the paper's subject and goals.",
     },
     {
         "folder": "sections",
@@ -56,6 +56,45 @@ files_to_create = [
         "folder": "sections",
         "filename": "future_work.md",
         "content": "# Future Work\n\nSuggestions for future research.",
+    },
+    # References
+    {
+        "folder": "references",
+        "filename": "references.md",
+        "content": "# References\n\nBibliographic references used in the paper.",
+    },
+    # Reviews
+    {
+        "folder": "reviews",
+        "filename": "consistency_check.md",
+        "content": "# Consistency Check\n\nResults of consistency verification across sections.",
+    },
+    {
+        "folder": "reviews",
+        "filename": "citation_check.md",
+        "content": "# Citation Check\n\nResults of citation verification and formatting.",
+    },
+    {
+        "folder": "reviews",
+        "filename": "format_check.md",
+        "content": "# Format Check\n\nResults of paper formatting verification.",
+    },
+    # Analysis
+    {
+        "folder": "analysis",
+        "filename": "analysis_plan.md",
+        "content": "# Analysis Plan\n\nDetailed plan for data analysis.",
+    },
+    {
+        "folder": "analysis",
+        "filename": "results_summary.md",
+        "content": "# Results Summary\n\nSummary of analysis results.",
+    },
+    # Concept Maps
+    {
+        "folder": "concept_maps",
+        "filename": "research_framework.md",
+        "content": "# Research Framework\n\nConceptual framework and theoretical relationships.",
     },
     # Figures
     {

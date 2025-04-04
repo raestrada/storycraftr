@@ -5,11 +5,10 @@ from pathlib import Path
 from storycraftr.utils.core import load_book_config
 from storycraftr.agent.paper.generate_section import (
     generate_introduction,
-    generate_literature_review,
     generate_methodology,
     generate_results,
     generate_discussion,
-    generate_conclusion,
+    generate_conclusion
 )
 
 console = Console()
@@ -44,30 +43,6 @@ def introduction(prompt: str, book_path: str = None):
         return None
 
     generate_introduction(book_path, prompt)
-
-@generate.command()
-@click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
-)
-@click.argument("prompt", type=str)
-def literature_review(prompt: str, book_path: str = None):
-    """
-    Generate or refine the literature review section.
-    Uses OpenAI to create a comprehensive literature review.
-
-    Args:
-        prompt (str): Instructions for the literature review content.
-        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
-    """
-    book_path = book_path or os.getcwd()
-
-    if not load_book_config(book_path):
-        return None
-
-    generate_literature_review(book_path, prompt)
 
 @generate.command()
 @click.option(

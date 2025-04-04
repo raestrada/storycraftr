@@ -8,6 +8,7 @@ from rich.markdown import Markdown  # Importar soporte de Markdown de Rich
 from storycraftr.prompts.permute import longer_date_formats
 from storycraftr.state import debug_state  # Importar el estado de debug
 from pathlib import Path
+from types import SimpleNamespace
 
 console = Console()
 
@@ -93,43 +94,37 @@ class BookConfig(NamedTuple):
     multiple_answer: bool
 
 
-def load_book_config(book_path: str) -> BookConfig:
+def load_book_config(book_path: str):
     """
-    Loads the book's configuration from the storycraftr.json file.
-
-    Args:
-        book_path (str): The path to the book's directory.
-
-    Returns:
-        BookConfig: An instance of the BookConfig NamedTuple containing the book's settings.
-        None: If the storycraftr.json file is not found or is in an invalid directory.
+    Load configuration from the book path.
     """
-    config_file = Path(book_path) / "storycraftr.json"
+    if not book_path:
+        console.print(
+            "[red]Error: Please either:\n"
+            "1. Run the command inside a StoryCraftr/PaperCraftr project directory, or\n"
+            "2. Specify the project path using --book-path[/red]"
+        )
+        return None
 
     try:
-        with config_file.open("r", encoding="utf-8") as file:
-            data = json.load(file)
-            # Devuelve una instancia de BookConfig con los valores del archivo JSON
-            return BookConfig(
-                book_path=data["book_path"],
-                book_name=data["book_name"],
-                primary_language=data["primary_language"],
-                alternate_languages=data["alternate_languages"],
-                default_author=data["default_author"],
-                genre=data["genre"],
-                license=data["license"],
-                reference_author=data["reference_author"],
-                keywords=data["keywords"] if "keywords" in data else "",
-                cli_name=data["cli_name"],
-                openai_url=data["openai_url"],
-                openai_model=data["openai_model"],
-                multiple_answer=data["multiple_answer"],
-            )
-    except (FileNotFoundError, NotADirectoryError):
-        console.print(
-            f"[bold red]⚠[/bold red] Folder '[bold]{book_path}[/bold]' is not a storycraftr project.",
-            style="red",
-        )
+        # Intentar cargar papercraftr.json primero
+        config_path = Path(book_path) / "papercraftr.json"
+        if not config_path.exists():
+            # Si no existe, intentar storycraftr.json
+            config_path = Path(book_path) / "storycraftr.json"
+            if not config_path.exists():
+                console.print(
+                    "[red]Error: No configuration file found. Please either:\n"
+                    "1. Run the command inside a StoryCraftr/PaperCraftr project directory, or\n"
+                    "2. Specify the project path using --book-path[/red]"
+                )
+                return None
+
+        config_data = json.loads(config_path.read_text(encoding="utf-8"))
+        return SimpleNamespace(**config_data)
+
+    except Exception as e:
+        console.print(f"[red]Error loading configuration: {str(e)}[/red]")
         return None
 
 

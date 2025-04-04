@@ -99,97 +99,93 @@ Generate a methodology section for the paper titled "{paper_title}" based on thi
 Include:
 1. Research Design
    - Approach justification
-   - Design framework
-   - Variables/constructs
+   - Framework description
+   - Study scope
 
-2. Data Collection
-   - Methods
-   - Instruments
-   - Procedures
-   - Sample selection
+2. Methods
+   - Data collection procedures
+   - Analysis techniques
+   - Tools and instruments
+   - Validation methods
 
-3. Analysis Methods
-   - Analytical techniques
-   - Statistical tests
-   - Tools/software
-   - Data processing
+3. Implementation
+   - Step-by-step process
+   - Controls and measures
+   - Quality assurance
 
-4. Validation
-   - Quality measures
-   - Reliability checks
-   - Bias control
-   - Ethical considerations
+4. Ethical Considerations
+   - Data handling
+   - Privacy measures
+   - Compliance standards
 
-Format as a detailed, replicable methodology section.
+Format as a detailed, replicable methodology that supports your research objectives.
 """
 
 METHODOLOGY_PROMPT_REFINE = """
 Refine the existing methodology based on this input: {prompt}.
 
-Improve:
+Enhance:
 1. Clarity
-   - Clearer procedures
-   - Better explanations
-   - More detail where needed
+   - Procedural details
+   - Technical specifications
+   - Process flow
 
 2. Rigor
-   - Stronger justification
-   - Better validation
-   - More robust methods
+   - Validation methods
+   - Control measures
+   - Error handling
 
-3. Replicability
-   - Complete procedures
-   - Specific parameters
-   - Clear conditions
+3. Justification
+   - Method selection
+   - Tool choices
+   - Analysis approaches
 """
 
 RESULTS_PROMPT_NEW = """
 Generate a results section for the paper titled "{paper_title}" based on this input: {prompt}.
 
-Present:
-1. Main Findings
-   - Key results
-   - Statistical analyses
+Structure:
+1. Key Findings
+   - Primary outcomes
+   - Statistical results
    - Data patterns
 
-2. Data Presentation
-   - Tables
-   - Figures
-   - Charts
-   - Statistical summaries
+2. Analysis
+   - Interpretation of data
+   - Statistical significance
+   - Trends and correlations
 
-3. Observations
-   - Patterns
-   - Trends
-   - Anomalies
-   - Relationships
+3. Visual Elements
+   - Tables and figures
+   - Data visualization
+   - Key metrics
 
 4. Validation
-   - Robustness checks
+   - Reliability measures
    - Error analysis
-   - Confidence measures
+   - Robustness checks
 
-Format as a clear, objective presentation of research findings.
+Present results objectively, focusing on the data and findings.
 """
 
 RESULTS_PROMPT_REFINE = """
 Refine the existing results based on this input: {prompt}.
 
-Enhance:
+Improve:
 1. Clarity
-   - Better organization
-   - Clearer presentation
-   - Improved flow
+   - Data presentation
+   - Statistical reporting
+   - Visual elements
 
-2. Completeness
-   - Additional analyses
-   - Missing details
-   - Supporting data
+2. Organization
+   - Logical flow
+   - Result grouping
+   - Priority ordering
 
-3. Visualization
-   - Better figures
-   - Clearer tables
-   - More effective displays
+3. Technical Accuracy
+   - Statistical precision
+   - Data interpretation
+   - Error reporting
 """
 
 DISCUSSION_PROMPT_NEW = """
@@ -197,46 +193,46 @@ Generate a discussion section for the paper titled "{paper_title}" based on this
 
 Include:
 1. Interpretation
-   - Results meaning
-   - Context
-   - Implications
+   - Key findings analysis
+   - Context within field
+   - Theoretical implications
 
-2. Comparison
-   - Prior research
-   - Theoretical framework
-   - Expected outcomes
-
-3. Implications
-   - Theoretical impact
+2. Implications
    - Practical applications
-   - Future directions
+   - Theoretical contributions
+   - Field impact
 
-4. Limitations
+3. Limitations
    - Study constraints
-   - Methodological limits
-   - Generalizability
+   - Data limitations
+   - Method restrictions
 
-Format as an insightful discussion that connects results to broader context.
+4. Future Directions
+   - Research opportunities
+   - Methodology improvements
+   - Extended applications
+
+Connect findings to broader research context while maintaining academic rigor.
 """
 
 DISCUSSION_PROMPT_REFINE = """
 Refine the existing discussion based on this input: {prompt}.
 
-Strengthen:
-1. Analysis
+Enhance:
+1. Analysis Depth
    - Deeper insights
-   - Better connections
-   - Stronger arguments
-
-2. Context
    - Broader implications
-   - Field impact
-   - Future directions
+   - Theoretical connections
 
-3. Balance
-   - Limitations vs. strengths
-   - Theory vs. practice
-   - Current vs. future
+2. Critical Evaluation
+   - Stronger arguments
+   - Better limitations
+   - Clearer implications
+
+3. Future Directions
+   - More specific recommendations
+   - Practical suggestions
+   - Research opportunities
 """
 
 CONCLUSION_PROMPT_NEW = """
@@ -258,25 +254,25 @@ Include:
    - Open questions
    - Recommendations
 
-Format as a strong conclusion that reinforces the paper's value.
+Provide a strong closing that reinforces the paper's significance.
 """
 
 CONCLUSION_PROMPT_REFINE = """
 Refine the existing conclusion based on this input: {prompt}.
 
-Enhance:
+Strengthen:
 1. Impact
-   - Stronger contributions
-   - Clearer implications
+   - Clearer contributions
+   - Stronger implications
    - Better recommendations
 
 2. Synthesis
-   - Better summary
-   - Clearer message
-   - Stronger ending
+   - Tighter integration
+   - Better flow
+   - Comprehensive coverage
 
 3. Future Vision
-   - More specific directions
-   - Better opportunities
-   - Clearer next steps
+   - Specific directions
+   - Research opportunities
+   - Field advancement
 """ 

@@ -34,7 +34,7 @@ def generate_lit_summary(book_path: str, prompt: str) -> str:
     # Load configuration and setup
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "sections", "literature_summary.md")
     paper_title = config.book_name
 
@@ -89,7 +89,7 @@ def generate_concept_map(book_path: str, prompt: str) -> str:
     # Load configuration and setup
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "sections", "concept_map.md")
     paper_title = config.book_name
 

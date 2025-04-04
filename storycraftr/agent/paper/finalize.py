@@ -34,7 +34,7 @@ def check_paper_consistency(book_path: str, prompt: str) -> str:
     # Load configuration and setup
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "reviews", "consistency_check.md")
     paper_title = config.book_name
 
@@ -80,7 +80,7 @@ def finalize_paper_format(book_path: str, prompt: str) -> str:
     # Load configuration and setup
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "reviews", "formatting_report.md")
     paper_title = config.book_name
 
@@ -108,4 +108,10 @@ def finalize_paper_format(book_path: str, prompt: str) -> str:
     console.print("[bold green]✔ Formatting report completed successfully[/bold green]")
 
     update_agent_files(book_path, assistant)
-    return formatting_report 
+    return formatting_report
+
+def generate_abstract(book_path: str, prompt: str) -> str:
+    # ... setup code ...
+    assistant = create_or_get_assistant(book_path)
+    thread = get_thread(book_path)
+    # ... rest of the code ... 

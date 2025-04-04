@@ -24,8 +24,12 @@ def initialize_openai_client(book_path: str):
         book_path (str): Path to the book directory.
     """
     config = load_book_config(book_path)
-    openai.api_base = config.openai_url
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url=config.openai_url)
+    # Si no hay configuración o no hay URL específica, usar la URL por defecto
+    api_base = getattr(config, 'openai_url', "https://api.openai.com/v1")
+    client = OpenAI(
+        api_key=os.getenv("OPENAI_API_KEY"), 
+        base_url=api_base
+    )
     return client
 
 
@@ -155,62 +159,46 @@ def delete_assistant(book_path: str):
             break
 
 
-def create_or_get_assistant(book_path: str, progress: Progress = None, task=None):
+def create_or_get_assistant(book_path: str):
     """
-    Create or retrieve an assistant for the given book.
+    Create or get an existing assistant for the book.
 
     Args:
         book_path (str): Path to the book directory.
-        progress (Progress, optional): Progress object for tracking.
-        task (Task, optional): Task ID for progress tracking.
-
-    Returns:
-        Assistant: The created or retrieved assistant object.
     """
-    client = initialize_openai_client(book_path)
     config = load_book_config(book_path)
-    name = os.path.basename(book_path)
-    if progress and task:
-        progress.update(
-            task, description=f"Searching for existing assistant '{name}'..."
-        )
+    client = initialize_openai_client(book_path)
+    
+    # Usar valores por defecto si config es None o no tiene los atributos
+    openai_model = "gpt-4" if config is None else getattr(config, 'openai_model', "gpt-4")
+    
+    # Obtener el contenido del behavior file
+    behavior_file = Path(book_path) / "behaviors" / "default.txt"
+    if behavior_file.exists():
+        behavior_content = behavior_file.read_text(encoding="utf-8")
     else:
-        console.print(
-            f"[bold blue]Searching for existing assistant '{name}'...[/bold blue]"
-        )
+        console.print("[red]Behavior file not found.[/red]")
+        return None
 
-    assistants = client.beta.assistants.list()
+    # Buscar o crear el asistente
+    assistants = client.beta.assistants.list(
+        order="desc",
+        limit=100,
+    )
+
+    name = f"Assistant for {Path(book_path).name}"
     for assistant in assistants.data:
         if assistant.name == name:
-            console.print(
-                f"[bold yellow]Assistant {name} already exists.[/bold yellow]"
-            )
             return assistant
 
-    vector_store = client.beta.vector_stores.create(name=f"{name} Docs")
-    upload_markdown_files_to_vector_store(
-        vector_store.id, book_path, client, progress, task
-    )
-
-    # Read instructions from behaviors
-    with open(
-        os.path.join(book_path, "behaviors", "default.txt"), "r", encoding="utf-8"
-    ) as file:
-        instructions = file.read()
-
+    # Si no existe, crear uno nuevo con las herramientas soportadas
     assistant = client.beta.assistants.create(
-        instructions=instructions,
         name=name,
-        tools=[{"type": "file_search"}],
-        model=config.openai_model,
+        instructions=behavior_content,
+        model=openai_model,
+        tools=[{"type": "code_interpreter"}]  # Solo usamos code_interpreter por ahora
     )
 
-    client.beta.assistants.update(
-        assistant_id=assistant.id,
-        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
-    )
-
-    console.print(f"[bold green]Assistant '{name}' created successfully.[/bold green]")
     return assistant
 
 
@@ -390,10 +378,22 @@ def create_message(
         raise
 
 
-def get_thread(book_path: str) -> object:
-    """Retrieve or create a new thread."""
+def get_thread(book_path: str):
+    """
+    Create a new thread for the conversation.
+
+    Args:
+        book_path (str): Path to the book directory.
+
+    Returns:
+        Thread: The thread object.
+    """
     client = initialize_openai_client(book_path)
-    return client.beta.threads.create()
+    # Create a new thread with book metadata
+    thread = client.beta.threads.create(
+        metadata={"book_path": book_path}
+    )
+    return thread
 
 
 def update_agent_files(book_path: str, assistant):
@@ -496,3 +496,35 @@ def process_chapters(
             progress.update(task_chapters, advance=1)
 
     update_agent_files(book_path, assistant)
+
+
+def update_assistant_files(book_path: str, assistant):
+    """
+    Update the assistant's files with any new content.
+
+    Args:
+        book_path (str): Path to the book directory.
+        assistant: The assistant object to update.
+    """
+    client = initialize_openai_client(book_path)
+    
+    # Obtener los IDs de archivos actuales
+    current_files = client.beta.assistants.files.list(assistant_id=assistant.id)
+    current_file_ids = [f.id for f in current_files.data]
+    
+    # Subir nuevos archivos
+    for root, _, files in os.walk(book_path):
+        for file in files:
+            if file.endswith('.md'):
+                file_path = Path(root) / file
+                with open(file_path, 'rb') as f:
+                    new_file = client.files.create(
+                        file=f,
+                        purpose="assistants"
+                    )
+                    # Agregar el nuevo archivo al asistente si no existe
+                    if new_file.id not in current_file_ids:
+                        client.beta.assistants.files.create(
+                            assistant_id=assistant.id,
+                            file_id=new_file.id
+                        )

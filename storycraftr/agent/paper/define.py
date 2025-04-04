@@ -34,7 +34,7 @@ def define_core_question(book_path: str, question: str) -> str:
     # Load the book configuration and setup
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "sections", "core_question.md")
     paper_title = config.book_name
 
@@ -90,7 +90,7 @@ def define_contribution(book_path: str, prompt: str) -> str:
     # Load the book configuration and setup
     config = load_book_config(book_path)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "sections", "contribution.md")
     book_name = config.book_name
 

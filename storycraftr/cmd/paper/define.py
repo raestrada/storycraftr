@@ -1,7 +1,8 @@
+import os
 import click
 from rich.console import Console
 from pathlib import Path
-
+from storycraftr.utils.core import load_book_config
 from storycraftr.agent.paper.define import define_core_question, define_contribution
 
 console = Console()
@@ -18,7 +19,10 @@ def define():
 
 @define.command()
 @click.option(
-    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+    "--book-path",
+    type=click.Path(),
+    help="Path to the paper directory",
+    required=False
 )
 @click.argument("question", type=str)
 def core_question(question: str, book_path: str = None):
@@ -27,7 +31,7 @@ def core_question(question: str, book_path: str = None):
 
     Args:
         question (str): The main research question or hypothesis.
-        book_path (str, optional): The path to the book's directory. Defaults to the current working directory.
+        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
     """
     book_path = book_path or os.getcwd()
 
@@ -40,7 +44,7 @@ def core_question(question: str, book_path: str = None):
     define_core_question(book_path, question)
 
 
-@click.command()
+@define.command()
 @click.option(
     "--book-path", type=click.Path(), help="Path to the book directory", required=False
 )

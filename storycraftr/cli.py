@@ -58,6 +58,9 @@ from storycraftr.cmd.paper.organize_lit import organize_lit as paper_organize_li
 from storycraftr.cmd.paper.outline_sections import outline as paper_outline
 from storycraftr.cmd.paper.analyze import analyze as paper_analyze
 from storycraftr.cmd.paper.finalize import finalize as paper_finalize
+from storycraftr.cmd.paper.generate_section import generate as paper_generate
+from storycraftr.cmd.paper.references import references as paper_references
+from storycraftr.cmd.paper.iterate import iterate as paper_iterate
 
 from storycraftr.init import init_structure_story, init_structure_paper
 
@@ -184,6 +187,38 @@ def init(
     """
     Initialize the project structure with configuration and behavior content.
     """
+    # Asegurarse de que el directorio del proyecto existe o crearlo
+    project_path = Path(project_path).resolve()
+    try:
+        project_path.mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        console.print(f"[red]Error creating project directory: {e}[/red]")
+        sys.exit(1)
+
+    # Manejar la ruta del archivo behavior
+    behavior_path = Path(behavior).resolve()
+    if not behavior_path.is_file():
+        # Intentar buscar el archivo en el directorio actual
+        current_dir_behavior = Path.cwd() / behavior
+        if current_dir_behavior.is_file():
+            behavior_path = current_dir_behavior
+        else:
+            console.print(f"[red]Behavior file not found at {behavior_path} or {current_dir_behavior}[/red]")
+            sys.exit(1)
+
+    try:
+        behavior_content = behavior_path.read_text(encoding="utf-8")
+    except Exception as e:
+        console.print(f"[red]Error reading behavior file: {e}[/red]")
+        sys.exit(1)
+
+    # Cambiar al directorio del proyecto
+    try:
+        os.chdir(project_path)
+    except Exception as e:
+        console.print(f"[red]Error accessing project directory: {e}[/red]")
+        sys.exit(1)
+
     cli_name = detect_invocation()
 
     # Parameter validation based on the CLI
@@ -204,13 +239,6 @@ def init(
         )
         sys.exit(1)
 
-    # Load behavior file content
-    behavior_path = Path(behavior)
-    if not behavior_path.is_file():
-        console.print("[red]Behavior must be a file.[/red]")
-        sys.exit(1)
-
-    behavior_content = behavior_path.read_text(encoding="utf-8")
 
     # Project initialization based on the CLI
     if cli_name == "storycraftr":
@@ -220,7 +248,7 @@ def init(
             else []
         )
         init_structure_story(
-            book_path=project_path,
+            book_path=str(project_path),
             license=license,
             primary_language=primary_language,
             alternate_languages=alternate_languages_list,
@@ -234,7 +262,7 @@ def init(
         )
     elif cli_name == "papercraftr":
         init_structure_paper(
-            paper_path=project_path,
+            paper_path=str(project_path),
             primary_language=primary_language,
             author=author,
             keywords=keywords,
@@ -287,6 +315,9 @@ elif cli_name == "papercraftr":
     cli.add_command(paper_outline)
     cli.add_command(paper_analyze)
     cli.add_command(paper_finalize)
+    cli.add_command(paper_generate)
+    cli.add_command(paper_references)
+    cli.add_command(paper_iterate)
 else:
     console.print(
         "[red]Unknown CLI tool name. Use 'storycraftr' or 'papercraftr'.[/red]"
