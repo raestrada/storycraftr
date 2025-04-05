@@ -230,10 +230,10 @@ run_command 'iterate conclusion "Strengthen the concluding remarks."' || exit 1
 run_command 'generate bibliography --format "bibtex" --output "references.bib"' || exit 1
 
 # Generar PDF en inglés
-run_command 'generate pdf --language "en" --template "ieee" --output "deep_learning_medical_imaging.pdf"' || exit 1
+run_command 'generate-pdf --language "en" --template "ieee" --output "deep_learning_medical_imaging.pdf"' || exit 1
 
 # Generar PDF en español
-run_command 'generate pdf --language "es" --template "ieee" --output "deep_learning_medical_imaging_es.pdf"' || exit 1
+run_command 'generate-pdf --language "es" --template "ieee" --output "deep_learning_medical_imaging_es.pdf"' || exit 1
 
 # Finalizar paper
 run_command 'finalize "Review and polish the entire paper."' || exit 1

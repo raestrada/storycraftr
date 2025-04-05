@@ -6,7 +6,11 @@ from storycraftr.prompts.paper.generate_pdf import (
     GENERATE_LATEX_PROMPT,
     VALIDATE_LATEX_PROMPT
 )
-from storycraftr.agent.agents import create_or_get_assistant
+from storycraftr.agent.agents import (
+    create_or_get_assistant,
+    get_thread,
+    create_message,
+)
 
 console = Console()
 
@@ -25,21 +29,28 @@ def generate_pdf_file(book_path: str, language: str, template: str, output: str)
         return None
 
     assistant = create_or_get_assistant(book_path)
+    thread = get_thread(book_path)
     
     # Generate LaTeX content
-    response = assistant.chat(
-        GENERATE_LATEX_PROMPT.format(
+    response = create_message(
+        book_path=book_path,
+        thread_id=thread.id,
+        content=GENERATE_LATEX_PROMPT.format(
             language=language,
             template=template,
             paper_path=book_path
-        )
+        ),
+        assistant=assistant
     )
     
     # Validate LaTeX
-    validation = assistant.chat(
-        VALIDATE_LATEX_PROMPT.format(
+    validation = create_message(
+        book_path=book_path,
+        thread_id=thread.id,
+        content=VALIDATE_LATEX_PROMPT.format(
             latex_content=response
-        )
+        ),
+        assistant=assistant
     )
     
     if "VALID" not in validation:
@@ -54,10 +65,15 @@ def generate_pdf_file(book_path: str, language: str, template: str, output: str)
     
     # Compile PDF
     try:
-        os.system(f"pdflatex -output-directory={book_path} {tex_path}")
-        os.system(f"bibtex {os.path.join(book_path, tex_file.replace('.tex', '.aux'))}")
-        os.system(f"pdflatex -output-directory={book_path} {tex_path}")
-        os.system(f"pdflatex -output-directory={book_path} {tex_path}")
+        # Escapar espacios en las rutas
+        escaped_tex_path = f'"{tex_path}"'
+        escaped_book_path = f'"{book_path}"'
+        escaped_aux_path = f'"{os.path.join(book_path, tex_file.replace(".tex", ".aux"))}"'
+        
+        os.system(f'pdflatex -output-directory={escaped_book_path} {escaped_tex_path}')
+        os.system(f'bibtex {escaped_aux_path}')
+        os.system(f'pdflatex -output-directory={escaped_book_path} {escaped_tex_path}')
+        os.system(f'pdflatex -output-directory={escaped_book_path} {escaped_tex_path}')
         
         console.print(f"[green]PDF generated successfully: {os.path.join(book_path, output)}[/green]")
     except Exception as e:
