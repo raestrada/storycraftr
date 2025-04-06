@@ -179,7 +179,7 @@ def generate_magic_system(book_path: str, prompt: str) -> str:
     console.print("[bold blue]Generating magic/science system...[/bold blue]")
     language = load_book_config(book_path).primary_language
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
 
     file_path = Path(book_path) / "worldbuilding" / "magic_system.md"
 

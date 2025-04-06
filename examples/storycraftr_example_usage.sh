@@ -131,7 +131,7 @@ run_command 'chapters chapter 3 "progress de history"' || exit 1
 
 run_command 'iterate insert-chapter 2 "Insert a new chapter that explores a critical event from the protagonist's past, shedding light on their true intentions and setting the stage for the conflict in chapter 1."' || exit 1
 
-run_command 'iterate split-chapter 3 "Split chapter into two chapters."' || exit 1
+run_command 'iterate split-chapter 1 "Split chapter into two chapters."' || exit 1
 
 run_command 'iterate add-flashback 3 "Insert a flashback revealing a hidden alliance the protagonist formed years ago, explaining a key turning point in the current events."' || exit 1
 
