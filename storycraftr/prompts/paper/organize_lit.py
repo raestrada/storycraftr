@@ -23,34 +23,4 @@ Consider:
 5. Improving flow and coherence
 
 Maintain academic rigor while ensuring clarity and readability.
-"""
-
-CONCEPT_MAP_PROMPT_NEW = """
-Create a detailed concept map for the research paper titled "{paper_title}" based on this input: {prompt}.
-
-Include:
-1. Core concepts and theories
-2. Relationships between concepts
-3. Key variables and their interactions
-4. Theoretical frameworks
-5. Research gaps and opportunities
-
-Format the output as a structured markdown document that clearly shows:
-- Hierarchical relationships
-- Cross-connections between concepts
-- Supporting evidence from literature
-- Potential research directions
-"""
-
-CONCEPT_MAP_PROMPT_REFINE = """
-Refine and enhance the existing concept map based on this input: {prompt}.
-
-Focus on:
-1. Strengthening conceptual relationships
-2. Adding missing connections
-3. Clarifying hierarchies
-4. Incorporating new insights
-5. Improving visual clarity in the markdown structure
-
-Ensure the concept map effectively communicates the theoretical framework while maintaining academic rigor.
 """ 

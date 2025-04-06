@@ -10,7 +10,6 @@ from storycraftr.agent.paper.generate_section import (
     generate_discussion,
     generate_conclusion
 )
-from storycraftr.agent.paper.finalize import generate_abstract
 
 console = Console()
 
@@ -20,30 +19,6 @@ def generate():
     Group of commands for generating different sections of the paper.
     """
     pass
-
-@generate.command()
-@click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
-)
-@click.argument("prompt", type=str)
-def abstract(prompt: str, book_path: str = None):
-    """
-    Generate or refine the abstract section.
-    Uses OpenAI to create a concise and informative abstract.
-
-    Args:
-        prompt (str): Instructions for the abstract content.
-        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
-    """
-    book_path = book_path or os.getcwd()
-
-    if not load_book_config(book_path):
-        return None
-
-    generate_abstract(book_path, prompt)
 
 @generate.command()
 @click.option(
@@ -104,7 +79,7 @@ def methodology(prompt: str, book_path: str = None):
 def results(prompt: str, book_path: str = None):
     """
     Generate or refine the results section.
-    Uses OpenAI to create a clear presentation of findings.
+    Uses OpenAI to create a clear presentation of research findings.
 
     Args:
         prompt (str): Instructions for the results content.
@@ -128,7 +103,7 @@ def results(prompt: str, book_path: str = None):
 def discussion(prompt: str, book_path: str = None):
     """
     Generate or refine the discussion section.
-    Uses OpenAI to create an insightful discussion of results.
+    Uses OpenAI to create a comprehensive discussion of the results.
 
     Args:
         prompt (str): Instructions for the discussion content.
@@ -152,7 +127,7 @@ def discussion(prompt: str, book_path: str = None):
 def conclusion(prompt: str, book_path: str = None):
     """
     Generate or refine the conclusion section.
-    Uses OpenAI to create a strong conclusion.
+    Uses OpenAI to create a strong conclusion that summarizes key findings.
 
     Args:
         prompt (str): Instructions for the conclusion content.

@@ -49,47 +49,4 @@ Focus on:
 5. Incorporating feedback and new insights
 
 Maintain academic rigor while ensuring clarity and coherence.
-"""
-
-DEFINE_METHODS_PROMPT_NEW = """
-Define the research methodology for the paper titled "{paper_title}" based on this input: {prompt}.
-
-Include detailed descriptions of:
-1. Research Design
-   - Approach (qualitative, quantitative, mixed)
-   - Design rationale
-   - Research framework
-
-2. Data Collection
-   - Methods and instruments
-   - Sampling strategy
-   - Data sources
-   - Collection procedures
-
-3. Analysis Methods
-   - Analytical techniques
-   - Tools and software
-   - Statistical methods
-   - Validation approach
-
-4. Quality Assurance
-   - Reliability measures
-   - Validity checks
-   - Bias control
-   - Ethical considerations
-
-Format the output as a comprehensive methodology section with clear justification for each choice.
-"""
-
-DEFINE_METHODS_PROMPT_REFINE = """
-Refine and improve the existing methodology based on this input: {prompt}.
-
-Focus on:
-1. Strengthening justification for methodological choices
-2. Improving clarity of procedures
-3. Enhancing reliability and validity measures
-4. Adding missing details or steps
-5. Addressing potential limitations
-
-Ensure the methodology is robust, replicable, and aligned with research objectives.
 """ 

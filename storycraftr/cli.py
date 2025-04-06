@@ -53,15 +53,11 @@ from storycraftr.cmd.story.chapters import chapters as story_chapters
 from storycraftr.cmd.story.iterate import iterate as story_iterate
 
 # Imports PaperCraftr in storycraftr.cmd.paper
-from storycraftr.cmd.paper.define import define as paper_define
 from storycraftr.cmd.paper.organize_lit import organize_lit as paper_organize_lit
 from storycraftr.cmd.paper.outline_sections import outline as paper_outline
-from storycraftr.cmd.paper.analyze import analyze as paper_analyze
-from storycraftr.cmd.paper.finalize import finalize as paper_finalize
 from storycraftr.cmd.paper.generate_section import generate as paper_generate
 from storycraftr.cmd.paper.references import references as paper_references
 from storycraftr.cmd.paper.iterate import iterate as paper_iterate
-from storycraftr.cmd.paper.generate_bibliography import generate_bibliography
 from storycraftr.cmd.paper.publish import publish as paper_publish
 
 from storycraftr.init import init_structure_story, init_structure_paper
@@ -312,16 +308,13 @@ if cli_name == "storycraftr":
     cli.add_command(story_chapters)
     cli.add_command(story_iterate)
 elif cli_name == "papercraftr":
-    cli.add_command(paper_define)
     cli.add_command(paper_organize_lit)
     cli.add_command(paper_outline)
-    cli.add_command(paper_analyze)
-    cli.add_command(paper_finalize)
     cli.add_command(paper_generate)
     cli.add_command(paper_references)
     cli.add_command(paper_iterate)
-    cli.add_command(generate_bibliography)
     cli.add_command(paper_publish)
+    cli.add_command(chat)
 else:
     console.print(
         "[red]Unknown CLI tool name. Use 'storycraftr' or 'papercraftr'.[/red]"
