@@ -136,7 +136,7 @@ def consolidate_book_md(
 
     # Create or get the assistant and thread for translation (if needed)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
 
     # Collect chapters to process
     files_to_process = []

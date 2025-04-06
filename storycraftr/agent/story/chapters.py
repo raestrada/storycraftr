@@ -35,8 +35,9 @@ def generate_chapter(book_path: str, chapter_number: int, prompt: str) -> str:
     """
     console.print(f"[bold blue]Generating chapter {chapter_number}...[/bold blue]")
 
+    language = load_book_config(book_path).primary_language
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
 
     chapter_file = f"chapter-{chapter_number}.md"
     file_path = Path(book_path) / "chapters" / chapter_file
@@ -45,14 +46,14 @@ def generate_chapter(book_path: str, chapter_number: int, prompt: str) -> str:
     if file_path.exists():
         console.print(f"[yellow]Existing chapter found. Refining...[/yellow]")
         content = CHAPTER_PROMPT_REFINE.format(
-            prompt=prompt, language=load_book_config(book_path).primary_language
+            prompt=prompt, language=language
         )
     else:
         console.print(
             f"[yellow]No existing chapter found. Generating new content...[/yellow]"
         )
         content = CHAPTER_PROMPT_NEW.format(
-            prompt=prompt, language=load_book_config(book_path).primary_language
+            prompt=prompt, language=language
         )
 
     chapter_content = create_message(
@@ -94,8 +95,9 @@ def generate_cover(book_path: str, prompt: str) -> str:
     console.print("[bold blue]Generating book cover...[/bold blue]")
 
     config = load_book_config(book_path)
+    language = config.primary_language
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
 
     prompt_content = COVER_PROMPT.format(
         title=config.book_name,
@@ -103,7 +105,7 @@ def generate_cover(book_path: str, prompt: str) -> str:
         genre=config.genre,
         alternate_languages=", ".join(config.alternate_languages),
         prompt=prompt,
-        language=config.primary_language,
+        language=language,
     )
 
     cover_content = create_message(
@@ -131,8 +133,9 @@ def generate_back_cover(book_path: str, prompt: str) -> str:
     console.print("[bold blue]Generating back cover...[/bold blue]")
 
     config = load_book_config(book_path)
+    language = config.primary_language
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
 
     prompt_content = BACK_COVER_PROMPT.format(
         title=config.book_name,
@@ -140,7 +143,7 @@ def generate_back_cover(book_path: str, prompt: str) -> str:
         genre=config.genre,
         alternate_languages=", ".join(config.alternate_languages),
         prompt=prompt,
-        language=config.primary_language,
+        language=language,
         license=config.license,
     )
 
@@ -170,8 +173,9 @@ def generate_epilogue(book_path: str, prompt: str) -> str:
     """
     console.print("[bold blue]Generating epilogue...[/bold blue]")
 
+    language = load_book_config(book_path).primary_language
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
 
     file_path = Path(book_path) / "chapters" / "epilogue.md"
 
@@ -179,14 +183,14 @@ def generate_epilogue(book_path: str, prompt: str) -> str:
     if file_path.exists():
         console.print(f"[yellow]Existing epilogue found. Refining...[/yellow]")
         content = EPILOGUE_PROMPT_REFINE.format(
-            prompt=prompt, language=load_book_config(book_path).primary_language
+            prompt=prompt, language=language
         )
     else:
         console.print(
             f"[yellow]No existing epilogue found. Generating new content...[/yellow]"
         )
         content = EPILOGUE_PROMPT_NEW.format(
-            prompt=prompt, language=load_book_config(book_path).primary_language
+            prompt=prompt, language=language
         )
 
     epilogue_content = create_message(

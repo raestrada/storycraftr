@@ -1,4 +1,4 @@
-from storycraftr.agent.agents import create_message, get_thread
+from storycraftr.agent.agents import create_message, get_thread, create_or_get_assistant
 from rich.console import Console
 from rich.progress import Progress
 
@@ -16,14 +16,18 @@ def summarize_content(assistant, original_prompt: str) -> str:
     Returns:
         str: The summarized content, or an empty string if summarization fails.
     """
-    thread = get_thread()
+    console.print("[bold blue]Retrieving information...[/bold blue]")
+    language = load_book_config(book_path).primary_language
+    assistant = create_or_get_assistant(book_path)
+    thread = get_thread(book_path)
+
     content = f"Summarize the following prompt to make it more concise:\n\nPrompt:\n{original_prompt}"
 
     console.print("[cyan]Summarizing the prompt...[/cyan]")
 
     # Send the summarization request to the assistant
     summary_response = create_message(
-        book_path=None, thread_id=thread.id, content=content, assistant=assistant
+        book_path=book_path, thread_id=thread.id, content=content, assistant=assistant
     )
 
     if summary_response:
@@ -45,14 +49,18 @@ def optimize_query_with_summary(assistant, summarized_prompt: str) -> str:
     Returns:
         str: The optimized content, or an empty string if optimization fails.
     """
-    thread = get_thread()
+    console.print("[bold blue]Retrieving information...[/bold blue]")
+    language = load_book_config(book_path).primary_language
+    assistant = create_or_get_assistant(book_path)
+    thread = get_thread(book_path)
+
     content = f"Using the following summarized prompt, optimize it for the best result:\n\nSummarized Prompt: {summarized_prompt}"
 
     console.print("[cyan]Optimizing the summarized prompt...[/cyan]")
 
     # Send the optimization request to the assistant
     optimized_response = create_message(
-        book_path=None, thread_id=thread.id, content=content, assistant=assistant
+        book_path=book_path, thread_id=thread.id, content=content, assistant=assistant
     )
 
     if optimized_response:
@@ -74,14 +82,18 @@ def final_query(assistant, optimized_prompt: str) -> str:
     Returns:
         str: The response to the final query, or an empty string if the query fails.
     """
-    thread = get_thread()
+    console.print("[bold blue]Retrieving information...[/bold blue]")
+    language = load_book_config(book_path).primary_language
+    assistant = create_or_get_assistant(book_path)
+    thread = get_thread(book_path)
+
     content = f"Answer the following query:\n\nQuery: {optimized_prompt}"
 
     console.print("[cyan]Executing the final query...[/cyan]")
 
     # Send the final query to the assistant
     final_response = create_message(
-        book_path=None, thread_id=thread.id, content=content, assistant=assistant
+        book_path=book_path, thread_id=thread.id, content=content, assistant=assistant
     )
 
     if final_response:

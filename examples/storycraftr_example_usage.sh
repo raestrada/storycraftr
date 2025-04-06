@@ -133,6 +133,6 @@ run_command 'iterate insert-chapter 2 "Insert a new chapter that explores a crit
 
 run_command 'iterate split-chapter 1 "Split chapter into two chapters."' || exit 1
 
-run_command 'iterate add-flashback 3 "Insert a flashback revealing a hidden alliance the protagonist formed years ago, explaining a key turning point in the current events."' || exit 1
+run_command 'iterate add-flashback 1 "Insert a flashback revealing a hidden alliance the protagonist formed years ago, explaining a key turning point in the current events."' || exit 1
 
 echo -e "${GREEN}Example usage for StoryCraftr completed successfully${NC}"
