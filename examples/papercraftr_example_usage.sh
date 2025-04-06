@@ -123,47 +123,6 @@ QUALITY STANDARDS:
 - Address potential criticisms
 - Follow ethical guidelines
 - Check for completeness
-
-SPECIFIC BEHAVIORS:
-1. When generating new content:
-   - Follow the section-specific guidelines
-   - Maintain consistency with existing content
-   - Consider the target audience
-   - Include appropriate citations
-
-2. When refining content:
-   - Preserve key arguments and findings
-   - Improve clarity and flow
-   - Strengthen weak points
-   - Add missing details
-   - Enhance technical precision
-
-3. When reviewing:
-   - Check logical consistency
-   - Verify technical accuracy
-   - Ensure proper citations
-   - Validate statistical reporting
-   - Suggest specific improvements
-
-4. When formatting:
-   - Follow journal/conference guidelines
-   - Maintain consistent style
-   - Structure for readability
-   - Use appropriate academic conventions
-
-INTERACTION STYLE:
-- Provide constructive feedback
-- Suggest specific improvements
-- Explain technical concepts clearly
-- Maintain academic rigor
-- Be thorough but concise
-
-Remember to always prioritize:
-1. Scientific accuracy
-2. Technical rigor
-3. Clear communication
-4. Logical structure
-5. Academic standards
 EOL
 
     mark_command "generate_behavior"
@@ -185,57 +144,33 @@ run_command 'init "Deep Learning in Medical Imaging" --primary-language "en" --a
 
 cd "Deep Learning in Medical Imaging"
 
-# Definir elementos core del paper
-run_command 'define core-question "What are the current applications and limitations of deep learning in medical imaging for diagnostic purposes?"' || exit 1
+# 1. Crear outline del paper
+run_command 'outline outline-sections "Create a detailed outline for a comprehensive review paper on deep learning in medical imaging."' || exit 1
 
-run_command 'define contribution "This paper provides a comprehensive review of deep learning applications in medical imaging, analyzing their effectiveness and current limitations in diagnostic systems."' || exit 1
+# 2. Organizar literatura
+run_command 'organize-lit lit-summary "Review and summarize current literature on deep learning applications in medical imaging, focusing on diagnostic systems."' || exit 1
 
-# Organizar literatura
-run_command 'organize-lit lit-summary "Analyze and summarize the current state of deep learning in medical imaging."' || exit 1
-run_command 'organize-lit concept-map "Create a concept map showing the relationships between deep learning architectures."' || exit 1
+# 3. Generar secciones
+run_command 'generate introduction "Write an introduction that establishes the importance of deep learning in medical imaging."' || exit 1
+run_command 'generate methodology "Detail the systematic review methodology used in this paper."' || exit 1
+run_command 'generate results "Present the findings on deep learning applications in medical imaging."' || exit 1
+run_command 'generate discussion "Discuss the implications, limitations, and future directions of deep learning in medical imaging."' || exit 1
+run_command 'generate conclusion "Summarize key findings and contributions to the field."' || exit 1
 
-# Crear outline
-run_command 'outline outline-sections "Create a detailed outline for a comprehensive review paper."' || exit 1
-run_command 'outline define-methods "Define the systematic review methodology."' || exit 1
-
-# Referencias y Bibliografía
+# 4. Gestionar referencias
 run_command 'references add "LeCun, Y., Bengio, Y., & Hinton, G. (2015). Deep learning. Nature, 521(7553), 436-444."' || exit 1
 run_command 'references add "Litjens, G., et al. (2017). A survey on deep learning in medical image analysis. Medical Image Analysis, 42, 60-88."' || exit 1
 run_command 'references format "IEEE"' || exit 1
 run_command 'references check "Verify all citations are properly formatted and consistently used throughout the paper."' || exit 1
-run_command 'references cite --format "IEEE" "LeCun et al. Deep Learning (2015)"' || exit 1
 
-# Generar secciones
-run_command 'generate abstract "Write an abstract summarizing the key findings and contributions of the paper."' || exit 1
-run_command 'generate introduction "Write an introduction that establishes the importance of deep learning."' || exit 1
-run_command 'generate background "Provide comprehensive background on deep learning and medical imaging."' || exit 1
-run_command 'generate methodology "Detail the systematic review methodology."' || exit 1
-run_command 'generate results "Present the findings on deep learning applications."' || exit 1
-run_command 'generate discussion "Discuss the implications of the findings."' || exit 1
-run_command 'generate conclusion "Summarize the key findings."' || exit 1
+# 5. Iterar y mejorar
+run_command 'iterate reinforce-ideas "Strengthen the core arguments and technical depth throughout the paper."' || exit 1
+run_command 'iterate improve-clarity "Enhance clarity and readability while maintaining academic rigor."' || exit 1
 
-# Analizar resultados
-run_command 'analyze "Perform a comprehensive analysis of the findings."' || exit 1
+# 6. Publicar
+run_command 'publish pdf en --template "ieee" --output "deep_learning_medical_imaging.pdf"' || exit 1
 
-# Iterar sobre secciones
-run_command 'iterate abstract "Refine the abstract to better highlight key contributions."' || exit 1
-run_command 'iterate introduction "Strengthen the motivation and research questions."' || exit 1
-run_command 'iterate background "Ensure comprehensive coverage of relevant concepts."' || exit 1
-run_command 'iterate methodology "Clarify the review methodology and criteria."' || exit 1
-run_command 'iterate results "Enhance the presentation of findings."' || exit 1
-run_command 'iterate discussion "Deepen the analysis and implications."' || exit 1
-run_command 'iterate conclusion "Strengthen the concluding remarks."' || exit 1
-
-# Generar bibliografía
-run_command 'generate bibliography --format "bibtex" --output "references.bib"' || exit 1
-
-# Generar PDF en inglés
-run_command 'generate-pdf --language "en" --template "ieee" --output "deep_learning_medical_imaging.pdf"' || exit 1
-
-# Generar PDF en español
-run_command 'generate-pdf --language "es" --template "ieee" --output "deep_learning_medical_imaging_es.pdf"' || exit 1
-
-# Finalizar paper
-run_command 'finalize "Review and polish the entire paper."' || exit 1
+# 7. Interactuar con el asistente para mejoras finales
+run_command 'chat "Please review the paper and suggest any final improvements."' || exit 1
 
 echo -e "${GREEN}Example usage for PaperCraftr completed successfully${NC}" 
