@@ -30,6 +30,53 @@ def check_tool_installed(tool_name: str) -> bool:
         return False
 
 
+def check_font_available(font_name: str) -> bool:
+    """
+    Check if a font is available on the system using fc-list.
+
+    Args:
+        font_name (str): The name of the font to check.
+
+    Returns:
+        bool: True if the font is available, False otherwise.
+    """
+    try:
+        result = subprocess.run(
+            ["fc-list", font_name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )  # nosec
+        return result.returncode == 0 and len(result.stdout) > 0
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
+
+def get_available_font() -> str:
+    """
+    Get an available font from a list of preferred fonts.
+    
+    Returns:
+        str: The name of an available font.
+    """
+    preferred_fonts = [
+        "Palatino",
+        "Times New Roman",
+        "Times",
+        "DejaVu Serif",
+        "Liberation Serif",
+        "FreeSerif",
+        "Nimbus Roman",
+        "Bitstream Vera Serif"
+    ]
+    
+    for font in preferred_fonts:
+        if check_font_available(font):
+            return font
+    
+    return "DejaVu Serif"  # Default to a common font that should be available
+
+
 def compile_latex(tex_path: str, output_dir: str, output_name: str = None) -> str:
     """
     Compile a LaTeX file to PDF using a comprehensive compilation process.
@@ -217,6 +264,35 @@ def to_pdf(book_path: str, primary_language: str, translate: str = None) -> str:
 
     console.print(f"Using LaTeX template: [bold]{template_path}[/bold]")
 
+    # Check if Palatino font is available
+    if not check_font_available("Palatino"):
+        console.print("[yellow]Warning:[/yellow] Palatino font not found.")
+        console.print("[yellow]Recommendation:[/yellow] Install Palatino for the best experience.")
+        console.print("[yellow]Installation instructions:[/yellow]")
+        console.print("  - Ubuntu/Debian: sudo apt-get install texlive-fonts-recommended")
+        console.print("  - Fedora: sudo dnf install texlive-palatino")
+        console.print("  - macOS: Palatino is included by default")
+        console.print("  - Windows: Install TeX Live with Palatino package")
+        
+        # Get an available font
+        available_font = get_available_font()
+        console.print(f"[yellow]Using {available_font} as fallback font.[/yellow]")
+        
+        # Create a temporary template with the available font
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+        
+        # Replace Palatino with the available font
+        modified_template = template_content.replace("\\setmainfont{Palatino}", f"\\setmainfont{{{available_font}}}")
+        
+        # Create a temporary template file
+        temp_template_path = Path(book_path) / "templates" / "template_temp.tex"
+        with open(temp_template_path, "w", encoding="utf-8") as f:
+            f.write(modified_template)
+        
+        template_path = temp_template_path
+        console.print(f"Using modified template with {available_font} font: [bold]{template_path}[/bold]")
+
     # Convert markdown to PDF using pandoc
     try:
         subprocess.run(
@@ -236,6 +312,14 @@ def to_pdf(book_path: str, primary_language: str, translate: str = None) -> str:
             f"[red bold]Error:[/red bold] Failed to convert markdown to PDF: {e}"
         )
         raise
+
+    # Clean up temporary template if it was created
+    if "template_temp.tex" in str(template_path):
+        try:
+            os.remove(template_path)
+            console.print("Temporary template removed.")
+        except Exception as e:
+            console.print(f"[yellow]Warning:[/yellow] Failed to remove temporary template: {e}")
 
     console.print(f"PDF generated at [bold]{output_pdf_path}[/bold]")
     return output_pdf_path
