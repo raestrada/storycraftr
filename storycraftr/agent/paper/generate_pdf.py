@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
+from storycraftr.utils.pdf import compile_latex
 from storycraftr.prompts.paper.generate_pdf import (
     GENERATE_LATEX_PROMPT,
     VALIDATE_LATEX_PROMPT
@@ -63,18 +64,9 @@ def generate_pdf_file(book_path: str, language: str, template: str, output: str)
     with open(tex_path, "w", encoding="utf-8") as f:
         f.write(response)
     
-    # Compile PDF
+    # Compile PDF using the common function
     try:
-        # Escapar espacios en las rutas
-        escaped_tex_path = f'"{tex_path}"'
-        escaped_book_path = f'"{book_path}"'
-        escaped_aux_path = f'"{os.path.join(book_path, tex_file.replace(".tex", ".aux"))}"'
-        
-        os.system(f'pdflatex -output-directory={escaped_book_path} {escaped_tex_path}')
-        os.system(f'bibtex {escaped_aux_path}')
-        os.system(f'pdflatex -output-directory={escaped_book_path} {escaped_tex_path}')
-        os.system(f'pdflatex -output-directory={escaped_book_path} {escaped_tex_path}')
-        
-        console.print(f"[green]PDF generated successfully: {os.path.join(book_path, output)}[/green]")
+        compile_latex(tex_path, book_path, output)
     except Exception as e:
         console.print(f"[red]Error generating PDF: {e}[/red]")
+        return None

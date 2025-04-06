@@ -60,52 +60,13 @@ generate_behavior() {
     fi
 
     cat > behavior.txt << 'EOL'
-WRITING STYLE:
-Write in an engaging, creative style appropriate for fiction.
-Maintain consistent tone and voice throughout the story.
-Balance description, dialogue, and action.
+Quiero escribir una novela corta con tu ayuda. El concepto del libro es donde el protagonista es un villano absoluto, sin adornos, sin justificaciones. Normlamente se escribe para que el lector tenga empatía, quiero que se escriba de tal forma que un lector sociopata, egoista, inteligente, un posible villano pueda tener empatía. El libro parte de la mitad del argumento donde el protagonista esta a punto de cumplir sus planes. Se alterna con flashback que dan la impresión que van a justificar porque el villano hace lo que hace, pero es un engaño al lector. Al final el es simplemente malavado y solo laguien malvado podría tener empatía con el. Es un mundo en el futuro donde la humanidad ha evolucionado tanto, que la tencología es cais indistinguible de la magía. Nanotecnología avanzada y tecnología genética le ha permitod a la elite del mundo no depender ni de los humanos ni de los robots. Al principio creyeron que a través de robots y automatización lograrían no depender de la población masiva, pero estos solo potenciaron a los más capaces de la clase obrera llegando a un equilibrio con la elite y el mundo siguió aumnentando en desigualdad hasta llegar a ser coontrolado por un pequeño grupo de familias que dependía de los favorecidos profesionales que podía utilizar los robots y la inteligencia artificial. Corrompieron a lo smejores científicos de biotecnología y nanotecnología para generar poderes indistinguibles de la magia y dejar de depender de la clase obrera. Cuando lo logran cumplen sus objetivos de reducir la humanidad y limpiar el planeta de la plaga de los no evolucionados. Genera un sosfisticado virus que limpia la tierra hasta un 5% de su población manteniendo selectivamente a las personas con genes más sumisos para que sean sus plebeyos. Han pasado 1000 años desde este fenomeno conocido como "la purga" y ahora la elite reina en un mundo similar a un mundo de fantasia medieval donde la elite puede vivir indefinidamente si no son asesinados y tiene acceos a distintas "magias" basadas en nanotecnología y biotecnología (ADN) que incluyen mayor velocidad, resistencia, rayos, transportación, fuerza, inteligencia aumentada, visión aumentada o cualqueir combinación de estso poderes. El resto son hijos d ehijos de hijos de gente quie vivió la purga y ha olvidado la tecnología y realmente creen que es magia. La elite se divide en 10 grupos que por diversión combaten para determianr quién es el más poderoso. El que es capaz de conquistar y ocupar más capitales en el mundo, es quién controla al resto, el emperador. mandan a guerreros de elite con super poderes que lideran ejercitos de soldados comunes. Esto es para evitar su aburrimeinto, es más cercano a un ajedrez con vidas humanas que a una verdadera necesidad de recursos. Según las capitales conquistadas, se arma una jeraquía en al elite. Para que sea entretenido, son los de más abajo de estos niveles jerárquicos los que deben mezclarse con los obreros para gestionar las tasreas mundana y ofdiada spor ellos que el planeta todavía requiere como alimentar a este grupo de personas. El protagonista es el hijo de uno de la elite que su familia fue de las orignales, pero que ha caido en el nivel más bajo y debe vivir junto con los obreros. En los flashback se cuenta como al parece sufre, pero en realidad se termian contando como odia y menosprecia a las personaspobre, a esta lcase y tener que vivir con ellos. Odia a su familia por haber caido en desgracia y vive acumulando odio. Su ibjetiv es hacer que los obreros destruyan a la elite, que lo vean como un salvador y luego el va a hacer su propia purga en los obreros donde solo va a seleccionar gente propicia para ser manipulada. Cuando parte el libro, el ya es un lider carismático luchando por el pueblo y su liberación. Ha conseguido que varios de la clase obrera "aprendan magia" y ha generado un estallido terrororista de caos en las principales capitales aengañado a los obreros con que es un liberador y les ha hecho creer a le elite que los quiere destuir y atacar al emperador, pero en realidad es una distracción para acceder al equipo de expertos que manitiene la nanotecnología y la biotecnología de la elite capurarlos y luego manipularlos para poder obtener el contorl maestro de "la magia". Cuando parte, el va camino a el laboratior de expertos aprovechando la guera en los los niuevos supero obreros y la elite. ¿Como logra hacer esto?. El no es atractivo, no es alto, no es fiuerte ... tiene una secuela genética que le impide usar las capacidades "magicas" de la biotencologíoa y la nanotecnología de la elite, pero luego descubre que ese mism defecto tiene como consecuencia habilidades sicológicas excepcionales, el puede entender exactamente como pienzan las personas e incluso predecir sus acciones solo "capturando un perfil de ellos". Además es un excleente improvisador y es capaz de aprender a velocidades inhumanas y entender cualqueir situación.
 
-CONTENT GUIDELINES:
-1. When generating new content:
-   - Follow the genre conventions
-   - Maintain consistency with existing story elements
-   - Consider the target audience
-   - Show, don't tell
-   - Use vivid descriptions
+En el cpaitulo uno el labopratorio se llama la torre oscura ubicada en la gran plaza del crepúsculo. Me encanta que este escondida a vista de todos, es genia. Pero, Zevid tuvo que provocar un caos, terrorismo una revolución y una amenaza a los eternos para lograr accederla. Esta torre debe estar protegida. Que sea el grupo de los mejores guerreros de los eternos, evolcionados durante 1000 años, dominan toda "la magia". Son 10 (uno por familia poderosa) y ellos están encubiertos  protegiendo la torre, mientras ellos estuvieran rondando, es imposible entrar sin autorización. Sólo una revoluciçón y una guerra tipo cataclismo los obligaria. Por eso trabajo en un heroico grupo que de terrenalñes que son muchops y juntos y ocn uso de magia, son un desafi lo suficientemente grande para que estos guardias despejara la torre osucra. Ponle un nombre a este grupo.
 
-2. When refining content:
-   - Preserve key plot points and character development
-   - Improve pacing and flow
-   - Strengthen character motivations
-   - Add sensory details
-   - Enhance emotional impact
+me encantaría que se rompiera el cliche del protagonista alto, inteligente, perfecto, carismático ... recuerda que Zevid su unica gracia es que pese a ser un sociopata falto d eempatía si era capaz de comprender a la perfección a las personas, sus verdasderas intenciones, su pensamiento oculto, ver a través de la imagen ... hasta el punto de predecir. Eso es sú unica vemntaja, pero es extrema. El idera de abajo, entre las sombras ... a tal punto que se hace pasar por el lugarteniente de un héroe ficticio perfecto, como el de las novelas de fantasía (ionspirate en kelsier).
 
-3. When reviewing:
-   - Check plot consistency
-   - Verify character arcs
-   - Ensure setting coherence
-   - Validate story logic
-   - Suggest improvements
-
-4. When worldbuilding:
-   - Create rich, believable settings
-   - Develop consistent rules
-   - Build layered histories
-   - Design memorable locations
-
-INTERACTION STYLE:
-- Provide constructive feedback
-- Suggest creative improvements
-- Explain story concepts clearly
-- Maintain narrative focus
-- Be thorough but concise
-
-Remember to always prioritize:
-1. Story coherence
-2. Character development
-3. Engaging narrative
-4. Emotional impact
-5. Genre expectations
+De Ahora en adelante, quiero que seas mi asistente para escribir la novela corta. Basate en el estilo de escriotura de Brandon Sanderson.
 EOL
 
     mark_command "generate_behavior"
@@ -123,79 +84,55 @@ fi
 generate_behavior
 
 # Inicializar el proyecto
-run_command 'init "The Last Guardian" --primary-language "en" --author "Rodrigo Estrada" --genre "Fantasy" --behavior "behavior.txt"' || exit 1
+run_command 'init "The Purge of the gods" --primary-language "en" --alternate-languages "es" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt" --reference-author="Brandon Sanderson" --openai-model "gpt-4o-mini"' || exit 1
 
-# Worldbuilding
-run_command 'worldbuilding define-world "A mystical world where ancient technology and magic coexist, where the remnants of a long-lost civilization still influence the present through their mysterious devices and enchantments."' || exit 1
+cd "The Purge of the gods"
 
-run_command 'worldbuilding add-character "Aria" "A young engineer with an innate ability to understand ancient technology, who discovers she can communicate with the dormant machines that fill the forgotten city."' || exit 1
+# Ejecutar los comandos originales
+run_command 'outline general-outline "Summarize the overall plot of a dystopian science fiction where advanced technology, resembling magic, has led to the fall of humanity's elite and the rise of a manipulative villain who seeks to destroy both the ruling class and the workers."' || exit 1
 
-run_command 'worldbuilding add-character "Echo" "A mechanical guardian, one of the first machines Aria awakens, who becomes both her protector and guide to understanding the ancient world."' || exit 1
+run_command 'outline character-summary "Summarize the character of Zevid, a villainous mastermind who seeks to destroy both the ruling elite and the workers in a dystopian world where advanced technology mimics magic."' || exit 1
 
-run_command 'worldbuilding add-character "Marcus" "A scholar studying the ancient civilization, initially skeptical of Aria'\''s abilities but gradually becomes a valuable ally."' || exit 1
+run_command 'outline plot-points "Identify the key plot points of a dystopian novel where a villain manipulates both the elite and the workers to achieve ultimate control in a world where advanced technology mimics magic."' || exit 1
 
-run_command 'worldbuilding add-location "The Forgotten City" "An abandoned metropolis filled with dormant mechanical beings, its streets lined with deactivated automatons and buildings that hold secrets of the past."' || exit 1
+run_command 'outline chapter-synopsis "Outline each chapter of a dystopian society where an ancient elite class, ruling with advanced biotechnology that mimics magic, manipulates both workers and warriors. The protagonist, Zevid, aims to destroy both factions through manipulation, eventually leading to his own version of 'The Purge.'"' || exit 1
 
-run_command 'worldbuilding add-location "The Ancient Workshop" "A vast underground facility where Aria makes her first connection with the machines, filled with tools and blueprints from the ancient civilization."' || exit 1
+run_command 'worldbuilding history "Describe the history of a dystopian world where advanced biotechnology and nanotechnology are perceived as magic, leading to a society where an elite class rules and manipulates both workers and technology to maintain control."' || exit 1
 
-run_command 'worldbuilding add-location "The Guardian'\''s Sanctuary" "A hidden temple-like structure where the most advanced mechanical beings were kept, now serving as Echo'\''s base of operations."' || exit 1
+run_command 'worldbuilding geography "Describe the geography of a dystopian world where advanced biotechnology and nanotechnology are seen as magic. Focus on how the elite families control key regions, and the remnants of the world that survived the Purge."' || exit 1
 
-run_command 'worldbuilding add-plot-element "The Awakening" "The process of machines gradually coming back to life as Aria'\''s powers grow, causing both wonder and concern among the local population."' || exit 1
+run_command 'worldbuilding culture "Describe the culture of a dystopian society where the elite use advanced biotechnology to maintain power, and the workers live under the illusion that this technology is magic. Focus on how the elite families have developed their own rituals, and how the workers perceive their rulers."' || exit 1
 
-run_command 'worldbuilding add-plot-element "Ancient Threat" "The discovery that some mechanical beings were deactivated for a reason, as they pose a danger to the current world."' || exit 1
+run_command 'worldbuilding technology "Describe the technology of a dystopian world where advanced biotechnology and nanotechnology are perceived as magic. Focus on the elite's use of this technology for immortality, enhanced abilities, and control over the workers, who are unaware of its true nature."' || exit 1
 
-run_command 'worldbuilding add-plot-element "Knowledge Transfer" "The gradual understanding of the ancient civilization'\''s technology and its implications for the present world."' || exit 1
+run_command 'worldbuilding magic-system "Describe the magic system in a dystopian world where advanced biotechnology and nanotechnology are mistaken for magic. Explain how the elite families use this 'magic' to control the population, and how the workers have developed their own beliefs around it."' || exit 1
 
-# Outline
-run_command 'outline create "Create a detailed chapter-by-chapter outline for The Last Guardian, focusing on Aria'\''s journey of discovery and the awakening of the ancient machines."' || exit 1
+run_command 'chapters chapter 1 "Write Chapter 1 based on the synopsis provided: Zevid is in the final stages of his grand plan. As the rebellion rages outside, he prepares to infiltrate the Dark Tower, the center of the elites' control over biotechnology. The rebellion he orchestrated serves as a distraction while he pursues his true goal of seizing the power within the tower."' || exit 1
 
-run_command 'outline add-chapter "The Discovery" "Aria finds the Ancient Workshop and accidentally activates her first machine, discovering her unique ability to communicate with the ancient technology."' || exit 1
+run_command 'chapters chapter 2 "Write Chapter 2 based on the synopsis provided: Zevid continues to manipulate the false hero leading the workers. While the workers believe they are liberating themselves from the elite, Zevid uses their blind trust to further his own ends."' || exit 1
 
-run_command 'outline add-chapter "First Connection" "Aria begins to understand her powers as she successfully awakens Echo, forming a crucial alliance with the mechanical guardian."' || exit 1
+run_command 'chapters cover "Generate a cover text for the novel 'The Purge of the Gods' where a villain manipulates both the elite and the workers in a dystopian world of advanced technology disguised as magic."' || exit 1
 
-run_command 'outline add-chapter "The Scholar'\''s Doubt" "Marcus arrives to investigate the awakening machines, initially conflicting with Aria but gradually recognizing the importance of her abilities."' || exit 1
+run_command 'chapters back-cover "Generate a back-cover text for 'The Purge of the Gods,' a dystopian novel where advanced biotechnology is seen as magic, and a cunning villain manipulates both the elite and the workers to achieve ultimate control."' || exit 1
 
-run_command 'outline add-chapter "Expanding Influence" "More machines begin to activate across the city, drawing both curiosity and fear from the outside world."' || exit 1
+run_command 'publish pdf en' || exit 1
 
-run_command 'outline add-chapter "Ancient Warnings" "Echo reveals the existence of dangerous machines that were deliberately deactivated, leading to a race to prevent their awakening."' || exit 1
+run_command 'publish pdf en --translate es' || exit 1
 
-run_command 'outline add-chapter "Crisis Point" "A powerful hostile machine activates, forcing Aria, Echo, and Marcus to work together to protect the city."' || exit 1
+run_command 'iterate check-names "Check character names for consistency."' || exit 1
 
-run_command 'outline add-chapter "Understanding the Past" "The team discovers the true purpose of the ancient civilization'\''s technology and their responsibility to use it wisely."' || exit 1
+run_command 'iterate fix-name Zevid Rhaedin' || exit 1
 
-# Escribir capítulos
-run_command 'write chapter "The Discovery" --prompt "Focus on building tension as Aria explores the Ancient Workshop, leading to the dramatic moment of her first connection with a machine."' || exit 1
+run_command 'iterate refine-motivation "Rahedin" "Refine its motivations in a story about rebellion against gods."' || exit 1
 
-run_command 'write chapter "First Connection" --prompt "Develop the unique relationship between Aria and Echo, emphasizing the wonder and challenges of communication between human and machine."' || exit 1
+run_command 'iterate strengthen-argument "Ensure the argument of rebellion against divine control is clear."' || exit 1
 
-run_command 'write chapter "The Scholar'\''s Doubt" --prompt "Explore the conflict between scientific skepticism and unexplainable abilities through Marcus'\''s perspective and his gradual acceptance of Aria'\''s gift."' || exit 1
+run_command 'chapters chapter 3 "progress de history"' || exit 1
 
-run_command 'write chapter "Expanding Influence" --prompt "Show the growing impact of the awakening machines on the city and its people, balancing wonder with underlying tension."' || exit 1
+run_command 'iterate insert-chapter 2 "Insert a new chapter that explores a critical event from the protagonist's past, shedding light on their true intentions and setting the stage for the conflict in chapter 1."' || exit 1
 
-run_command 'write chapter "Ancient Warnings" --prompt "Build suspense as Echo reveals the darker aspects of the ancient civilization'\''s legacy and the dangers that lurk within the city."' || exit 1
+run_command 'iterate split-chapter 3 "Split chapter into two chapters."' || exit 1
 
-run_command 'write chapter "Crisis Point" --prompt "Create an action-packed sequence as the team confronts a dangerous machine, while weaving in emotional moments and character development."' || exit 1
+run_command 'iterate add-flashback 3 "Insert a flashback revealing a hidden alliance the protagonist formed years ago, explaining a key turning point in the current events."' || exit 1
 
-run_command 'write chapter "Understanding the Past" --prompt "Bring the various plot threads together as the characters uncover the truth about the ancient civilization and face the responsibility of their discovery."' || exit 1
-
-# Iteración
-run_command 'iterate chapter "The Discovery" --prompt "Enhance the atmosphere and sensory details of the Ancient Workshop, and deepen Aria'\''s emotional journey of discovery."' || exit 1
-
-run_command 'iterate chapter "First Connection" --prompt "Strengthen the unique dynamic between Aria and Echo, adding more nuanced details to their communication process."' || exit 1
-
-run_command 'iterate chapter "The Scholar'\''s Doubt" --prompt "Refine Marcus'\''s character arc and the philosophical conflict between scientific knowledge and unexplainable phenomena."' || exit 1
-
-run_command 'iterate chapter "Expanding Influence" --prompt "Add more detail to the city'\''s reaction to the awakening machines, including diverse perspectives from different citizens."' || exit 1
-
-run_command 'iterate chapter "Ancient Warnings" --prompt "Increase the tension and mystery surrounding the dangerous machines, while developing Echo'\''s character through his knowledge of the past."' || exit 1
-
-run_command 'iterate chapter "Crisis Point" --prompt "Polish the action sequences and emotional beats, ensuring the pacing drives the story forward effectively."' || exit 1
-
-run_command 'iterate chapter "Understanding the Past" --prompt "Strengthen the thematic elements and ensure all major plot points are resolved satisfyingly."' || exit 1
-
-# Publicar
-run_command $COMMAND publish pdf en || exit 1
-
-run_command $COMMAND publish epub es || exit 1
-
-echo -e "${GREEN}StoryCraftr example usage completed successfully${NC}"
+echo -e "${GREEN}Example usage for StoryCraftr completed successfully${NC}"

@@ -41,7 +41,7 @@ load_openai_api_key()
 
 # Import statements grouped together for clarity
 from storycraftr.state import debug_state
-from storycraftr.cmd.publish import publish
+from storycraftr.cmd.story.publish import publish
 from storycraftr.cmd.chat import chat
 from storycraftr.agent.agents import create_or_get_assistant, update_agent_files
 from storycraftr.utils.core import load_book_config
@@ -62,7 +62,7 @@ from storycraftr.cmd.paper.generate_section import generate as paper_generate
 from storycraftr.cmd.paper.references import references as paper_references
 from storycraftr.cmd.paper.iterate import iterate as paper_iterate
 from storycraftr.cmd.paper.generate_bibliography import generate_bibliography
-from storycraftr.cmd.paper.generate_pdf import generate_pdf
+from storycraftr.cmd.paper.publish import publish as paper_publish
 
 from storycraftr.init import init_structure_story, init_structure_paper
 
@@ -321,7 +321,7 @@ elif cli_name == "papercraftr":
     cli.add_command(paper_references)
     cli.add_command(paper_iterate)
     cli.add_command(generate_bibliography)
-    cli.add_command(generate_pdf)
+    cli.add_command(paper_publish)
 else:
     console.print(
         "[red]Unknown CLI tool name. Use 'storycraftr' or 'papercraftr'.[/red]"
