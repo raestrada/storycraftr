@@ -20,6 +20,8 @@ from storycraftr.prompts.paper.generate_section import (
     DISCUSSION_PROMPT_REFINE,
     CONCLUSION_PROMPT_NEW,
     CONCLUSION_PROMPT_REFINE,
+    CUSTOM_SECTION_PROMPT_NEW,
+    CUSTOM_SECTION_PROMPT_REFINE,
 )
 
 console = Console()
@@ -92,4 +94,34 @@ def generate_discussion(book_path: str, prompt: str) -> str:
 def generate_conclusion(book_path: str, prompt: str) -> str:
     """Generate or refine the conclusion section."""
     return _generate_section(book_path, prompt, "conclusion",
-                           CONCLUSION_PROMPT_NEW, CONCLUSION_PROMPT_REFINE) 
+                           CONCLUSION_PROMPT_NEW, CONCLUSION_PROMPT_REFINE)
+
+def generate_custom_section(book_path: str, prompt: str, section_title: str, order: int) -> str:
+    """
+    Generate or refine a custom section with a specified title and order.
+    
+    Args:
+        book_path (str): Path to the book directory
+        prompt (str): Instructions for the section content
+        section_title (str): Title of the custom section
+        order (int): Order number for the section (between methodology and results)
+        
+    Returns:
+        str: Generated section content
+    """
+    # Create a sanitized filename from the section title
+    section_name = f"custom_{order}_{section_title.lower().replace(' ', '_')}"
+    
+    # Format the prompts with the section title
+    new_prompt = CUSTOM_SECTION_PROMPT_NEW.format(
+        section_title=section_title,
+        paper_title=load_book_config(book_path).book_name,
+        prompt=prompt
+    )
+    
+    refine_prompt = CUSTOM_SECTION_PROMPT_REFINE.format(
+        section_title=section_title,
+        prompt=prompt
+    )
+    
+    return _generate_section(book_path, prompt, section_name, new_prompt, refine_prompt) 

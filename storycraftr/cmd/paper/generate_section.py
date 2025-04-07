@@ -8,7 +8,8 @@ from storycraftr.agent.paper.generate_section import (
     generate_methodology,
     generate_results,
     generate_discussion,
-    generate_conclusion
+    generate_conclusion,
+    generate_custom_section
 )
 
 console = Console()
@@ -139,3 +140,36 @@ def conclusion(prompt: str, book_path: str = None):
         return None
 
     generate_conclusion(book_path, prompt)
+
+@generate.command()
+@click.option(
+    "--book-path",
+    type=click.Path(),
+    help="Path to the paper directory",
+    required=False
+)
+@click.option(
+    "--order",
+    type=int,
+    help="Order number for the section (between methodology and results)",
+    required=True
+)
+@click.argument("section_title", type=str)
+@click.argument("prompt", type=str)
+def custom(section_title: str, prompt: str, order: int, book_path: str = None):
+    """
+    Generate or refine a custom section with a specified title and order.
+    Uses OpenAI to create a custom section that fits between methodology and results.
+
+    Args:
+        section_title (str): Title of the custom section.
+        prompt (str): Instructions for the section content.
+        order (int): Order number for the section (between methodology and results).
+        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
+    """
+    book_path = book_path or os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    generate_custom_section(book_path, prompt, section_title, order)

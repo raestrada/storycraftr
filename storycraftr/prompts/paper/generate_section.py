@@ -275,4 +275,46 @@ Strengthen:
    - Specific directions
    - Research opportunities
    - Field advancement
+"""
+
+CUSTOM_SECTION_PROMPT_NEW = """
+Generate a custom section titled "{section_title}" for the paper titled "{paper_title}" based on this input: {prompt}.
+
+Include:
+1. Main Content
+   - Key concepts
+   - Supporting evidence
+   - Analysis and interpretation
+
+2. Structure
+   - Clear organization
+   - Logical flow
+   - Appropriate transitions
+
+3. Integration
+   - Connection to methodology
+   - Preparation for results
+   - Alignment with research objectives
+
+Format as a cohesive section that fits naturally between the methodology and results sections.
+"""
+
+CUSTOM_SECTION_PROMPT_REFINE = """
+Refine the existing custom section titled "{section_title}" based on this input: {prompt}.
+
+Enhance:
+1. Content Quality
+   - Depth of analysis
+   - Supporting evidence
+   - Technical accuracy
+
+2. Structure
+   - Logical flow
+   - Clear transitions
+   - Appropriate organization
+
+3. Integration
+   - Connection to other sections
+   - Alignment with research objectives
+   - Preparation for results section
 """ 
