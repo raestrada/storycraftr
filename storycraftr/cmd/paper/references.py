@@ -8,6 +8,7 @@ from storycraftr.agent.paper.references import (
     format_references,
     check_citations,
     generate_citation,
+    generate_bibtex,
 )
 
 console = Console()
@@ -121,3 +122,32 @@ def cite(reference_info: str, citation_format: str, book_path: str = None):
         return None
 
     generate_citation(book_path, reference_info, citation_format)
+
+@references.command()
+@click.option(
+    "--book-path",
+    type=click.Path(),
+    help="Path to the paper directory",
+    required=False
+)
+@click.option(
+    "--style",
+    "bibtex_style",
+    default="IEEEtran",
+    help="BibTeX style to use (e.g., IEEEtran, plain, unsrt)"
+)
+def bibtex(bibtex_style: str, book_path: str = None):
+    """
+    Generate BibTeX references file for the paper.
+    Uses OpenAI to format references in proper BibTeX format.
+
+    Args:
+        bibtex_style (str): The BibTeX style to use.
+        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
+    """
+    book_path = book_path or os.getcwd()
+
+    if not load_book_config(book_path):
+        return None
+
+    generate_bibtex(book_path, bibtex_style)

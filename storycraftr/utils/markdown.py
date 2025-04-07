@@ -319,6 +319,25 @@ def consolidate_paper_md(book_path: str, primary_language: str, translate: str =
                 
                 consolidated_content.append(content.strip() + "\n\n")
     
+    # Add references section if it exists
+    references_path = paper_path / "references" / "references.md"
+    if references_path.exists():
+        with references_path.open("r", encoding="utf-8") as f:
+            references_content = f.read()
+            
+            # Translate references if translation is requested
+            if translate:
+                translation_prompt = f"Translate the following references from {primary_language} to {translate}. Maintain all formatting, including markdown syntax, LaTeX formulas, and code blocks. Only translate the actual text content:\n\n{references_content}"
+                references_content = create_message(
+                    book_path,
+                    thread_id=thread.id,
+                    content=translation_prompt,
+                    assistant=assistant
+                )
+            
+            consolidated_content.append("# References\n\n")
+            consolidated_content.append(references_content.strip() + "\n\n")
+    
     # Write the consolidated content
     output_file_name = f"paper-{primary_language}.md"
     if translate:

@@ -14,6 +14,7 @@ from storycraftr.prompts.paper.references import (
     FORMAT_REFERENCES_PROMPT,
     CHECK_CITATIONS_PROMPT,
     GENERATE_CITATION_PROMPT,
+    GENERATE_BIBTEX_PROMPT,
 )
 
 console = Console()
@@ -196,4 +197,50 @@ def generate_citation(book_path: str, prompt: str, citation_format: str) -> str:
     console.print("[bold green]✔ Citation generated successfully[/bold green]")
 
     update_agent_files(book_path, assistant)
-    return citation_content 
+    return citation_content
+
+def generate_bibtex(book_path: str, bibtex_style: str) -> str:
+    """
+    Generate BibTeX references file for the paper.
+
+    Args:
+        book_path (str): Path to the paper's directory.
+        bibtex_style (str): The BibTeX style to use.
+
+    Returns:
+        str: The generated BibTeX content.
+    """
+    console.print("[bold blue]Generating BibTeX references...[/bold blue]")
+
+    # Load configuration and setup
+    config = load_book_config(book_path)
+    assistant = create_or_get_assistant(book_path)
+    thread = get_thread(book_path)
+    file_path = os.path.join(book_path, "references", "references.bib")
+    paper_title = config.book_name
+
+    # Generate BibTeX references using the assistant
+    content = GENERATE_BIBTEX_PROMPT.format(
+        paper_title=paper_title,
+        bibtex_style=bibtex_style
+    )
+
+    bibtex_content = create_message(
+        book_path,
+        thread_id=thread.id,
+        content=content,
+        assistant=assistant,
+        file_path=file_path
+    )
+
+    # Save the BibTeX content
+    save_to_markdown(
+        book_path,
+        "references/references.bib",
+        "BibTeX References",
+        bibtex_content
+    )
+    console.print("[bold green]✔ BibTeX references generated successfully[/bold green]")
+
+    update_agent_files(book_path, assistant)
+    return bibtex_content 

@@ -6,6 +6,7 @@ from rich.console import Console
 from storycraftr.utils.core import load_book_config
 from storycraftr.utils.markdown import consolidate_paper_md
 from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message
+from storycraftr.agent.paper.references import generate_bibtex
 
 console = Console()
 
@@ -41,7 +42,13 @@ def publish():
     help="Path to the paper directory",
     required=False
 )
-def pdf(primary_language: str, translate: str = None, template: str = None, book_path: str = None):
+@click.option(
+    "--bibtex-style",
+    type=str,
+    default="IEEEtran",
+    help="BibTeX style to use (e.g., IEEEtran, plain, unsrt)"
+)
+def pdf(primary_language: str, translate: str = None, template: str = None, book_path: str = None, bibtex_style: str = "IEEEtran"):
     """
     Publish the paper as a PDF using pandoc and LaTeX.
 
@@ -50,6 +57,7 @@ def pdf(primary_language: str, translate: str = None, template: str = None, book
         translate (str, optional): The language to translate the paper into before publishing.
         template (str, optional): Path to a custom LaTeX template.
         book_path (str, optional): Path to the paper directory.
+        bibtex_style (str, optional): BibTeX style to use. Defaults to IEEEtran.
     """
     book_path = book_path or os.getcwd()
 
@@ -121,6 +129,12 @@ def pdf(primary_language: str, translate: str = None, template: str = None, book
             console.print("Please install MiKTeX from https://miktex.org/download")
             return
 
+        # Generate BibTeX references if needed
+        bibtex_file = Path(book_path) / "references" / "references.bib"
+        if not bibtex_file.exists():
+            console.print("[bold blue]Generating BibTeX references...[/bold blue]")
+            generate_bibtex(book_path, bibtex_style)
+
         # Consolidate all markdown files into one
         consolidated_md = consolidate_paper_md(book_path, primary_language, translate)
         if not consolidated_md:
@@ -183,7 +197,9 @@ def pdf(primary_language: str, translate: str = None, template: str = None, book
             "-V", "CJKmainfont=Noto Sans CJK JP",
             "-V", f"title={title}",
             "-V", f"author={author_str}",
-            "-V", f"keywords={keywords_str}"
+            "-V", f"keywords={keywords_str}",
+            "--bibliography=" + str(bibtex_file),
+            "--csl=" + bibtex_style + ".csl"
         ]
 
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
