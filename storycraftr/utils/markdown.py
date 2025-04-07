@@ -243,25 +243,27 @@ def consolidate_paper_md(book_path: str, primary_language: str, translate: str =
     section_order = [
         "sections/abstract.md",
         "sections/introduction.md",
+    ]
+
+    # Find custom sections in the sections directory
+    sections_dir = paper_path / "sections"
+    custom_sections = []
+    if sections_dir.exists():
+        for file in sections_dir.iterdir():
+            if file.name.startswith("custom_") and file.suffix == ".md":
+                custom_sections.append(f"sections/{file.name}")
+
+    # Add custom sections after introduction
+    section_order.extend(sorted(custom_sections))
+
+    # Add remaining standard sections
+    section_order.extend([
         "sections/related_work.md",
         "sections/methodology.md",
         "sections/results.md",
         "sections/discussion.md",
         "sections/conclusion.md",
-        "sections/references.md"
-    ]
-    
-    # Find custom sections (any .md file in the sections directory that's not in the standard order)
-    custom_sections = []
-    sections_dir = paper_path / "sections"
-    if sections_dir.exists():
-        for file in sections_dir.glob("*.md"):
-            file_name = file.name
-            if file_name not in [Path(s).name for s in section_order]:
-                custom_sections.append(f"sections/{file_name}")
-    
-    # Add custom sections to the order
-    section_order.extend(custom_sections)
+    ])
     
     # Start with the title and metadata
     consolidated_content = []

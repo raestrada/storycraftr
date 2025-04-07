@@ -7,6 +7,7 @@ import storycraftr.templates.folder_story
 from storycraftr.agent.agents import create_or_get_assistant
 from storycraftr.templates.tex import TEMPLATE_TEX
 from storycraftr.templates.paper_tex import TEMPLATE_PAPER_TEX
+from storycraftr.templates.ieee_tex import TEMPLATE_IEEE_TEX
 
 console = Console()
 
@@ -172,14 +173,10 @@ def init_structure_paper(
     template_file.write_text(TEMPLATE_PAPER_TEX, encoding="utf-8")
     console.print(f"[green]LaTeX template created: {template_file}[/green]")
 
-    # Copy IEEE template
-    ieee_template = Path(__file__).parent / "templates" / "ieee.tex"
-    if ieee_template.exists():
-        ieee_template_dest = template_dir / "ieee.tex"
-        ieee_template_dest.write_text(ieee_template.read_text(), encoding="utf-8")
-        console.print(f"[green]IEEE template copied: {ieee_template_dest}[/green]")
-    else:
-        console.print("[yellow]Warning: IEEE template not found in package[/yellow]")
+    # Create IEEE template
+    ieee_template_file = template_dir / "ieee.tex"
+    ieee_template_file.write_text(TEMPLATE_IEEE_TEX, encoding="utf-8")
+    console.print(f"[green]IEEE template created: {ieee_template_file}[/green]")
 
     # Initialize the assistant
     create_or_get_assistant(paper_path)

@@ -1,3 +1,2 @@
 generate_behavior
-poetry run papercraftr init "Deep Learning in Medical Imaging" --primary-language "en" --author "Rodrigo Estrada" --keywords "deep learning, medical imaging, CNN, diagnostic systems" --behavior "behavior.txt"
 poetry run papercraftr init "Deep Learning in Medical Imaging" --openai-model "gpt-4o-mini" --primary-language "en" --author "Rodrigo Estrada" --keywords "deep learning, medical imaging, CNN, diagnostic systems" --behavior "behavior.txt"

@@ -173,7 +173,7 @@ run_command 'iterate reinforce-ideas "Strengthen the core arguments and technica
 run_command 'iterate improve-clarity "Enhance clarity and readability while maintaining academic rigor."' || exit 1
 
 # 6. Publicar
-run_command 'publish pdf en --template "ieee" --output "deep_learning_medical_imaging.pdf"' || exit 1
+run_command 'publish pdf' || exit 1
 
 # 7. Interactuar con el asistente para mejoras finales
 run_command 'chat "Please review the paper and suggest any final improvements."' || exit 1
