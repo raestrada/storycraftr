@@ -3,7 +3,7 @@ import click
 from rich.console import Console
 from pathlib import Path
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.paper.iterate import reinforce_ideas, improve_clarity
+from storycraftr.agent.paper.iterate import reinforce_ideas as agent_reinforce_ideas, improve_clarity as agent_improve_clarity
 
 console = Console()
 
@@ -29,7 +29,7 @@ def reinforce_ideas(prompt: str, book_path: str = None):
     book_path = book_path or os.getcwd()
     if not load_book_config(book_path):
         return None
-    reinforce_ideas(book_path, prompt)
+    agent_reinforce_ideas(book_path, prompt)
 
 
 @iterate.command()
@@ -45,4 +45,4 @@ def improve_clarity(prompt: str, book_path: str = None):
     book_path = book_path or os.getcwd()
     if not load_book_config(book_path):
         return None
-    improve_clarity(book_path, prompt)
+    agent_improve_clarity(book_path, prompt)
