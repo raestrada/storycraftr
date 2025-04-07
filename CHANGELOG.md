@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.9.1-beta2] - 2024-11-01
+## [0.10.0-beta3] - 2024-11-01
 
 ### Added
 
@@ -9,7 +9,7 @@
 - **Behavior File Enhancements**: Improved the behavior file to guide the AI's writing process more effectively, ensuring alignment with the writer's vision.
 - **Interactive Chat Enhancements**: Enhanced the chat feature to support more dynamic interactions and command executions directly from the chat interface.
 
-## [0.9.1-beta2] - 2024-10-30
+## [0.10.0-beta3] - 2024-10-30
 
 ### Added
 

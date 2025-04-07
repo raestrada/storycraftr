@@ -166,14 +166,9 @@ def init_structure_paper(
     behavior_file.write_text(behavior_content, encoding="utf-8")
     console.print(f"[green]Behavior file created: {behavior_file}[/green]")
 
-    # Create LaTeX template
+    # Create IEEE template
     template_dir = Path(paper_path) / "templates"
     template_dir.mkdir(exist_ok=True)
-    template_file = template_dir / "template.tex"
-    template_file.write_text(TEMPLATE_PAPER_TEX, encoding="utf-8")
-    console.print(f"[green]LaTeX template created: {template_file}[/green]")
-
-    # Create IEEE template
     ieee_template_file = template_dir / "ieee.tex"
     ieee_template_file.write_text(TEMPLATE_IEEE_TEX, encoding="utf-8")
     console.print(f"[green]IEEE template created: {ieee_template_file}[/green]")

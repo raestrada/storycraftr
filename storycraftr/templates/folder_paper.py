@@ -14,13 +14,8 @@ files_to_create = [
     # Sections
     {
         "folder": "sections",
-        "filename": "core_question.md",
-        "content": "# Core Research Question\n\nDefine the main research question or hypothesis here.",
-    },
-    {
-        "folder": "sections",
-        "filename": "contribution.md",
-        "content": "# Contribution\n\nDescribe the main contribution or novelty of the paper.",
+        "filename": "abstract.md",
+        "content": "# Abstract\n\nAbstract of the paper.",
     },
     {
         "folder": "sections",
@@ -29,8 +24,8 @@ files_to_create = [
     },
     {
         "folder": "sections",
-        "filename": "literature_review.md",
-        "content": "# Literature Review\n\nOverview of existing research.",
+        "filename": "related_work.md",
+        "content": "# Related Work\n\nOverview of existing research.",
     },
     {
         "folder": "sections",
@@ -52,49 +47,28 @@ files_to_create = [
         "filename": "conclusion.md",
         "content": "# Conclusion\n\nSummary and closing thoughts.",
     },
-    {
-        "folder": "sections",
-        "filename": "future_work.md",
-        "content": "# Future Work\n\nSuggestions for future research.",
-    },
     # References
     {
         "folder": "references",
         "filename": "references.md",
         "content": "# References\n\nBibliographic references used in the paper.",
     },
-    # Reviews
     {
-        "folder": "reviews",
-        "filename": "consistency_check.md",
-        "content": "# Consistency Check\n\nResults of consistency verification across sections.",
+        "folder": "references",
+        "filename": "references.bib",
+        "content": "% References for citations in BibTeX format.",
     },
+    # Reviews
     {
         "folder": "reviews",
         "filename": "citation_check.md",
         "content": "# Citation Check\n\nResults of citation verification and formatting.",
     },
+    # Output
     {
-        "folder": "reviews",
-        "filename": "format_check.md",
-        "content": "# Format Check\n\nResults of paper formatting verification.",
-    },
-    # Analysis
-    {
-        "folder": "analysis",
-        "filename": "analysis_plan.md",
-        "content": "# Analysis Plan\n\nDetailed plan for data analysis.",
-    },
-    {
-        "folder": "analysis",
-        "filename": "results_summary.md",
-        "content": "# Results Summary\n\nSummary of analysis results.",
-    },
-    # Concept Maps
-    {
-        "folder": "concept_maps",
-        "filename": "research_framework.md",
-        "content": "# Research Framework\n\nConceptual framework and theoretical relationships.",
+        "folder": "output",
+        "filename": ".gitkeep",
+        "content": "",
     },
     # Figures
     {
@@ -107,33 +81,5 @@ files_to_create = [
         "folder": "tables",
         "filename": ".gitkeep",
         "content": "",
-    },
-    # Bibliography
-    {
-        "folder": "bibliography",
-        "filename": "references.bib",
-        "content": "% References for citations in BibTeX format.",
-    },
-    {
-        "folder": "bibliography",
-        "filename": "notes.md",
-        "content": "# Annotated Bibliography\n\nResearch notes and annotations.",
-    },
-    # Drafts
-    {
-        "folder": "drafts",
-        "filename": "draft_01.md",
-        "content": "# Draft 01\n\nInitial draft of the paper.",
-    },
-    {
-        "folder": "drafts",
-        "filename": "draft_final.md",
-        "content": "# Final Draft\n\nFinal draft before submission.",
-    },
-    # Templates
-    {
-        "folder": "templates",
-        "filename": "template.tex",
-        "content": "% Main LaTeX template for publication.\n\\documentclass{article}\n\\begin{document}\n\\title{Your Paper Title}\n\\maketitle\n\\end{document}",
     },
 ]
