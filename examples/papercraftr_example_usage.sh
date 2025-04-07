@@ -140,7 +140,7 @@ fi
 generate_behavior
 
 # Inicializar el proyecto
-run_command 'init "Deep Learning in Medical Imaging" --primary-language "en" --author "Rodrigo Estrada" --keywords "deep learning, medical imaging, CNN, diagnostic systems" --behavior "behavior.txt"' || exit 1
+run_command 'init "Deep Learning in Medical Imaging" --openai-model "gpt-4o-mini" --primary-language "en" --author "Rodrigo Estrada" --keywords "deep learning, medical imaging, CNN, diagnostic systems" --behavior "behavior.txt"' || exit 1
 
 cd "Deep Learning in Medical Imaging"
 
@@ -153,6 +153,11 @@ run_command 'organize-lit lit-summary "Review and summarize current literature o
 # 3. Generar secciones
 run_command 'generate introduction "Write an introduction that establishes the importance of deep learning in medical imaging."' || exit 1
 run_command 'generate methodology "Detail the systematic review methodology used in this paper."' || exit 1
+
+# Custom sections between methodology and results
+run_command 'generate custom --order 1 "Theoretical Framework" "Develop a theoretical framework that explains the connection between deep learning architectures and medical image analysis."' || exit 1
+run_command 'generate custom --order 2 "Data Collection" "Describe the data collection process, including sources, criteria for inclusion/exclusion, and data extraction methods."' || exit 1
+
 run_command 'generate results "Present the findings on deep learning applications in medical imaging."' || exit 1
 run_command 'generate discussion "Discuss the implications, limitations, and future directions of deep learning in medical imaging."' || exit 1
 run_command 'generate conclusion "Summarize key findings and contributions to the field."' || exit 1
