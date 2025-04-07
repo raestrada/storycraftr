@@ -172,5 +172,14 @@ def init_structure_paper(
     template_file.write_text(TEMPLATE_PAPER_TEX, encoding="utf-8")
     console.print(f"[green]LaTeX template created: {template_file}[/green]")
 
+    # Copy IEEE template
+    ieee_template = Path(__file__).parent / "templates" / "ieee.tex"
+    if ieee_template.exists():
+        ieee_template_dest = template_dir / "ieee.tex"
+        ieee_template_dest.write_text(ieee_template.read_text(), encoding="utf-8")
+        console.print(f"[green]IEEE template copied: {ieee_template_dest}[/green]")
+    else:
+        console.print("[yellow]Warning: IEEE template not found in package[/yellow]")
+
     # Initialize the assistant
     create_or_get_assistant(paper_path)

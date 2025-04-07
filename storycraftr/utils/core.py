@@ -121,7 +121,29 @@ def load_book_config(book_path: str):
                 return None
 
         config_data = json.loads(config_path.read_text(encoding="utf-8"))
-        return SimpleNamespace(**config_data)
+        
+        # Ensure required fields exist with default values
+        default_config = {
+            "book_name": "Untitled Paper",
+            "authors": [],
+            "primary_language": "en",
+            "alternate_languages": [],
+            "default_author": "Unknown Author",
+            "genre": "research",
+            "license": "CC BY",
+            "reference_author": "",
+            "keywords": "",
+            "cli_name": "papercraftr",
+            "openai_url": "https://api.openai.com/v1",
+            "openai_model": "gpt-4o",
+            "multiple_answer": True
+        }
+        
+        # Update default config with actual config data
+        for key, value in config_data.items():
+            default_config[key] = value
+            
+        return SimpleNamespace(**default_config)
 
     except Exception as e:
         console.print(f"[red]Error loading configuration: {str(e)}[/red]")
