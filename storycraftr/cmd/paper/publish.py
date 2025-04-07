@@ -127,6 +127,18 @@ def pdf(primary_language: str, translate: str = None, template: str = None, book
             console.print("[red bold]Error:[/red bold] Failed to consolidate markdown files.")
             return
 
+        # Get metadata from config
+        config = load_book_config(book_path)
+        title = getattr(config, 'book_name', 'Untitled Paper')
+        authors = getattr(config, 'authors', [])
+        keywords = getattr(config, 'keywords', [])
+        
+        # Format authors as a string
+        author_str = " and ".join(authors) if isinstance(authors, list) else authors
+        
+        # Format keywords as a string
+        keywords_str = ", ".join(keywords) if isinstance(keywords, list) else keywords
+
         # Create output directory if it doesn't exist
         output_dir = Path(book_path) / "output"
         output_dir.mkdir(exist_ok=True)
@@ -168,7 +180,10 @@ def pdf(primary_language: str, translate: str = None, template: str = None, book
             "-V", "mainfont=DejaVu Serif",
             "-V", "sansfont=DejaVu Sans",
             "-V", "monofont=DejaVu Sans Mono",
-            "-V", "CJKmainfont=Noto Sans CJK JP"
+            "-V", "CJKmainfont=Noto Sans CJK JP",
+            "-V", f"title={title}",
+            "-V", f"author={author_str}",
+            "-V", f"keywords={keywords_str}"
         ]
 
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)

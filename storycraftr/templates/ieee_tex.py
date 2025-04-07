@@ -46,6 +46,10 @@ TEMPLATE_IEEE_TEX = r"""\documentclass[conference]{IEEEtran}
 $abstract$
 \end{abstract}
 
+\begin{IEEEkeywords}
+$keywords$
+\end{IEEEkeywords}
+
 $body$
 
 \bibliographystyle{IEEEtran}

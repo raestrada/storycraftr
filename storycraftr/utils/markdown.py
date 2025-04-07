@@ -274,6 +274,7 @@ def consolidate_paper_md(book_path: str, primary_language: str, translate: str =
         # Access attributes using getattr to handle SimpleNamespace objects safely
         book_name = getattr(config, 'book_name', 'Untitled Paper')
         authors = getattr(config, 'authors', [])
+        keywords = getattr(config, 'keywords', [])
         
         consolidated_content.append(f"# {book_name}\n\n")
         if authors:
@@ -281,6 +282,14 @@ def consolidate_paper_md(book_path: str, primary_language: str, translate: str =
             for author in authors:
                 consolidated_content.append(f"- {author}\n")
         consolidated_content.append("\n")
+        
+        # Add keywords
+        if keywords:
+            consolidated_content.append("## Keywords\n\n")
+            if isinstance(keywords, list):
+                consolidated_content.append(", ".join(keywords) + "\n\n")
+            else:
+                consolidated_content.append(f"{keywords}\n\n")
     
     # Create or get the assistant and thread for translation (if needed)
     assistant = None

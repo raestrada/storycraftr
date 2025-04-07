@@ -59,6 +59,7 @@ from storycraftr.cmd.paper.generate_section import generate as paper_generate
 from storycraftr.cmd.paper.references import references as paper_references
 from storycraftr.cmd.paper.iterate import iterate as paper_iterate
 from storycraftr.cmd.paper.publish import publish as paper_publish
+from storycraftr.cmd.paper.abstract import abstract as paper_abstract
 
 from storycraftr.init import init_structure_story, init_structure_paper
 
@@ -303,10 +304,13 @@ cli.add_command(publish)
 
 # CLI-specific group configuration
 if cli_name == "storycraftr":
-    cli.add_command(story_outline)
     cli.add_command(story_worldbuilding)
+    cli.add_command(story_outline)
     cli.add_command(story_chapters)
     cli.add_command(story_iterate)
+    cli.add_command(publish)
+    cli.add_command(chat)
+    cli.add_command(reload_files)
 elif cli_name == "papercraftr":
     cli.add_command(paper_organize_lit)
     cli.add_command(paper_outline)
@@ -314,7 +318,9 @@ elif cli_name == "papercraftr":
     cli.add_command(paper_references)
     cli.add_command(paper_iterate)
     cli.add_command(paper_publish)
+    cli.add_command(paper_abstract)
     cli.add_command(chat)
+    cli.add_command(reload_files)
 else:
     console.print(
         "[red]Unknown CLI tool name. Use 'storycraftr' or 'papercraftr'.[/red]"
