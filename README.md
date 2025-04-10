@@ -13,9 +13,9 @@ Welcome to [**StoryCraftr**](https://storycraftr.app), the open-source project d
 
 ---
 
-## Release Notes v0.9.1-beta2
+## Release Notes v0.10.1-beta4
 
-You can find the release notes for version `v0.9.1-beta2` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.7.-alpha3).
+You can find the release notes for version `v0.10.1-beta4` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.10.1-beta4).
 
 ## Step 1: Install StoryCraftr
 
@@ -24,7 +24,13 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.9.1-beta2
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.10.1-beta4
+```
+
+Alternatively, if you have `uv` and `uvx` installed on your system, you can run storycraftr without installing it first:
+
+```bash
+uvx --from git+https://github.com/raestrada/storycraftr.git@v0.10.1-beta4 storycraftr
 ```
 
 ### Important: Before using StoryCraftr, make sure to set your OpenAI API key:

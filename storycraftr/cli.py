@@ -3,6 +3,7 @@ import os
 import sys
 from rich.console import Console
 from pathlib import Path
+from storycraftr.utils.cleanup import cleanup_vector_stores
 
 console = Console()
 
@@ -41,7 +42,7 @@ load_openai_api_key()
 
 # Import statements grouped together for clarity
 from storycraftr.state import debug_state
-from storycraftr.cmd.publish import publish
+from storycraftr.cmd.story.publish import publish
 from storycraftr.cmd.chat import chat
 from storycraftr.agent.agents import create_or_get_assistant, update_agent_files
 from storycraftr.utils.core import load_book_config
@@ -53,11 +54,13 @@ from storycraftr.cmd.story.chapters import chapters as story_chapters
 from storycraftr.cmd.story.iterate import iterate as story_iterate
 
 # Imports PaperCraftr in storycraftr.cmd.paper
-from storycraftr.cmd.paper.define import define as paper_define
 from storycraftr.cmd.paper.organize_lit import organize_lit as paper_organize_lit
 from storycraftr.cmd.paper.outline_sections import outline as paper_outline
-from storycraftr.cmd.paper.analyze import analyze as paper_analyze
-from storycraftr.cmd.paper.finalize import finalize as paper_finalize
+from storycraftr.cmd.paper.generate_section import generate as paper_generate
+from storycraftr.cmd.paper.references import references as paper_references
+from storycraftr.cmd.paper.iterate import iterate as paper_iterate
+from storycraftr.cmd.paper.publish import publish as paper_publish
+from storycraftr.cmd.paper.abstract import abstract as paper_abstract
 
 from storycraftr.init import init_structure_story, init_structure_paper
 
@@ -184,6 +187,40 @@ def init(
     """
     Initialize the project structure with configuration and behavior content.
     """
+    # Asegurarse de que el directorio del proyecto existe o crearlo
+    project_path = Path(project_path).resolve()
+    try:
+        project_path.mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        console.print(f"[red]Error creating project directory: {e}[/red]")
+        sys.exit(1)
+
+    # Manejar la ruta del archivo behavior
+    behavior_path = Path(behavior).resolve()
+    if not behavior_path.is_file():
+        # Intentar buscar el archivo en el directorio actual
+        current_dir_behavior = Path.cwd() / behavior
+        if current_dir_behavior.is_file():
+            behavior_path = current_dir_behavior
+        else:
+            console.print(
+                f"[red]Behavior file not found at {behavior_path} or {current_dir_behavior}[/red]"
+            )
+            sys.exit(1)
+
+    try:
+        behavior_content = behavior_path.read_text(encoding="utf-8")
+    except Exception as e:
+        console.print(f"[red]Error reading behavior file: {e}[/red]")
+        sys.exit(1)
+
+    # Cambiar al directorio del proyecto
+    try:
+        os.chdir(project_path)
+    except Exception as e:
+        console.print(f"[red]Error accessing project directory: {e}[/red]")
+        sys.exit(1)
+
     cli_name = detect_invocation()
 
     # Parameter validation based on the CLI
@@ -204,14 +241,6 @@ def init(
         )
         sys.exit(1)
 
-    # Load behavior file content
-    behavior_path = Path(behavior)
-    if not behavior_path.is_file():
-        console.print("[red]Behavior must be a file.[/red]")
-        sys.exit(1)
-
-    behavior_content = behavior_path.read_text(encoding="utf-8")
-
     # Project initialization based on the CLI
     if cli_name == "storycraftr":
         alternate_languages_list = (
@@ -220,7 +249,7 @@ def init(
             else []
         )
         init_structure_story(
-            book_path=project_path,
+            book_path=str(project_path),
             license=license,
             primary_language=primary_language,
             alternate_languages=alternate_languages_list,
@@ -234,7 +263,7 @@ def init(
         )
     elif cli_name == "papercraftr":
         init_structure_paper(
-            paper_path=project_path,
+            paper_path=str(project_path),
             primary_language=primary_language,
             author=author,
             keywords=keywords,
@@ -269,24 +298,58 @@ def reload_files(book_path):
         project_not_initialized_error(book_path)
 
 
+@click.command()
+@click.option(
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+)
+@click.option("--force", is_flag=True, help="Skip confirmation prompt", default=False)
+def cleanup(book_path, force):
+    """Delete all vector stores and their files."""
+    book_path = book_path or os.getcwd()
+    if not load_book_config(book_path):
+        return
+    if is_initialized(book_path):
+        console.print(
+            "[bold red]WARNING: This will delete ALL vector stores and their files from OpenAI.[/bold red]"
+        )
+        console.print("[bold red]This action cannot be undone![/bold red]")
+
+        if not force:
+            if not click.confirm("Are you sure you want to continue?"):
+                console.print("[yellow]Operation cancelled.[/yellow]")
+                return
+
+        cleanup_vector_stores(book_path)
+    else:
+        project_not_initialized_error(book_path)
+
+
 # Add common commands to CLI
 cli.add_command(init, name="init")
 cli.add_command(reload_files)
 cli.add_command(chat)
 cli.add_command(publish)
+cli.add_command(cleanup)
 
 # CLI-specific group configuration
 if cli_name == "storycraftr":
-    cli.add_command(story_outline)
     cli.add_command(story_worldbuilding)
+    cli.add_command(story_outline)
     cli.add_command(story_chapters)
     cli.add_command(story_iterate)
+    cli.add_command(publish)
+    cli.add_command(chat)
+    cli.add_command(reload_files)
 elif cli_name == "papercraftr":
-    cli.add_command(paper_define)
     cli.add_command(paper_organize_lit)
     cli.add_command(paper_outline)
-    cli.add_command(paper_analyze)
-    cli.add_command(paper_finalize)
+    cli.add_command(paper_generate)
+    cli.add_command(paper_references)
+    cli.add_command(paper_iterate)
+    cli.add_command(paper_publish)
+    cli.add_command(paper_abstract)
+    cli.add_command(chat)
+    cli.add_command(reload_files)
 else:
     console.print(
         "[red]Unknown CLI tool name. Use 'storycraftr' or 'papercraftr'.[/red]"

@@ -7,6 +7,7 @@ from storycraftr.agent.agents import (
     get_thread,
     create_message,
 )
+from storycraftr.utils.core import load_book_config
 from rich.console import Console
 from rich.progress import Progress
 
@@ -136,7 +137,7 @@ def consolidate_book_md(
 
     # Create or get the assistant and thread for translation (if needed)
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
 
     # Collect chapters to process
     files_to_process = []
@@ -218,3 +219,136 @@ def consolidate_book_md(
     )
 
     return str(output_file_path)
+
+
+def consolidate_paper_md(
+    book_path: str, primary_language: str, translate: str = None
+) -> str:
+    """
+    Consolidate all markdown files from the paper into a single markdown file.
+    The files are concatenated in a specific order based on the paper structure.
+    Optionally translates the content to a different language.
+
+    Args:
+        book_path (str): Path to the paper directory.
+        primary_language (str): The primary language of the paper.
+        translate (str, optional): If provided, translates the content to the specified language.
+
+    Returns:
+        str: Path to the consolidated markdown file.
+    """
+    paper_path = Path(book_path)
+    output_dir = paper_path / "output"
+    output_dir.mkdir(exist_ok=True)
+
+    # Define the order of sections
+    section_order = [
+        "sections/abstract.md",
+        "sections/introduction.md",
+    ]
+
+    # Find custom sections in the sections directory
+    sections_dir = paper_path / "sections"
+    custom_sections = []
+    if sections_dir.exists():
+        for file in sections_dir.iterdir():
+            if file.name.startswith("custom_") and file.suffix == ".md":
+                custom_sections.append(f"sections/{file.name}")
+
+    # Add custom sections after introduction
+    section_order.extend(sorted(custom_sections))
+
+    # Add remaining standard sections
+    section_order.extend(
+        [
+            "sections/related_work.md",
+            "sections/methodology.md",
+            "sections/results.md",
+            "sections/discussion.md",
+            "sections/conclusion.md",
+        ]
+    )
+
+    # Start with the title and metadata
+    consolidated_content = []
+
+    # Add title and metadata from config
+    config = load_book_config(book_path)
+    if config:
+        # Access attributes using getattr to handle SimpleNamespace objects safely
+        book_name = getattr(config, "book_name", "Untitled Paper")
+        authors = getattr(config, "authors", [])
+        keywords = getattr(config, "keywords", [])
+
+        consolidated_content.append(f"# {book_name}\n\n")
+        if authors:
+            consolidated_content.append("## Authors\n\n")
+            for author in authors:
+                consolidated_content.append(f"- {author}\n")
+        consolidated_content.append("\n")
+
+        # Add keywords
+        if keywords:
+            consolidated_content.append("## Keywords\n\n")
+            if isinstance(keywords, list):
+                consolidated_content.append(", ".join(keywords) + "\n\n")
+            else:
+                consolidated_content.append(f"{keywords}\n\n")
+
+    # Create or get the assistant and thread for translation (if needed)
+    assistant = None
+    thread = None
+    if translate:
+        assistant = create_or_get_assistant(book_path)
+        thread = get_thread(book_path)
+
+    # Add each section in order
+    for section in section_order:
+        section_path = paper_path / section
+        if section_path.exists():
+            with section_path.open("r", encoding="utf-8") as f:
+                content = f.read()
+                # Remove the title if it exists (first line starting with #)
+                content = re.sub(r"^#.*\n", "", content)
+
+                # Translate content if translation is requested
+                if translate:
+                    translation_prompt = f"Translate the following text from {primary_language} to {translate}. Maintain all formatting, including markdown syntax, LaTeX formulas, and code blocks. Only translate the actual text content:\n\n{content}"
+                    content = create_message(
+                        book_path,
+                        thread_id=thread.id,
+                        content=translation_prompt,
+                        assistant=assistant,
+                    )
+
+                consolidated_content.append(content.strip() + "\n\n")
+
+    # Add references section if it exists
+    references_path = paper_path / "references" / "references.md"
+    if references_path.exists():
+        with references_path.open("r", encoding="utf-8") as f:
+            references_content = f.read()
+
+            # Translate references if translation is requested
+            if translate:
+                translation_prompt = f"Translate the following references from {primary_language} to {translate}. Maintain all formatting, including markdown syntax, LaTeX formulas, and code blocks. Only translate the actual text content:\n\n{references_content}"
+                references_content = create_message(
+                    book_path,
+                    thread_id=thread.id,
+                    content=translation_prompt,
+                    assistant=assistant,
+                )
+
+            consolidated_content.append("# References\n\n")
+            consolidated_content.append(references_content.strip() + "\n\n")
+
+    # Write the consolidated content
+    output_file_name = f"paper-{primary_language}.md"
+    if translate:
+        output_file_name = f"paper-{translate}.md"
+
+    output_file = output_dir / output_file_name
+    with output_file.open("w", encoding="utf-8") as f:
+        f.write("".join(consolidated_content))
+
+    return str(output_file)

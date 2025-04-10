@@ -6,6 +6,8 @@ from pathlib import Path
 import storycraftr.templates.folder_story
 from storycraftr.agent.agents import create_or_get_assistant
 from storycraftr.templates.tex import TEMPLATE_TEX
+from storycraftr.templates.paper_tex import TEMPLATE_PAPER_TEX
+from storycraftr.templates.ieee_tex import TEMPLATE_IEEE_TEX
 
 console = Console()
 
@@ -120,8 +122,8 @@ def init_structure_paper(
     keywords,
     behavior_content,
     cli_name,
-    openai_url,
-    openai_model,
+    openai_url="https://api.openai.com/v1",
+    openai_model="gpt-4",
 ):
     """
     Initializes the PaperCraftr project structure by creating necessary files and folders.
@@ -138,7 +140,7 @@ def init_structure_paper(
         file_path.write_text(file["content"], encoding="utf-8")
         console.print(f"[green]File created: {file_path}[/green]")
 
-    # Create configuration file
+    # Create configuration file with default values if not provided
     config_data = {
         "book_path": paper_path,
         "book_name": paper_name,
@@ -149,26 +151,27 @@ def init_structure_paper(
         "openai_url": openai_url,
         "openai_model": openai_model,
         "multiple_answer": True,
+        "reference_author": "Leading experts in the field",  # Valor por defecto para papers
     }
-    config_file = Path(paper_path) / "papercraftr.json"
-    config_file.write_text(json.dumps(config_data, indent=4), encoding="utf-8")
-    console.print(f"[green]Configuration file created: {config_file}[/green]")
 
-    # Create behavior file
+    # Guardar configuración solo en el directorio del proyecto
+    project_config_file = Path(paper_path) / "papercraftr.json"
+    project_config_file.write_text(json.dumps(config_data, indent=4), encoding="utf-8")
+    console.print(f"[green]Configuration file created: {project_config_file}[/green]")
+
+    # Create behavior file in the project directory
     behaviors_dir = Path(paper_path) / "behaviors"
     behaviors_dir.mkdir(exist_ok=True)
     behavior_file = behaviors_dir / "default.txt"
     behavior_file.write_text(behavior_content, encoding="utf-8")
     console.print(f"[green]Behavior file created: {behavior_file}[/green]")
 
-    # Download additional files
-    urls = [
-        "https://raw.githubusercontent.com/raestrada/papercraftr/refs/heads/main/docs/getting_started.md",
-        "https://raw.githubusercontent.com/raestrada/papercraftr/refs/heads/main/docs/iterate.md",
-        "https://raw.githubusercontent.com/raestrada/papercraftr/refs/heads/main/docs/chat.md",
-    ]
-    filenames = ["getting_started.md", "iterate.md", "chat.md"]
-    for url, filename in zip(urls, filenames):
-        download_file(url, Path(paper_path) / "papercraftr", filename)
+    # Create IEEE template
+    template_dir = Path(paper_path) / "templates"
+    template_dir.mkdir(exist_ok=True)
+    ieee_template_file = template_dir / "ieee.tex"
+    ieee_template_file.write_text(TEMPLATE_IEEE_TEX, encoding="utf-8")
+    console.print(f"[green]IEEE template created: {ieee_template_file}[/green]")
 
+    # Initialize the assistant
     create_or_get_assistant(paper_path)

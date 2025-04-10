@@ -1,52 +1,38 @@
+import os
 import click
 from rich.console import Console
 from pathlib import Path
+from storycraftr.utils.core import load_book_config
+from storycraftr.agent.paper.organize_lit import generate_lit_summary
 
 console = Console()
 
 
 @click.group()
+def organize_lit():
+    """
+    Group of commands for organizing literature for the paper.
+    """
+    pass
+
+
+@organize_lit.command()
 @click.option(
-    "--book_path",
-    type=click.Path(),
-    required=True,
-    help="Path to the paper project directory.",
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
-def organize_lit(book_path):
+@click.argument("prompt", type=str)
+def lit_summary(prompt: str, book_path: str = None):
     """
-    Group of commands for organizing literature and building the conceptual framework for the paper.
-    """
-    # Store the book_path as an attribute for future file operations
-    organize_lit.book_path = Path(book_path)
-
-
-@organize_lit.command()
-@click.argument("prompt", type=str, required=False)
-def lit_summary(prompt):
-    """
-    Placeholder for generating a summary of key literature.
-    In the future, this command will use OpenAI to summarize major sources and identify research gaps.
+    Generate or refine a summary of key literature.
+    Uses OpenAI to analyze and summarize major sources and identify research gaps.
 
     Args:
-        prompt (str): Additional instructions to customize the summary generation.
+        prompt (str): Instructions to guide the literature summary generation.
+        book_path (str, optional): The path to the paper's directory. Defaults to current directory.
     """
-    console.print(
-        "[yellow]The 'lit_summary' command is a placeholder and currently does nothing.[/yellow]"
-    )
-    console.print(f"Prompt: {prompt if prompt else 'No additional prompt provided.'}")
+    book_path = book_path or os.getcwd()
 
+    if not load_book_config(book_path):
+        return None
 
-@organize_lit.command()
-@click.argument("prompt", type=str, required=False)
-def concept_map(prompt):
-    """
-    Placeholder for creating a concept map of the research framework.
-    In the future, this command will use OpenAI to map key concepts and theories related to the research question.
-
-    Args:
-        prompt (str): Additional instructions to customize the concept map creation.
-    """
-    console.print(
-        "[yellow]The 'concept_map' command is a placeholder and currently does nothing.[/yellow]"
-    )
-    console.print(f"Prompt: {prompt if prompt else 'No additional prompt provided.'}")
+    generate_lit_summary(book_path, prompt)

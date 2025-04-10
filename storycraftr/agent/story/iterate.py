@@ -184,13 +184,15 @@ def insert_new_chapter(
 
         # Get or create the assistant and thread
         assistant = create_or_get_assistant(book_path)
-        thread = get_thread()
+        thread = get_thread(book_path)
 
         # Determine prompt type (flashback or regular chapter)
         prompt_text = (
             INSERT_FLASHBACK_CHAPTER_PROMPT
             if flashback
-            else INSERT_SPLIT_CHAPTER_PROMPT if split else INSERT_CHAPTER_PROMPT
+            else INSERT_SPLIT_CHAPTER_PROMPT
+            if split
+            else INSERT_CHAPTER_PROMPT
         ).format(prompt=prompt, position=position)
 
         # Generate new chapter content
@@ -270,7 +272,7 @@ def rewrite_surrounding_chapter(
         task_chapters (Task): Task ID for tracking chapter rewrites.
     """
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
 
     prompt = (
         REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT

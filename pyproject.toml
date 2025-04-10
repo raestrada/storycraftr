@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "storycraftr"
-version = "0.9.1-beta2"
+version = "0.10.1-beta4"
 description = "A CLI tool for writing books and research papers using OpenAI."
 authors = ["Rodrigo Estrada <rodrigo.estrada@gmail.com>"]
 license = "MIT"

@@ -42,9 +42,10 @@ def chat(book_path=None):
         f"Starting chat for [bold]{book_path}[/bold]. Type [bold green]exit()[/bold green] to quit or [bold green]help()[/bold green] for a list of available commands."
     )
 
-    # Create or get the assistant and thread
+    console.print("[bold blue]Starting chat session...[/bold blue]")
+    language = load_book_config(book_path).primary_language
     assistant = create_or_get_assistant(book_path)
-    thread = get_thread()
+    thread = get_thread(book_path)
 
     session = PromptSession(history=InMemoryHistory())
 
@@ -156,7 +157,7 @@ Here are the available modules and some example commands:
 - **outline**: Commands related to outlining the book.
     - Example: `!outline general-outline "Summarize the overall plot of a dystopian sci-fi novel."`
     - Example: `!outline plot-points "Identify key plot points in the story."`
-    - Example: `!outline character-summary "Summarize Zevid’s character."`
+    - Example: `!outline character-summary "Summarize Zevid's character."`
     - Example: `!outline chapter-synopsis "Outline each chapter of a dystopian society."`
 
 - **worldbuilding**: Commands for building the world.
@@ -168,7 +169,7 @@ Here are the available modules and some example commands:
 
 - **chapters**: Commands for working with specific chapters.
     - Example: `!chapters chapter 1 "Write chapter 1 based on the synopsis provided."`
-    - Example: `!chapters insert-chapter 5 "Insert a chapter revealing Zevid’s manipulation."`
+    - Example: `!chapters insert-chapter 5 "Insert a chapter revealing Zevid's manipulation."`
     - Example: `!chapters cover "Generate the cover text for the novel."`
     - Example: `!chapters back-cover "Generate the back-cover text for the novel."`
 
