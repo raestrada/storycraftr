@@ -31,21 +31,17 @@ def initialize_openai_client(book_path: str):
         base_url=api_base
     )
     
-    # Verificar si la API es compatible
+    # Verificar si la API es compatible con Assistants
     try:
         # Intentar listar los assistants para verificar la compatibilidad
         client.beta.assistants.list()
         return client
-    except AttributeError:
-        # Si falla, intentar con la API más reciente
-        try:
-            client.assistants.list()
-            return client
-        except AttributeError:
-            console.print(
-                f"[bold red]Error: The OpenAI API version being used does not support assistants. Please ensure you are using a compatible version.[/bold red]"
-            )
-            raise
+    except Exception as e:
+        console.print(
+            f"[bold red]Error: The OpenAI API version being used does not support Assistants API. Please ensure you are using a compatible version.[/bold red]"
+        )
+        console.print(f"[bold red]Error details: {str(e)}[/bold red]")
+        raise
 
 
 def get_vector_store_id_by_name(assistant_name: str, client) -> str:
@@ -60,17 +56,13 @@ def get_vector_store_id_by_name(assistant_name: str, client) -> str:
         str: The ID of the vector store associated with the assistant's name, or None if not found.
     """
     try:
-        # Intentar con la API beta primero
-        vector_stores = client.beta.vector_stores.list()
-    except AttributeError:
-        # Si falla, intentar con la API más reciente
-        try:
-            vector_stores = client.vector_stores.list()
-        except AttributeError:
-            console.print(
-                f"[bold red]Error: The OpenAI API version being used does not support vector stores. Please ensure you are using a compatible version.[/bold red]"
-            )
-            return None
+        vector_stores = client.vector_stores.list()
+    except Exception as e:
+        console.print(
+            f"[bold red]Error: The OpenAI API version being used does not support vector stores. Please ensure you are using a compatible version.[/bold red]"
+        )
+        console.print(f"[bold red]Error details: {str(e)}[/bold red]")
+        return None
 
     expected_name = f"{assistant_name} Docs"
     for vector_store in vector_stores.data:
@@ -100,17 +92,13 @@ def upload_markdown_files_to_vector_store(
         None
     """
     try:
-        # Intentar con la API beta primero
-        vector_stores_api = client.beta.vector_stores
-    except AttributeError:
-        # Si falla, intentar con la API más reciente
-        try:
-            vector_stores_api = client.vector_stores
-        except AttributeError:
-            console.print(
-                f"[bold red]Error: The OpenAI API version being used does not support vector stores. Please ensure you are using a compatible version.[/bold red]"
-            )
-            return
+        vector_stores_api = client.vector_stores
+    except Exception as e:
+        console.print(
+            f"[bold red]Error: The OpenAI API version being used does not support vector stores. Please ensure you are using a compatible version.[/bold red]"
+        )
+        console.print(f"[bold red]Error details: {str(e)}[/bold red]")
+        return
 
     console.print(
         f"[bold blue]Uploading all knowledge files from '{book_path}'...[/bold blue]"
@@ -224,36 +212,13 @@ def create_or_get_assistant(book_path: str):
         console.print("[red]Behavior file not found.[/red]")
         return None
 
-    # Verificar si la API soporta assistants
-    try:
-        # Intentar con la API beta primero
-        assistants = client.beta.assistants.list(
-            order="desc",
-            limit=100,
-        )
-        assistants_api = client.beta.assistants
-        vector_stores_api = client.beta.vector_stores
-    except AttributeError:
-        # Si falla, intentar con la API más reciente
-        try:
-            assistants = client.assistants.list(
-                order="desc",
-                limit=100,
-            )
-            assistants_api = client.assistants
-            vector_stores_api = client.vector_stores
-        except AttributeError:
-            # Si no soporta assistants, crear un asistente dummy
-            console.print(
-                f"[bold yellow]Warning: The OpenAI API version being used does not support assistants. Using chat API instead.[/bold yellow]"
-            )
-            class DummyAssistant:
-                def __init__(self, model, instructions):
-                    self.id = "dummy_assistant_id"
-                    self.model = model
-                    self.instructions = instructions
-                    self.name = Path(book_path).name
-            return DummyAssistant(openai_model, behavior_content)
+    # Usar la API de Assistants
+    assistants = client.beta.assistants.list(
+        order="desc",
+        limit=100,
+    )
+    assistants_api = client.beta.assistants
+    vector_stores_api = client.vector_stores
 
     name = Path(book_path).name
     for assistant in assistants.data:
@@ -299,16 +264,13 @@ def create_or_get_assistant(book_path: str):
         console.print(f"[bold blue]Associating vector store with assistant {name}...[/bold blue]")
         assistants_api.update(
             assistant_id=assistant.id,
-            tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
+            tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}}
         )
 
-        console.print(f"[bold green]Assistant '{name}' created successfully.[/bold green]")
         return assistant
     except Exception as e:
-        console.print(
-            f"[bold red]Error: {str(e)}. Please ensure you are using a compatible version of the OpenAI API.[/bold red]"
-        )
-        return None
+        console.print(f"[bold red]Error creating assistant: {str(e)}[/bold red]")
+        raise
 
 
 def create_message(
@@ -353,84 +315,22 @@ def create_message(
             f"[bold blue]Creating message in thread {thread_id}...[/bold blue]"
         )
 
-    if file_path and os.path.exists(file_path):
-        if should_print:
-            console.print(
-                f"[bold blue]Reading content from {file_path} for improvement...[/bold blue]"
-            )
-        with open(file_path, "r", encoding="utf-8") as f:
-            file_content = f.read()
-            content = (
-                f"{content}\n\nHere is the existing content to improve:\n{file_content}"
-            )
-    else:
-        if should_print:
-            console.print(
-                f"[bold blue]Using provided prompt to generate new content...[/bold blue]"
-            )
-
-    # Add instructions for multiple answers if the flag is true and force_single_answer is false
-    if config.multiple_answer and not force_single_answer:
-        content = (
-            "Please provide the response in parts to avoid output token limitations. "
-            "Indicate 'END_OF_RESPONSE' when the response is complete. "
-            "Continue providing the next part of the response when you receive the prompt 'next'.\n\n"
-            + content
-        )
-
+    # Generar el prompt con hash
     prompt_with_hash = generate_prompt_with_hash(
-        f"{FORMAT_OUTPUT.format(reference_author=config.reference_author, language=config.primary_language)}\n\n{content}",
+        content,
         datetime.now().strftime("%B %d, %Y"),
-        book_path=book_path,
+        book_path
     )
 
     try:
-        # Si es un asistente dummy, usar la API de chat directamente
-        if assistant.id == "dummy_assistant_id":
-            messages = [
-                {"role": "system", "content": assistant.instructions},
-                {"role": "user", "content": prompt_with_hash}
-            ]
-            response = client.chat.completions.create(
-                model=assistant.model,
-                messages=messages,
-                temperature=0.7,
-                top_p=1.0,
-            )
-            return response.choices[0].message.content
+        # Usar la API de Assistants
+        client.beta.threads.messages.create(
+            thread_id=thread_id, role="user", content=prompt_with_hash
+        )
 
-        # Si es un thread dummy, usar la API de chat directamente
-        if thread_id == "dummy_thread_id":
-            messages = [
-                {"role": "system", "content": assistant.instructions},
-                {"role": "user", "content": prompt_with_hash}
-            ]
-            response = client.chat.completions.create(
-                model=assistant.model,
-                messages=messages,
-                temperature=0.7,
-                top_p=1.0,
-            )
-            return response.choices[0].message.content
-
-        # Intentar con la API beta primero
-        try:
-            client.beta.threads.messages.create(
-                thread_id=thread_id, role="user", content=prompt_with_hash
-            )
-
-            run = client.beta.threads.runs.create(
-                thread_id=thread_id, assistant_id=assistant.id
-            )
-        except AttributeError:
-            # Si falla, intentar con la API más reciente
-            client.threads.messages.create(
-                thread_id=thread_id, role="user", content=prompt_with_hash
-            )
-
-            run = client.threads.runs.create(
-                thread_id=thread_id, assistant_id=assistant.id
-            )
+        run = client.beta.threads.runs.create(
+            thread_id=thread_id, assistant_id=assistant.id
+        )
 
         if internal_progress:
             progress.start()
@@ -440,128 +340,53 @@ def create_message(
 
         # Initial run to get the first part of the response
         while run.status in ["queued", "in_progress"]:
-            try:
-                run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
-            except AttributeError:
-                run = client.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
             progress.update(task_id, advance=1)
             time.sleep(0.5)
 
-        try:
-            messages = client.beta.threads.messages.list(thread_id=thread_id)
-        except AttributeError:
-            messages = client.threads.messages.list(thread_id=thread_id)
+        messages = client.beta.threads.messages.list(thread_id=thread_id)
         response_text = messages.data[0].content[0].text.value
 
         # Continue iterating if the response is incomplete or if multiple_answer is true
         iter = 0
         while not force_single_answer and (done_flag not in response_text) and iter < 3:
-            console.print(
-                f"[bold blue]Requesting next part of the response...[/bold blue]"
-            )
-            try:
-                client.beta.threads.messages.create(
-                    thread_id=thread_id, role="user", content="next"
-                )
-                run = client.beta.threads.runs.create(
-                    thread_id=thread_id, assistant_id=assistant.id
-                )
-            except AttributeError:
-                client.threads.messages.create(
-                    thread_id=thread_id, role="user", content="next"
-                )
-                run = client.threads.runs.create(
-                    thread_id=thread_id, assistant_id=assistant.id
+            iter += 1
+            if should_print:
+                console.print(
+                    f"[bold blue]Iteration {iter} of response generation...[/bold blue]"
                 )
 
+            # Create a new run to continue the response
+            run = client.beta.threads.runs.create(
+                thread_id=thread_id,
+                assistant_id=assistant.id,
+                instructions=f"Continue the response from where you left off. If you have finished, end with {done_flag}.",
+            )
+
+            # Wait for the run to complete
             while run.status in ["queued", "in_progress"]:
-                try:
-                    run = client.beta.threads.runs.retrieve(
-                        thread_id=thread_id, run_id=run.id
-                    )
-                except AttributeError:
-                    run = client.threads.runs.retrieve(
-                        thread_id=thread_id, run_id=run.id
-                    )
+                run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
                 progress.update(task_id, advance=1)
                 time.sleep(0.5)
 
-            try:
-                messages = client.beta.threads.messages.list(thread_id=thread_id)
-            except AttributeError:
-                messages = client.threads.messages.list(thread_id=thread_id)
-            part_text = messages.data[0].content[0].text.value
-            response_text += part_text + "\n\n"
+            # Get the updated messages
+            messages = client.beta.threads.messages.list(thread_id=thread_id)
+            new_response = messages.data[0].content[0].text.value
 
-            # Break after 3 iterations to avoid endless loops
-            if response_text.count(done_flag) >= 3:
-                console.print(
-                    "[bold yellow]Maximum response iterations reached.[/bold yellow]"
-                )
-                break
-
-            iter = iter + 1
+            # Append the new response to the existing one
+            response_text += "\n" + new_response
 
         if internal_progress:
             progress.stop()
 
-        console.print(f"[bold green]Generated content received.[/bold green]")
+        # Remove the done flag if it exists
+        if done_flag in response_text:
+            response_text = response_text.replace(done_flag, "")
 
-        if response_text.strip() == content.strip():
-            console.print(
-                "[bold yellow]Warning: The response matches the original prompt. You might be out of credit.[/bold yellow]"
-            )
-            raise Exception(
-                "The response matches the original prompt. Check your account for credit availability."
-            )
-
-        # Post-process response if multiple_answer is true and force_single_answer is false using another prompt
-        if config.multiple_answer and not force_single_answer and iter > 1:
-            console.print(
-                "[bold blue]Post-processing the response using an additional prompt...[/bold blue]"
-            )
-            post_process_prompt = (
-                "Please refine and clean up the following content to ensure it is suitable for use as a book chapter. "
-                "Remove any redundant instructions, clean up formatting, and provide the final output in a markdown format ready to use:\n\n"
-                f"{response_text}"
-            )
-            try:
-                client.beta.threads.messages.create(
-                    thread_id=thread_id, role="user", content=post_process_prompt
-                )
-                run = client.beta.threads.runs.create(
-                    thread_id=thread_id, assistant_id=assistant.id
-                )
-            except AttributeError:
-                client.threads.messages.create(
-                    thread_id=thread_id, role="user", content=post_process_prompt
-                )
-                run = client.threads.runs.create(
-                    thread_id=thread_id, assistant_id=assistant.id
-                )
-
-            while run.status in ["queued", "in_progress"]:
-                try:
-                    run = client.beta.threads.runs.retrieve(
-                        thread_id=thread_id, run_id=run.id
-                    )
-                except AttributeError:
-                    run = client.threads.runs.retrieve(
-                        thread_id=thread_id, run_id=run.id
-                    )
-                progress.update(task_id, advance=1)
-                time.sleep(0.5)
-
-            try:
-                messages = client.beta.threads.messages.list(thread_id=thread_id)
-            except AttributeError:
-                messages = client.threads.messages.list(thread_id=thread_id)
-            response_text = messages.data[0].content[0].text.value
-
-        return response_text.replace(done_flag, "")
+        return response_text
 
     except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        console.print(f"[bold red]Error creating message: {str(e)}[/bold red]")
         raise
 
 
