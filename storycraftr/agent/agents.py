@@ -10,6 +10,7 @@ from rich.progress import Progress
 from storycraftr.prompts.story.core import FORMAT_OUTPUT
 from storycraftr.utils.core import load_book_config, generate_prompt_with_hash
 from pathlib import Path
+import asyncio
 
 load_dotenv()
 
@@ -421,6 +422,24 @@ def get_thread(book_path: str):
             return DummyThread()
 
 
+async def delete_file(vector_stores_api, vector_store_id, file_id):
+    """Delete a single file from the vector store."""
+    try:
+        await vector_stores_api.files.delete(
+            vector_store_id=vector_store_id,
+            file_id=file_id
+        )
+    except Exception as e:
+        console.print(f"[bold red]Error deleting file {file_id}: {str(e)}[/bold red]")
+
+async def delete_files_in_parallel(vector_stores_api, vector_store_id, files):
+    """Delete multiple files from the vector store in parallel."""
+    tasks = [
+        delete_file(vector_stores_api, vector_store_id, file.id)
+        for file in files.data
+    ]
+    await asyncio.gather(*tasks)
+
 def update_agent_files(book_path: str, assistant):
     """
     Update the assistant's knowledge with new files from the book path.
@@ -444,13 +463,10 @@ def update_agent_files(book_path: str, assistant):
         vector_stores_api = client.vector_stores
         files = vector_stores_api.files.list(vector_store_id=vector_store_id)
         
-        # Eliminar cada archivo existente
-        for file in files.data:
-            console.print(f"[bold blue]Deleting old file {file.id}...[/bold blue]")
-            vector_stores_api.files.delete(
-                vector_store_id=vector_store_id,
-                file_id=file.id
-            )
+        # Eliminar archivos en paralelo
+        if files.data:
+            console.print(f"[bold blue]Deleting {len(files.data)} old files...[/bold blue]")
+            asyncio.run(delete_files_in_parallel(vector_stores_api, vector_store_id, files))
         
         # Cargar archivos de documentación
         docs_path = Path(book_path) / "storycraftr"
