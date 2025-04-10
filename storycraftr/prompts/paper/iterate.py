@@ -50,4 +50,4 @@ Address:
    - Format consistency
 
 Focus on making the content more accessible while maintaining academic rigor.
-""" 
+"""

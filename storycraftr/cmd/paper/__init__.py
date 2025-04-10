@@ -7,10 +7,12 @@ from storycraftr.cmd.paper.outline_sections import outline_sections
 from storycraftr.cmd.paper.references import references
 from storycraftr.cmd.paper.abstract import abstract
 
+
 @click.group()
 def paper():
     """PaperCraftr commands for academic paper writing."""
     pass
+
 
 paper.add_command(publish)
 paper.add_command(iterate)

@@ -3,7 +3,10 @@ import click
 from rich.console import Console
 from pathlib import Path
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.paper.iterate import reinforce_ideas as agent_reinforce_ideas, improve_clarity as agent_improve_clarity
+from storycraftr.agent.paper.iterate import (
+    reinforce_ideas as agent_reinforce_ideas,
+    improve_clarity as agent_improve_clarity,
+)
 
 console = Console()
 
@@ -18,10 +21,7 @@ def iterate():
 
 @iterate.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("prompt", type=str)
 def reinforce_ideas(prompt: str, book_path: str = None):
@@ -34,10 +34,7 @@ def reinforce_ideas(prompt: str, book_path: str = None):
 
 @iterate.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("prompt", type=str)
 def improve_clarity(prompt: str, book_path: str = None):

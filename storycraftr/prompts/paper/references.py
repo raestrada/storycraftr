@@ -149,4 +149,4 @@ Consider:
    - Non-English sources
 
 Format the output as a complete BibTeX file with all necessary entries.
-""" 
+"""

@@ -16,6 +16,7 @@ from storycraftr.prompts.paper.outline_sections import (
 
 console = Console()
 
+
 def generate_outline(book_path: str, prompt: str) -> str:
     """
     Generate or refine the paper outline.
@@ -40,14 +41,12 @@ def generate_outline(book_path: str, prompt: str) -> str:
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         console.print("[yellow]Refining existing outline...[/yellow]")
         content = OUTLINE_SECTIONS_PROMPT_REFINE.format(
-            prompt=prompt,
-            paper_title=paper_title
+            prompt=prompt, paper_title=paper_title
         )
     else:
         console.print("[yellow]Generating new outline...[/yellow]")
         content = OUTLINE_SECTIONS_PROMPT_NEW.format(
-            prompt=prompt,
-            paper_title=paper_title
+            prompt=prompt, paper_title=paper_title
         )
 
     # Generate outline using the assistant
@@ -56,17 +55,12 @@ def generate_outline(book_path: str, prompt: str) -> str:
         thread_id=thread.id,
         content=content,
         assistant=assistant,
-        file_path=file_path
+        file_path=file_path,
     )
 
     # Save the result
-    save_to_markdown(
-        book_path,
-        "sections/outline.md",
-        "Paper Outline",
-        outline_content
-    )
+    save_to_markdown(book_path, "sections/outline.md", "Paper Outline", outline_content)
     console.print("[bold green]✔ Paper outline generated successfully[/bold green]")
 
     update_agent_files(book_path, assistant)
-    return outline_content 
+    return outline_content

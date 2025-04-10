@@ -26,12 +26,9 @@ def initialize_openai_client(book_path: str):
     """
     config = load_book_config(book_path)
     # Si no hay configuración o no hay URL específica, usar la URL por defecto
-    api_base = getattr(config, 'openai_url', "https://api.openai.com/v1")
-    client = OpenAI(
-        api_key=os.getenv("OPENAI_API_KEY"), 
-        base_url=api_base
-    )
-    
+    api_base = getattr(config, "openai_url", "https://api.openai.com/v1")
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url=api_base)
+
     # Verificar si la API es compatible con Assistants
     try:
         # Intentar listar los assistants para verificar la compatibilidad
@@ -201,10 +198,12 @@ def create_or_get_assistant(book_path: str):
     """
     config = load_book_config(book_path)
     client = initialize_openai_client(book_path)
-    
+
     # Usar valores por defecto si config es None o no tiene los atributos
-    openai_model = "gpt-4" if config is None else getattr(config, 'openai_model', "gpt-4")
-    
+    openai_model = (
+        "gpt-4" if config is None else getattr(config, "openai_model", "gpt-4")
+    )
+
     # Obtener el contenido del behavior file
     behavior_file = Path(book_path) / "behaviors" / "default.txt"
     if behavior_file.exists():
@@ -233,15 +232,21 @@ def create_or_get_assistant(book_path: str):
         # Crear vector store para file_search
         console.print(f"[bold blue]Creating vector store for {name}...[/bold blue]")
         vector_store = vector_stores_api.create(name=f"{name} Docs")
-        
+
         # Cargar archivos de documentación desde la carpeta storycraftr dentro del book_path
         docs_path = Path(book_path) / "storycraftr"
         if docs_path.exists():
-            console.print(f"[bold blue]Loading documentation from {docs_path}...[/bold blue]")
-            upload_markdown_files_to_vector_store(vector_store.id, str(docs_path), client)
+            console.print(
+                f"[bold blue]Loading documentation from {docs_path}...[/bold blue]"
+            )
+            upload_markdown_files_to_vector_store(
+                vector_store.id, str(docs_path), client
+            )
         else:
-            console.print(f"[bold yellow]Documentation folder not found at {docs_path}[/bold yellow]")
-        
+            console.print(
+                f"[bold yellow]Documentation folder not found at {docs_path}[/bold yellow]"
+            )
+
         # Cargar archivos del libro
         console.print(f"[bold blue]Loading book files from {book_path}...[/bold blue]")
         upload_markdown_files_to_vector_store(vector_store.id, book_path, client)
@@ -262,10 +267,12 @@ def create_or_get_assistant(book_path: str):
         )
 
         # Asociar el vector store con el asistente
-        console.print(f"[bold blue]Associating vector store with assistant {name}...[/bold blue]")
+        console.print(
+            f"[bold blue]Associating vector store with assistant {name}...[/bold blue]"
+        )
         assistants_api.update(
             assistant_id=assistant.id,
-            tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}}
+            tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
         )
 
         return assistant
@@ -318,9 +325,7 @@ def create_message(
 
     # Generar el prompt con hash
     prompt_with_hash = generate_prompt_with_hash(
-        content,
-        datetime.now().strftime("%B %d, %Y"),
-        book_path
+        content, datetime.now().strftime("%B %d, %Y"), book_path
     )
 
     try:
@@ -366,7 +371,9 @@ def create_message(
 
             # Wait for the run to complete
             while run.status in ["queued", "in_progress"]:
-                run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+                run = client.beta.threads.runs.retrieve(
+                    thread_id=thread_id, run_id=run.id
+                )
                 progress.update(task_id, advance=1)
                 time.sleep(0.5)
 
@@ -394,10 +401,10 @@ def create_message(
 def get_thread(book_path: str):
     """
     Retrieve or create a new thread.
-    
+
     Args:
         book_path (str): Path to the book directory.
-        
+
     Returns:
         object: The thread object.
     """
@@ -415,22 +422,22 @@ def get_thread(book_path: str):
             console.print(
                 f"[bold red]Error creating thread: {str(e)}. Please ensure you are using a compatible version of the OpenAI API.[/bold red]"
             )
+
             # Crear un thread dummy para evitar errores
             class DummyThread:
                 def __init__(self):
                     self.id = "dummy_thread_id"
+
             return DummyThread()
 
 
 def delete_file(vector_stores_api, vector_store_id, file_id):
     """Delete a single file from the vector store."""
     try:
-        vector_stores_api.files.delete(
-            vector_store_id=vector_store_id,
-            file_id=file_id
-        )
+        vector_stores_api.files.delete(vector_store_id=vector_store_id, file_id=file_id)
     except Exception as e:
         console.print(f"[bold red]Error deleting file {file_id}: {str(e)}[/bold red]")
+
 
 def delete_files_in_parallel(vector_stores_api, vector_store_id, files):
     """Delete multiple files from the vector store in parallel using ThreadPoolExecutor."""
@@ -443,10 +450,11 @@ def delete_files_in_parallel(vector_stores_api, vector_store_id, files):
         for future in futures:
             future.result()
 
+
 def update_agent_files(book_path: str, assistant):
     """
     Update the assistant's knowledge with new files from the book path.
-    
+
     Args:
         book_path (str): Path to the book directory.
         assistant (object): The assistant object.
@@ -465,20 +473,28 @@ def update_agent_files(book_path: str, assistant):
         # Obtener los archivos actuales del vector store
         vector_stores_api = client.vector_stores
         files = vector_stores_api.files.list(vector_store_id=vector_store_id)
-        
+
         # Eliminar archivos en paralelo
         if files.data:
-            console.print(f"[bold blue]Deleting {len(files.data)} old files...[/bold blue]")
+            console.print(
+                f"[bold blue]Deleting {len(files.data)} old files...[/bold blue]"
+            )
             delete_files_in_parallel(vector_stores_api, vector_store_id, files)
-        
+
         # Cargar archivos de documentación
         docs_path = Path(book_path) / "storycraftr"
         if docs_path.exists():
-            console.print(f"[bold blue]Loading documentation from {docs_path}...[/bold blue]")
-            upload_markdown_files_to_vector_store(vector_store_id, str(docs_path), client)
+            console.print(
+                f"[bold blue]Loading documentation from {docs_path}...[/bold blue]"
+            )
+            upload_markdown_files_to_vector_store(
+                vector_store_id, str(docs_path), client
+            )
         else:
-            console.print(f"[bold yellow]Documentation folder not found at {docs_path}[/bold yellow]")
-        
+            console.print(
+                f"[bold yellow]Documentation folder not found at {docs_path}[/bold yellow]"
+            )
+
         # Cargar archivos del libro
         console.print(f"[bold blue]Loading book files from {book_path}...[/bold blue]")
         upload_markdown_files_to_vector_store(vector_store_id, book_path, client)

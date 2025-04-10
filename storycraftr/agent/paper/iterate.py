@@ -16,6 +16,7 @@ from storycraftr.prompts.paper.iterate import (
 
 console = Console()
 
+
 def reinforce_ideas(book_path: str, prompt: str) -> str:
     """
     Strengthen core ideas and arguments throughout the paper.
@@ -27,27 +28,19 @@ def reinforce_ideas(book_path: str, prompt: str) -> str:
     thread = get_thread(book_path)
     paper_title = config.book_name
 
-    content = REINFORCE_IDEAS_PROMPT.format(
-        prompt=prompt,
-        paper_title=paper_title
-    )
+    content = REINFORCE_IDEAS_PROMPT.format(prompt=prompt, paper_title=paper_title)
 
     improvements = create_message(
-        book_path,
-        thread_id=thread.id,
-        content=content,
-        assistant=assistant
+        book_path, thread_id=thread.id, content=content, assistant=assistant
     )
 
     save_to_markdown(
-        book_path,
-        "reviews/improvements.md",
-        "Suggested Improvements",
-        improvements
+        book_path, "reviews/improvements.md", "Suggested Improvements", improvements
     )
-    
+
     console.print("[bold green]✔ Ideas reinforced successfully[/bold green]")
     return improvements
+
 
 def improve_clarity(book_path: str, prompt: str) -> str:
     """
@@ -60,24 +53,18 @@ def improve_clarity(book_path: str, prompt: str) -> str:
     thread = get_thread(book_path)
     paper_title = config.book_name
 
-    content = IMPROVE_CLARITY_PROMPT.format(
-        prompt=prompt,
-        paper_title=paper_title
-    )
+    content = IMPROVE_CLARITY_PROMPT.format(prompt=prompt, paper_title=paper_title)
 
     improvements = create_message(
-        book_path,
-        thread_id=thread.id,
-        content=content,
-        assistant=assistant
+        book_path, thread_id=thread.id, content=content, assistant=assistant
     )
 
     save_to_markdown(
         book_path,
         "reviews/clarity_improvements.md",
         "Clarity Improvements",
-        improvements
+        improvements,
     )
-    
+
     console.print("[bold green]✔ Clarity improved successfully[/bold green]")
-    return improvements 
+    return improvements

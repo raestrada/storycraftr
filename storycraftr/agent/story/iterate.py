@@ -190,7 +190,9 @@ def insert_new_chapter(
         prompt_text = (
             INSERT_FLASHBACK_CHAPTER_PROMPT
             if flashback
-            else INSERT_SPLIT_CHAPTER_PROMPT if split else INSERT_CHAPTER_PROMPT
+            else INSERT_SPLIT_CHAPTER_PROMPT
+            if split
+            else INSERT_CHAPTER_PROMPT
         ).format(prompt=prompt, position=position)
 
         # Generate new chapter content

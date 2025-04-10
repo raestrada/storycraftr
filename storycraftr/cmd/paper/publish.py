@@ -1,12 +1,14 @@
 import os
 import click
-import subprocess
+import subprocess  # nosec
 from pathlib import Path
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
 from storycraftr.utils.markdown import consolidate_paper_md
 from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message
 from storycraftr.agent.paper.references import generate_bibtex
+import shutil
+from rich.progress import Progress
 
 console = Console()
 
@@ -22,6 +24,102 @@ def publish():
     pass
 
 
+def find_executable(executable_name):
+    """Find the full path of an executable."""
+    return shutil.which(executable_name)
+
+
+def check_dependencies():
+    """Check if required dependencies are installed."""
+    pandoc_path = find_executable("pandoc")
+    if not pandoc_path:
+        raise click.ClickException("pandoc is not installed. Please install it first.")
+
+    xelatex_path = find_executable("xelatex")
+    if not xelatex_path:
+        raise click.ClickException("xelatex is not installed. Please install it first.")
+
+    return pandoc_path, xelatex_path
+
+
+def check_latex_packages():
+    """Check if required LaTeX packages are installed."""
+    kpsewhich_path = find_executable("kpsewhich")
+    if not kpsewhich_path:
+        raise click.ClickException(
+            "kpsewhich is not installed. Please install it first."
+        )
+
+    latex_packages = {
+        "book.cls": "book",
+        "geometry.sty": "geometry",
+        "fancyhdr.sty": "fancyhdr",
+        "graphicx.sty": "graphicx",
+        "hyperref.sty": "hyperref",
+        "xcolor.sty": "xcolor",
+        "titlesec.sty": "titlesec",
+        "fontspec.sty": "fontspec",
+        "polyglossia.sty": "polyglossia",
+    }
+
+    missing_packages = []
+    for latex_file, package in latex_packages.items():
+        try:
+            result = subprocess.run(  # nosec
+                [kpsewhich_path, latex_file], capture_output=True, text=True, check=True
+            )
+            if not result.stdout.strip():
+                missing_packages.append(package)
+        except subprocess.CalledProcessError:
+            missing_packages.append(package)
+
+    if missing_packages:
+        raise click.ClickException(
+            f"The following LaTeX packages are missing: {', '.join(missing_packages)}. "
+            "Please install them using your LaTeX distribution's package manager."
+        )
+
+
+def generate_pdf(book_path, pandoc_path, xelatex_path):
+    """Generate PDF from markdown files."""
+    config = load_book_config(book_path)
+    output_dir = Path(book_path) / "output"
+    output_dir.mkdir(exist_ok=True)
+
+    # Generate PDF using pandoc
+    cmd = [
+        pandoc_path,
+        "--from=markdown",
+        "--to=pdf",
+        f"--output={output_dir / 'book.pdf'}",
+        "--pdf-engine=xelatex",
+        "--template=template.tex",
+        "--variable=mainfont:DejaVu Serif",
+        "--variable=monofont:DejaVu Sans Mono",
+        "--variable=fontsize:12pt",
+        "--variable=geometry:margin=1in",
+        "--variable=colorlinks:true",
+        "--variable=linkcolor:blue",
+        "--variable=toccolor:blue",
+        "--toc",
+        "--toc-depth=3",
+        "--number-sections",
+        "--standalone",
+    ]
+
+    # Add input files
+    cmd.extend(str(f) for f in Path(book_path).glob("**/*.md"))
+
+    try:
+        result = subprocess.run(
+            cmd, check=True, capture_output=True, text=True
+        )  # nosec
+        console.print("[bold green]PDF generated successfully![/bold green]")
+    except subprocess.CalledProcessError as e:
+        console.print(f"[bold red]Error generating PDF: {e.stderr}[/bold red]")
+        raise click.ClickException("Failed to generate PDF")
+
+
 @publish.command()
 @click.argument("primary_language", type=str)
 @click.option(
@@ -34,21 +132,24 @@ def publish():
     "--template",
     type=click.Path(),
     help="Path to a custom LaTeX template",
-    required=False
+    required=False,
 )
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.option(
     "--bibtex-style",
     type=str,
     default="IEEEtran",
-    help="BibTeX style to use (e.g., IEEEtran, plain, unsrt)"
+    help="BibTeX style to use (e.g., IEEEtran, plain, unsrt)",
 )
-def pdf(primary_language: str, translate: str = None, template: str = None, book_path: str = None, bibtex_style: str = "IEEEtran"):
+def pdf(
+    primary_language: str,
+    translate: str = None,
+    template: str = None,
+    book_path: str = None,
+    bibtex_style: str = "IEEEtran",
+):
     """
     Publish the paper as a PDF using pandoc and LaTeX.
 
@@ -69,146 +170,19 @@ def pdf(primary_language: str, translate: str = None, template: str = None, book
         )
         return
 
-    # Check if pandoc is installed
     try:
-        subprocess.run(["pandoc", "--version"], check=True, capture_output=True)
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        console.print(
-            "[red bold]Error:[/red bold] Pandoc is not installed. Please install it first."
-        )
-        return
+        # Check dependencies
+        pandoc_path, xelatex_path = check_dependencies()
 
-    # Check if xelatex is installed
-    try:
-        subprocess.run(["xelatex", "--version"], check=True, capture_output=True)
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        console.print(
-            "[red bold]Error:[/red bold] xelatex is not installed. Please install texlive-xetex first:"
-        )
-        console.print("\nFor Ubuntu/Debian:")
-        console.print("sudo apt-get install texlive-xetex")
-        console.print("\nFor macOS:")
-        console.print("brew install --cask mactex")
-        console.print("\nFor Windows:")
-        console.print("Please install MiKTeX from https://miktex.org/download")
-        return
+        # Check LaTeX packages
+        check_latex_packages()
 
-    # Log the start of the process
-    if translate:
-        console.print(f"[bold blue]Generating PDF for the paper in [bold]{primary_language}[/bold] and translating to [bold]{translate}[/bold]...[/bold blue]")
-    else:
-        console.print(f"[bold blue]Generating PDF for the paper in [bold]{primary_language}[/bold]...[/bold blue]")
+        # Generate PDF
+        generate_pdf(book_path, pandoc_path, xelatex_path)
 
-    try:
-        # Verificar dependencias de LaTeX
-        latex_packages = {
-            "IEEEtran.cls": "texlive-publishers",
-            "algorithm.sty": "texlive-science",
-            "algorithmic.sty": "texlive-science",
-            "booktabs.sty": "texlive-latex-extra",
-            "multirow.sty": "texlive-latex-extra"
-        }
-        
-        missing_packages = []
-        for latex_file, package in latex_packages.items():
-            result = subprocess.run(["kpsewhich", latex_file], capture_output=True, text=True)
-            if not result.stdout.strip():
-                missing_packages.append((latex_file, package))
-        
-        if missing_packages:
-            console.print("[red]Error: Missing LaTeX packages[/red]")
-            console.print("\nThe following LaTeX packages are required but not installed:")
-            for latex_file, package in missing_packages:
-                console.print(f"- {latex_file} (from package {package})")
-            console.print("\nPlease install them using your package manager:")
-            console.print("\nFor Ubuntu/Debian:")
-            console.print("sudo apt-get install " + " ".join(set(p[1] for p in missing_packages)))
-            console.print("\nFor macOS:")
-            console.print("brew install --cask mactex")
-            console.print("\nFor Windows:")
-            console.print("Please install MiKTeX from https://miktex.org/download")
-            return
-
-        # Generate BibTeX references if needed
-        bibtex_file = Path(book_path) / "references" / "references.bib"
-        if not bibtex_file.exists():
-            console.print("[bold blue]Generating BibTeX references...[/bold blue]")
-            generate_bibtex(book_path, bibtex_style)
-
-        # Consolidate all markdown files into one
-        consolidated_md = consolidate_paper_md(book_path, primary_language, translate)
-        if not consolidated_md:
-            console.print("[red bold]Error:[/red bold] Failed to consolidate markdown files.")
-            return
-
-        # Get metadata from config
-        config = load_book_config(book_path)
-        title = getattr(config, 'book_name', 'Untitled Paper')
-        authors = getattr(config, 'authors', [])
-        keywords = getattr(config, 'keywords', [])
-        
-        # Format authors as a string
-        author_str = " and ".join(authors) if isinstance(authors, list) else authors
-        
-        # Format keywords as a string
-        keywords_str = ", ".join(keywords) if isinstance(keywords, list) else keywords
-
-        # Create output directory if it doesn't exist
-        output_dir = Path(book_path) / "output"
-        output_dir.mkdir(exist_ok=True)
-
-        # Create templates directory if it doesn't exist
-        templates_dir = Path(book_path) / "templates"
-        templates_dir.mkdir(exist_ok=True)
-
-        # Use default IEEE template if none provided
-        if not template:
-            # Copy default template to project's templates directory
-            default_template = Path(__file__).parent.parent.parent / "templates" / "ieee.tex"
-            project_template = templates_dir / "ieee.tex"
-            
-            if not project_template.exists():
-                if not default_template.exists():
-                    console.print("[red bold]Error:[/red bold] Default IEEE template not found in package.")
-                    return
-                # Copy template to project directory
-                import shutil
-                shutil.copy2(default_template, project_template)
-            
-            template = str(project_template)
-
-        # Generate PDF using pandoc
-        output_pdf = output_dir / f"paper-{primary_language}.pdf"
-        if translate:
-            output_pdf = output_dir / f"paper-{translate}.pdf"
-            
-        cmd = [
-            "pandoc",
-            consolidated_md,
-            "-o", str(output_pdf),
-            "--pdf-engine=xelatex",
-            "--template=" + template,
-            "--toc",
-            "--number-sections",
-            "--highlight-style=tango",
-            "-V", "mainfont=DejaVu Serif",
-            "-V", "sansfont=DejaVu Sans",
-            "-V", "monofont=DejaVu Sans Mono",
-            "-V", "CJKmainfont=Noto Sans CJK JP",
-            "-V", f"title={title}",
-            "-V", f"author={author_str}",
-            "-V", f"keywords={keywords_str}",
-            "--bibliography=" + str(bibtex_file),
-            "--csl=" + bibtex_style + ".csl"
-        ]
-
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        
-        # Success log
-        console.print(
-            f"[green bold]Success![/green bold] PDF generated at: [bold]{output_pdf}[/bold]"
-        )
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red bold]Error:[/red bold] Failed to generate PDF: {e.stderr}")
+    except click.ClickException as e:
+        console.print(f"[bold red]Error: {e.message}[/bold red]")
+        raise
     except Exception as e:
-        console.print(f"[red bold]Error:[/red bold] Failed to generate PDF: {str(e)}") 
+        console.print(f"[bold red]Unexpected error: {str(e)}[/bold red]")
+        raise click.ClickException("Failed to publish book")

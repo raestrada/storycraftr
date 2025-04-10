@@ -54,4 +54,4 @@ def pdf(primary_language: str, translate: str = None, book_path: str = None):
             f"[green bold]Success![/green bold] PDF generated at: [bold]{output_pdf_path}[/bold]"
         )
     except Exception as e:
-        console.print(f"[red bold]Error:[/red bold] Failed to generate PDF: {str(e)}") 
+        console.print(f"[red bold]Error:[/red bold] Failed to generate PDF: {str(e)}")

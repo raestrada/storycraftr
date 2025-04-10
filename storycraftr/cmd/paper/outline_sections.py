@@ -18,10 +18,7 @@ def outline():
 
 @outline.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("prompt", type=str)
 def outline_sections(prompt: str, book_path: str = None):

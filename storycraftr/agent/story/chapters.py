@@ -45,16 +45,12 @@ def generate_chapter(book_path: str, chapter_number: int, prompt: str) -> str:
     # Check if the chapter already exists to decide between new or refined content
     if file_path.exists():
         console.print(f"[yellow]Existing chapter found. Refining...[/yellow]")
-        content = CHAPTER_PROMPT_REFINE.format(
-            prompt=prompt, language=language
-        )
+        content = CHAPTER_PROMPT_REFINE.format(prompt=prompt, language=language)
     else:
         console.print(
             f"[yellow]No existing chapter found. Generating new content...[/yellow]"
         )
-        content = CHAPTER_PROMPT_NEW.format(
-            prompt=prompt, language=language
-        )
+        content = CHAPTER_PROMPT_NEW.format(prompt=prompt, language=language)
 
     chapter_content = create_message(
         book_path,
@@ -182,16 +178,12 @@ def generate_epilogue(book_path: str, prompt: str) -> str:
     # Determine if refining an existing epilogue or generating a new one
     if file_path.exists():
         console.print(f"[yellow]Existing epilogue found. Refining...[/yellow]")
-        content = EPILOGUE_PROMPT_REFINE.format(
-            prompt=prompt, language=language
-        )
+        content = EPILOGUE_PROMPT_REFINE.format(prompt=prompt, language=language)
     else:
         console.print(
             f"[yellow]No existing epilogue found. Generating new content...[/yellow]"
         )
-        content = EPILOGUE_PROMPT_NEW.format(
-            prompt=prompt, language=language
-        )
+        content = EPILOGUE_PROMPT_NEW.format(prompt=prompt, language=language)
 
     epilogue_content = create_message(
         book_path,

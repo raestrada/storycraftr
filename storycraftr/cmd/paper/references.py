@@ -13,6 +13,7 @@ from storycraftr.agent.paper.references import (
 
 console = Console()
 
+
 @click.group()
 def references():
     """
@@ -20,12 +21,10 @@ def references():
     """
     pass
 
+
 @references.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("reference_info", type=str)
 def add(reference_info: str, book_path: str = None):
@@ -44,12 +43,10 @@ def add(reference_info: str, book_path: str = None):
 
     add_reference(book_path, reference_info)
 
+
 @references.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("style_guide", type=str)
 def format(style_guide: str, book_path: str = None):
@@ -68,12 +65,10 @@ def format(style_guide: str, book_path: str = None):
 
     format_references(book_path, style_guide)
 
+
 @references.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("prompt", type=str)
 def check(prompt: str, book_path: str = None):
@@ -92,18 +87,16 @@ def check(prompt: str, book_path: str = None):
 
     check_citations(book_path, prompt)
 
+
 @references.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.option(
     "--format",
     "citation_format",
     default="APA",
-    help="Citation format to use (e.g., APA, IEEE)"
+    help="Citation format to use (e.g., APA, IEEE)",
 )
 @click.argument("reference_info", type=str)
 def cite(reference_info: str, citation_format: str, book_path: str = None):
@@ -123,18 +116,16 @@ def cite(reference_info: str, citation_format: str, book_path: str = None):
 
     generate_citation(book_path, reference_info, citation_format)
 
+
 @references.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.option(
     "--style",
     "bibtex_style",
     default="IEEEtran",
-    help="BibTeX style to use (e.g., IEEEtran, plain, unsrt)"
+    help="BibTeX style to use (e.g., IEEEtran, plain, unsrt)",
 )
 def bibtex(bibtex_style: str, book_path: str = None):
     """

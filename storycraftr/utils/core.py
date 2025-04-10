@@ -121,7 +121,7 @@ def load_book_config(book_path: str):
                 return None
 
         config_data = json.loads(config_path.read_text(encoding="utf-8"))
-        
+
         # Ensure required fields exist with default values
         default_config = {
             "book_name": "Untitled Paper",
@@ -136,13 +136,13 @@ def load_book_config(book_path: str):
             "cli_name": "papercraftr",
             "openai_url": "https://api.openai.com/v1",
             "openai_model": "gpt-4o",
-            "multiple_answer": True
+            "multiple_answer": True,
         }
-        
+
         # Update default config with actual config data
         for key, value in config_data.items():
             default_config[key] = value
-            
+
         return SimpleNamespace(**default_config)
 
     except Exception as e:

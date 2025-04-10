@@ -4,6 +4,7 @@ import subprocess  # nosec
 from pathlib import Path
 from storycraftr.utils.markdown import consolidate_book_md
 from rich.console import Console
+import shutil
 
 console = Console()
 
@@ -55,7 +56,7 @@ def check_font_available(font_name: str) -> bool:
 def get_available_font() -> str:
     """
     Get an available font from a list of preferred fonts.
-    
+
     Returns:
         str: The name of an available font.
     """
@@ -67,143 +68,147 @@ def get_available_font() -> str:
         "Liberation Serif",
         "FreeSerif",
         "Nimbus Roman",
-        "Bitstream Vera Serif"
+        "Bitstream Vera Serif",
     ]
-    
+
     for font in preferred_fonts:
         if check_font_available(font):
             return font
-    
+
     return "DejaVu Serif"  # Default to a common font that should be available
 
 
-def compile_latex(tex_path: str, output_dir: str, output_name: str = None) -> str:
+def find_executable(executable_name):
+    """Find the full path of an executable."""
+    return shutil.which(executable_name)
+
+
+def compile_latex_to_pdf(tex_path, output_dir, output_name="output.pdf"):
     """
-    Compile a LaTeX file to PDF using a comprehensive compilation process.
-    
-    This function performs a complete LaTeX compilation including:
-    - Multiple pdflatex runs to resolve references
-    - BibTeX for bibliography
-    - Makeindex for indices
-    - Makeglossaries for glossaries
-    - Handling of auxiliary files
-    
+    Compile a LaTeX file to PDF using pdflatex.
+
     Args:
         tex_path (str): Path to the LaTeX file
-        output_dir (str): Directory where the PDF will be saved
-        output_name (str, optional): Name of the output PDF file. If None, uses the same name as the tex file.
-        
+        output_dir (str): Directory to store output files
+        output_name (str): Name of the output PDF file
+
     Returns:
         str: Path to the generated PDF file
-        
-    Raises:
-        Exception: If compilation fails
     """
-    # Check if required tools are installed
-    required_tools = ["pdflatex", "bibtex"]
-    for tool in required_tools:
-        if not check_tool_installed(tool):
-            console.print(
-                f"[red bold]Error:[/red bold] '{tool}' is not installed. Please install it to proceed."
-            )
-            raise SystemExit(1)
-    
-    # Check for optional tools
-    optional_tools = {
-        "makeindex": "index",
-        "makeglossaries": "glossary",
-        "makeglossaries-ll": "glossary"
-    }
-    
-    tools_available = {}
-    for tool, feature in optional_tools.items():
-        tools_available[feature] = check_tool_installed(tool)
-        if tools_available[feature]:
-            console.print(f"[green]Found {tool} for {feature} generation[/green]")
-    
-    # Escape spaces in paths
-    escaped_tex_path = f'"{tex_path}"'
-    escaped_output_dir = f'"{output_dir}"'
-    
-    # Get the base name of the tex file without extension
-    tex_base = os.path.splitext(os.path.basename(tex_path))[0]
-    
-    # Set output name if not provided
-    if output_name is None:
-        output_name = tex_base
-    
-    # Ensure output name has .pdf extension
-    if not output_name.endswith('.pdf'):
-        output_name += '.pdf'
-    
-    # Paths to auxiliary files
-    aux_path = os.path.join(output_dir, f"{tex_base}.aux")
-    escaped_aux_path = f'"{aux_path}"'
-    
-    # Compile LaTeX to PDF
-    console.print(f"Compiling LaTeX file: [bold]{tex_path}[/bold]")
-    
-    try:
-        # First pdflatex run - generates auxiliary files
-        console.print("First pdflatex run (generating auxiliary files)...")
-        subprocess.run(
-            f'pdflatex -interaction=nonstopmode -output-directory={escaped_output_dir} {escaped_tex_path}',
-            shell=True,
-            check=True
+    # Find executables
+    pdflatex_path = find_executable("pdflatex")
+    bibtex_path = find_executable("bibtex")
+    makeindex_path = find_executable("makeindex")
+    makeglossaries_path = find_executable("makeglossaries")
+
+    if not all([pdflatex_path, bibtex_path, makeindex_path, makeglossaries_path]):
+        raise RuntimeError(
+            "Required LaTeX tools not found. Please install pdflatex, bibtex, makeindex, and makeglossaries."
         )
-        
+
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Get absolute paths
+    tex_path = os.path.abspath(tex_path)
+    output_dir = os.path.abspath(output_dir)
+
+    # Get base name without extension
+    tex_base = os.path.splitext(os.path.basename(tex_path))[0]
+
+    # Define paths for auxiliary files
+    aux_path = os.path.join(output_dir, f"{tex_base}.aux")
+    idx_path = os.path.join(output_dir, f"{tex_base}.idx")
+
+    try:
+        # First pdflatex run - generates aux file
+        console.print("First pdflatex run (generating aux file)...")
+        subprocess.run(  # nosec
+            [
+                pdflatex_path,
+                "-interaction=nonstopmode",
+                f"-output-directory={output_dir}",
+                tex_path,
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
         # Run bibtex if aux file exists
         if os.path.exists(aux_path):
             console.print("Running bibtex for bibliography...")
-            subprocess.run(
-                f'bibtex {escaped_aux_path}',
-                shell=True,
-                check=True
+            subprocess.run(  # nosec
+                [bibtex_path, aux_path],
+                check=True,
+                capture_output=True,
+                text=True,
             )
-        
-        # Run makeindex if idx file exists and makeindex is available
-        idx_path = os.path.join(output_dir, f"{tex_base}.idx")
-        if os.path.exists(idx_path) and tools_available.get("index", False):
+
+        # Run makeindex if idx file exists
+        if os.path.exists(idx_path):
             console.print("Running makeindex for index generation...")
-            subprocess.run(
-                f'makeindex {idx_path}',
-                shell=True,
-                check=True
+            subprocess.run(  # nosec
+                [makeindex_path, idx_path],
+                check=True,
+                capture_output=True,
+                text=True,
             )
-        
-        # Run makeglossaries if gls file exists and makeglossaries is available
-        gls_path = os.path.join(output_dir, f"{tex_base}.gls")
-        if os.path.exists(gls_path) and tools_available.get("glossary", False):
-            console.print("Running makeglossaries for glossary generation...")
-            subprocess.run(
-                f'makeglossaries -d {escaped_output_dir} {tex_base}',
-                shell=True,
-                check=True
+
+            # Run makeglossaries if needed
+            console.print("Running makeglossaries for glossary...")
+            subprocess.run(  # nosec
+                [
+                    makeglossaries_path,
+                    "-d",
+                    output_dir,
+                    tex_base,
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
             )
-        
+
         # Second pdflatex run - processes bibliography and other references
         console.print("Second pdflatex run (processing references)...")
-        subprocess.run(
-            f'pdflatex -interaction=nonstopmode -output-directory={escaped_output_dir} {escaped_tex_path}',
-            shell=True,
-            check=True
+        subprocess.run(  # nosec
+            [
+                pdflatex_path,
+                "-interaction=nonstopmode",
+                f"-output-directory={output_dir}",
+                tex_path,
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
         )
-        
+
         # Third pdflatex run - final pass for all references
         console.print("Third pdflatex run (final pass)...")
-        subprocess.run(
-            f'pdflatex -interaction=nonstopmode -output-directory={escaped_output_dir} {escaped_tex_path}',
-            shell=True,
-            check=True
+        subprocess.run(  # nosec
+            [
+                pdflatex_path,
+                "-interaction=nonstopmode",
+                f"-output-directory={output_dir}",
+                tex_path,
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
         )
-        
+
         # Return the path to the generated PDF
         output_pdf_path = os.path.join(output_dir, output_name)
-        console.print(f"[green bold]Success![/green bold] PDF generated at: [bold]{output_pdf_path}[/bold]")
+        if not os.path.exists(output_pdf_path):
+            raise RuntimeError(
+                f"PDF generation failed. Expected output file not found: {output_pdf_path}"
+            )
+
         return output_pdf_path
-        
+
     except subprocess.CalledProcessError as e:
-        console.print(f"[red bold]Error:[/red bold] Failed to compile LaTeX: {str(e)}")
+        console.print(f"[bold red]Error during LaTeX compilation:[/bold red]")
+        console.print(e.stderr)
         raise
 
 
@@ -267,31 +272,39 @@ def to_pdf(book_path: str, primary_language: str, translate: str = None) -> str:
     # Check if Palatino font is available
     if not check_font_available("Palatino"):
         console.print("[yellow]Warning:[/yellow] Palatino font not found.")
-        console.print("[yellow]Recommendation:[/yellow] Install Palatino for the best experience.")
+        console.print(
+            "[yellow]Recommendation:[/yellow] Install Palatino for the best experience."
+        )
         console.print("[yellow]Installation instructions:[/yellow]")
-        console.print("  - Ubuntu/Debian: sudo apt-get install texlive-fonts-recommended")
+        console.print(
+            "  - Ubuntu/Debian: sudo apt-get install texlive-fonts-recommended"
+        )
         console.print("  - Fedora: sudo dnf install texlive-palatino")
         console.print("  - macOS: Palatino is included by default")
         console.print("  - Windows: Install TeX Live with Palatino package")
-        
+
         # Get an available font
         available_font = get_available_font()
         console.print(f"[yellow]Using {available_font} as fallback font.[/yellow]")
-        
+
         # Create a temporary template with the available font
         with open(template_path, "r", encoding="utf-8") as f:
             template_content = f.read()
-        
+
         # Replace Palatino with the available font
-        modified_template = template_content.replace("\\setmainfont{Palatino}", f"\\setmainfont{{{available_font}}}")
-        
+        modified_template = template_content.replace(
+            "\\setmainfont{Palatino}", f"\\setmainfont{{{available_font}}}"
+        )
+
         # Create a temporary template file
         temp_template_path = Path(book_path) / "templates" / "template_temp.tex"
         with open(temp_template_path, "w", encoding="utf-8") as f:
             f.write(modified_template)
-        
+
         template_path = temp_template_path
-        console.print(f"Using modified template with {available_font} font: [bold]{template_path}[/bold]")
+        console.print(
+            f"Using modified template with {available_font} font: [bold]{template_path}[/bold]"
+        )
 
     # Convert markdown to PDF using pandoc
     try:
@@ -319,7 +332,9 @@ def to_pdf(book_path: str, primary_language: str, translate: str = None) -> str:
             os.remove(template_path)
             console.print("Temporary template removed.")
         except Exception as e:
-            console.print(f"[yellow]Warning:[/yellow] Failed to remove temporary template: {e}")
+            console.print(
+                f"[yellow]Warning:[/yellow] Failed to remove temporary template: {e}"
+            )
 
     console.print(f"PDF generated at [bold]{output_pdf_path}[/bold]")
     return output_pdf_path

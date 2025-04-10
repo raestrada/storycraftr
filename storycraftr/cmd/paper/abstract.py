@@ -11,10 +11,7 @@ console = Console()
 @click.command()
 @click.argument("prompt", type=str)
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 def abstract(prompt: str, book_path: str = None):
     """
@@ -44,7 +41,7 @@ def abstract(prompt: str, book_path: str = None):
 
     # Generate abstract
     console.print("[bold blue]Generating abstract...[/bold blue]")
-    
+
     # Create a more detailed prompt for the abstract
     detailed_prompt = f"""Generate a concise and informative abstract for an academic paper. The abstract should:
 
@@ -61,10 +58,7 @@ Please write the abstract in a clear, academic style, avoiding unnecessary jargo
 
     # Get the abstract from the assistant
     abstract_content = create_message(
-        book_path,
-        thread_id=thread.id,
-        content=detailed_prompt,
-        assistant=assistant
+        book_path, thread_id=thread.id, content=detailed_prompt, assistant=assistant
     )
 
     # Save the abstract
@@ -72,8 +66,8 @@ Please write the abstract in a clear, academic style, avoiding unnecessary jargo
         book_path=book_path,
         file_name="sections/abstract.md",
         header="Abstract",
-        content=abstract_content
+        content=abstract_content,
     )
 
     console.print("[green bold]Abstract generated successfully![/green bold]")
-    console.print("\nYou can find it in sections/abstract.md") 
+    console.print("\nYou can find it in sections/abstract.md")

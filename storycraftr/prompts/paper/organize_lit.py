@@ -23,4 +23,4 @@ Consider:
 5. Improving flow and coherence
 
 Maintain academic rigor while ensuring clarity and readability.
-""" 
+"""

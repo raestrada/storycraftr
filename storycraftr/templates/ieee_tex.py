@@ -56,4 +56,4 @@ $body$
 \bibliography{references}
 
 \end{document}
-""" 
+"""

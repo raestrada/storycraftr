@@ -9,10 +9,11 @@ from storycraftr.agent.paper.generate_section import (
     generate_results,
     generate_discussion,
     generate_conclusion,
-    generate_custom_section
+    generate_custom_section,
 )
 
 console = Console()
+
 
 @click.group()
 def generate():
@@ -21,12 +22,10 @@ def generate():
     """
     pass
 
+
 @generate.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("prompt", type=str)
 def introduction(prompt: str, book_path: str = None):
@@ -45,12 +44,10 @@ def introduction(prompt: str, book_path: str = None):
 
     generate_introduction(book_path, prompt)
 
+
 @generate.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("prompt", type=str)
 def methodology(prompt: str, book_path: str = None):
@@ -69,12 +66,10 @@ def methodology(prompt: str, book_path: str = None):
 
     generate_methodology(book_path, prompt)
 
+
 @generate.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("prompt", type=str)
 def results(prompt: str, book_path: str = None):
@@ -93,12 +88,10 @@ def results(prompt: str, book_path: str = None):
 
     generate_results(book_path, prompt)
 
+
 @generate.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("prompt", type=str)
 def discussion(prompt: str, book_path: str = None):
@@ -117,12 +110,10 @@ def discussion(prompt: str, book_path: str = None):
 
     generate_discussion(book_path, prompt)
 
+
 @generate.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.argument("prompt", type=str)
 def conclusion(prompt: str, book_path: str = None):
@@ -141,18 +132,16 @@ def conclusion(prompt: str, book_path: str = None):
 
     generate_conclusion(book_path, prompt)
 
+
 @generate.command()
 @click.option(
-    "--book-path",
-    type=click.Path(),
-    help="Path to the paper directory",
-    required=False
+    "--book-path", type=click.Path(), help="Path to the paper directory", required=False
 )
 @click.option(
     "--order",
     type=int,
     help="Order number for the section (between methodology and results)",
-    required=True
+    required=True,
 )
 @click.argument("section_title", type=str)
 @click.argument("prompt", type=str)
