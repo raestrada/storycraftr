@@ -10,7 +10,7 @@ from rich.progress import Progress
 from storycraftr.prompts.story.core import FORMAT_OUTPUT
 from storycraftr.utils.core import load_book_config, generate_prompt_with_hash
 from pathlib import Path
-import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
 
@@ -422,23 +422,26 @@ def get_thread(book_path: str):
             return DummyThread()
 
 
-async def delete_file(vector_stores_api, vector_store_id, file_id):
+def delete_file(vector_stores_api, vector_store_id, file_id):
     """Delete a single file from the vector store."""
     try:
-        await vector_stores_api.files.delete(
+        vector_stores_api.files.delete(
             vector_store_id=vector_store_id,
             file_id=file_id
         )
     except Exception as e:
         console.print(f"[bold red]Error deleting file {file_id}: {str(e)}[/bold red]")
 
-async def delete_files_in_parallel(vector_stores_api, vector_store_id, files):
-    """Delete multiple files from the vector store in parallel."""
-    tasks = [
-        delete_file(vector_stores_api, vector_store_id, file.id)
-        for file in files.data
-    ]
-    await asyncio.gather(*tasks)
+def delete_files_in_parallel(vector_stores_api, vector_store_id, files):
+    """Delete multiple files from the vector store in parallel using ThreadPoolExecutor."""
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [
+            executor.submit(delete_file, vector_stores_api, vector_store_id, file.id)
+            for file in files.data
+        ]
+        # Wait for all tasks to complete
+        for future in futures:
+            future.result()
 
 def update_agent_files(book_path: str, assistant):
     """
@@ -466,7 +469,7 @@ def update_agent_files(book_path: str, assistant):
         # Eliminar archivos en paralelo
         if files.data:
             console.print(f"[bold blue]Deleting {len(files.data)} old files...[/bold blue]")
-            asyncio.run(delete_files_in_parallel(vector_stores_api, vector_store_id, files))
+            delete_files_in_parallel(vector_stores_api, vector_store_id, files)
         
         # Cargar archivos de documentación
         docs_path = Path(book_path) / "storycraftr"
