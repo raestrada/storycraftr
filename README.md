@@ -27,6 +27,12 @@ To install **StoryCraftr**, run the following command:
 pipx install git+https://github.com/raestrada/storycraftr.git@v0.10.1-beta4
 ```
 
+Alternatively, if you have `uv` and `uvx` installed on your system, you can run storycraftr without installing it first:
+
+```bash
+uvx --from git+https://github.com/raestrada/storycraftr.git@v0.10.1-beta4 storycraftr
+```
+
 ### Important: Before using StoryCraftr, make sure to set your OpenAI API key:
 
 Store the key in a text file located at `~/.storycraftr/openai_api_key.txt` for convenience.
