@@ -439,10 +439,37 @@ def update_agent_files(book_path: str, assistant):
         )
         return
 
-    upload_markdown_files_to_vector_store(vector_store_id, book_path, client)
-    console.print(
-        f"[bold green]Files updated successfully in assistant '{assistant.name}'.[/bold green]"
-    )
+    try:
+        # Obtener los archivos actuales del vector store
+        vector_stores_api = client.vector_stores
+        files = vector_stores_api.files.list(vector_store_id=vector_store_id)
+        
+        # Eliminar cada archivo existente
+        for file in files.data:
+            console.print(f"[bold blue]Deleting old file {file.id}...[/bold blue]")
+            vector_stores_api.files.delete(
+                vector_store_id=vector_store_id,
+                file_id=file.id
+            )
+        
+        # Cargar archivos de documentación
+        docs_path = Path(book_path) / "storycraftr"
+        if docs_path.exists():
+            console.print(f"[bold blue]Loading documentation from {docs_path}...[/bold blue]")
+            upload_markdown_files_to_vector_store(vector_store_id, str(docs_path), client)
+        else:
+            console.print(f"[bold yellow]Documentation folder not found at {docs_path}[/bold yellow]")
+        
+        # Cargar archivos del libro
+        console.print(f"[bold blue]Loading book files from {book_path}...[/bold blue]")
+        upload_markdown_files_to_vector_store(vector_store_id, book_path, client)
+
+        console.print(
+            f"[bold green]Files updated successfully in assistant '{assistant.name}'.[/bold green]"
+        )
+    except Exception as e:
+        console.print(f"[bold red]Error updating files: {str(e)}[/bold red]")
+        raise
 
 
 def process_chapters(
