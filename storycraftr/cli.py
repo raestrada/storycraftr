@@ -3,6 +3,7 @@ import os
 import sys
 from rich.console import Console
 from pathlib import Path
+from storycraftr.utils.cleanup import cleanup_vector_stores
 
 console = Console()
 
@@ -296,11 +297,38 @@ def reload_files(book_path):
         project_not_initialized_error(book_path)
 
 
+@click.command()
+@click.option(
+    "--book-path", type=click.Path(), help="Path to the book directory", required=False
+)
+@click.option(
+    "--force", is_flag=True, help="Skip confirmation prompt", default=False
+)
+def cleanup(book_path, force):
+    """Delete all vector stores and their files."""
+    book_path = book_path or os.getcwd()
+    if not load_book_config(book_path):
+        return
+    if is_initialized(book_path):
+        console.print("[bold red]WARNING: This will delete ALL vector stores and their files from OpenAI.[/bold red]")
+        console.print("[bold red]This action cannot be undone![/bold red]")
+        
+        if not force:
+            if not click.confirm("Are you sure you want to continue?"):
+                console.print("[yellow]Operation cancelled.[/yellow]")
+                return
+                
+        cleanup_vector_stores(book_path)
+    else:
+        project_not_initialized_error(book_path)
+
+
 # Add common commands to CLI
 cli.add_command(init, name="init")
 cli.add_command(reload_files)
 cli.add_command(chat)
 cli.add_command(publish)
+cli.add_command(cleanup)
 
 # CLI-specific group configuration
 if cli_name == "storycraftr":

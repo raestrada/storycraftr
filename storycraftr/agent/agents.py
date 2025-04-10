@@ -265,6 +265,7 @@ def create_or_get_assistant(book_path: str):
 
     try:
         # Crear vector store para file_search
+        console.print(f"[bold blue]Creating vector store for {name}...[/bold blue]")
         vector_store = vector_stores_api.create(name=f"{name} Docs")
         
         # Cargar archivos de documentación desde la carpeta storycraftr dentro del book_path
@@ -276,9 +277,15 @@ def create_or_get_assistant(book_path: str):
             console.print(f"[bold yellow]Documentation folder not found at {docs_path}[/bold yellow]")
         
         # Cargar archivos del libro
+        console.print(f"[bold blue]Loading book files from {book_path}...[/bold blue]")
         upload_markdown_files_to_vector_store(vector_store.id, book_path, client)
 
+        # Esperar a que los archivos se carguen completamente
+        console.print("[bold blue]Waiting for files to be processed...[/bold blue]")
+        time.sleep(5)  # Dar tiempo para que los archivos se procesen
+
         # Si no existe, crear uno nuevo con las herramientas soportadas
+        console.print(f"[bold blue]Creating assistant {name}...[/bold blue]")
         assistant = assistants_api.create(
             name=name,
             instructions=behavior_content,
@@ -289,6 +296,7 @@ def create_or_get_assistant(book_path: str):
         )
 
         # Asociar el vector store con el asistente
+        console.print(f"[bold blue]Associating vector store with assistant {name}...[/bold blue]")
         assistants_api.update(
             assistant_id=assistant.id,
             tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
