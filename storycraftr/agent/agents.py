@@ -30,7 +30,22 @@ def initialize_openai_client(book_path: str):
         api_key=os.getenv("OPENAI_API_KEY"), 
         base_url=api_base
     )
-    return client
+    
+    # Verificar si la API es compatible
+    try:
+        # Intentar listar los assistants para verificar la compatibilidad
+        client.beta.assistants.list()
+        return client
+    except AttributeError:
+        # Si falla, intentar con la API más reciente
+        try:
+            client.assistants.list()
+            return client
+        except AttributeError:
+            console.print(
+                f"[bold red]Error: The OpenAI API version being used does not support assistants. Please ensure you are using a compatible version.[/bold red]"
+            )
+            raise
 
 
 def get_vector_store_id_by_name(assistant_name: str, client) -> str:
@@ -44,7 +59,18 @@ def get_vector_store_id_by_name(assistant_name: str, client) -> str:
     Returns:
         str: The ID of the vector store associated with the assistant's name, or None if not found.
     """
-    vector_stores = client.beta.vector_stores.list()
+    try:
+        # Intentar con la API beta primero
+        vector_stores = client.beta.vector_stores.list()
+    except AttributeError:
+        # Si falla, intentar con la API más reciente
+        try:
+            vector_stores = client.vector_stores.list()
+        except AttributeError:
+            console.print(
+                f"[bold red]Error: The OpenAI API version being used does not support vector stores. Please ensure you are using a compatible version.[/bold red]"
+            )
+            return None
 
     expected_name = f"{assistant_name} Docs"
     for vector_store in vector_stores.data:
@@ -73,6 +99,19 @@ def upload_markdown_files_to_vector_store(
     Returns:
         None
     """
+    try:
+        # Intentar con la API beta primero
+        vector_stores_api = client.beta.vector_stores
+    except AttributeError:
+        # Si falla, intentar con la API más reciente
+        try:
+            vector_stores_api = client.vector_stores
+        except AttributeError:
+            console.print(
+                f"[bold red]Error: The OpenAI API version being used does not support vector stores. Please ensure you are using a compatible version.[/bold red]"
+            )
+            return
+
     console.print(
         f"[bold blue]Uploading all knowledge files from '{book_path}'...[/bold blue]"
     )
@@ -83,7 +122,7 @@ def upload_markdown_files_to_vector_store(
         return
 
     file_streams = [open(file_path, "rb") for file_path in md_files]
-    file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+    file_batch = vector_stores_api.file_batches.upload_and_poll(
         vector_store_id=vector_store_id, files=file_streams
     )
 
@@ -148,15 +187,20 @@ def delete_assistant(book_path: str):
         f"[bold blue]Checking if assistant '{name}' exists for deletion...[/bold blue]"
     )
 
-    assistants = client.beta.assistants.list()
-    for assistant in assistants.data:
-        if assistant.name == name:
-            console.print(f"Deleting assistant {name}...")
-            client.beta.assistants.delete(assistant_id=assistant.id)
-            console.print(
-                f"[bold green]Assistant {name} deleted successfully.[/bold green]"
-            )
-            break
+    try:
+        assistants = client.assistants.list()
+        for assistant in assistants.data:
+            if assistant.name == name:
+                console.print(f"Deleting assistant {name}...")
+                client.assistants.delete(assistant_id=assistant.id)
+                console.print(
+                    f"[bold green]Assistant {name} deleted successfully.[/bold green]"
+                )
+                break
+    except AttributeError:
+        console.print(
+            f"[bold red]Error: The OpenAI API version being used does not support assistants. Please ensure you are using a compatible version.[/bold red]"
+        )
 
 
 def create_or_get_assistant(book_path: str):
@@ -180,11 +224,36 @@ def create_or_get_assistant(book_path: str):
         console.print("[red]Behavior file not found.[/red]")
         return None
 
-    # Buscar o crear el asistente
-    assistants = client.beta.assistants.list(
-        order="desc",
-        limit=100,
-    )
+    # Verificar si la API soporta assistants
+    try:
+        # Intentar con la API beta primero
+        assistants = client.beta.assistants.list(
+            order="desc",
+            limit=100,
+        )
+        assistants_api = client.beta.assistants
+        vector_stores_api = client.beta.vector_stores
+    except AttributeError:
+        # Si falla, intentar con la API más reciente
+        try:
+            assistants = client.assistants.list(
+                order="desc",
+                limit=100,
+            )
+            assistants_api = client.assistants
+            vector_stores_api = client.vector_stores
+        except AttributeError:
+            # Si no soporta assistants, crear un asistente dummy
+            console.print(
+                f"[bold yellow]Warning: The OpenAI API version being used does not support assistants. Using chat API instead.[/bold yellow]"
+            )
+            class DummyAssistant:
+                def __init__(self, model, instructions):
+                    self.id = "dummy_assistant_id"
+                    self.model = model
+                    self.instructions = instructions
+                    self.name = Path(book_path).name
+            return DummyAssistant(openai_model, behavior_content)
 
     name = Path(book_path).name
     for assistant in assistants.data:
@@ -194,28 +263,44 @@ def create_or_get_assistant(book_path: str):
             )
             return assistant
 
-    # Crear vector store para file_search
-    vector_store = client.beta.vector_stores.create(name=f"{name} Docs")
-    upload_markdown_files_to_vector_store(vector_store.id, book_path, client)
+    try:
+        # Crear vector store para file_search
+        vector_store = vector_stores_api.create(name=f"{name} Docs")
+        
+        # Cargar archivos de documentación desde la carpeta storycraftr dentro del book_path
+        docs_path = Path(book_path) / "storycraftr"
+        if docs_path.exists():
+            console.print(f"[bold blue]Loading documentation from {docs_path}...[/bold blue]")
+            upload_markdown_files_to_vector_store(vector_store.id, str(docs_path), client)
+        else:
+            console.print(f"[bold yellow]Documentation folder not found at {docs_path}[/bold yellow]")
+        
+        # Cargar archivos del libro
+        upload_markdown_files_to_vector_store(vector_store.id, book_path, client)
 
-    # Si no existe, crear uno nuevo con las herramientas soportadas
-    assistant = client.beta.assistants.create(
-        name=name,
-        instructions=behavior_content,
-        model=openai_model,
-        tools=[{"type": "code_interpreter"}, {"type": "file_search"}],
-        temperature=0.7,  # Nivel de creatividad balanceado
-        top_p=1.0,  # Considerar todas las opciones
-    )
+        # Si no existe, crear uno nuevo con las herramientas soportadas
+        assistant = assistants_api.create(
+            name=name,
+            instructions=behavior_content,
+            model=openai_model,
+            tools=[{"type": "code_interpreter"}, {"type": "file_search"}],
+            temperature=0.7,  # Nivel de creatividad balanceado
+            top_p=1.0,  # Considerar todas las opciones
+        )
 
-    # Asociar el vector store con el asistente
-    client.beta.assistants.update(
-        assistant_id=assistant.id,
-        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
-    )
+        # Asociar el vector store con el asistente
+        assistants_api.update(
+            assistant_id=assistant.id,
+            tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
+        )
 
-    console.print(f"[bold green]Assistant '{name}' created successfully.[/bold green]")
-    return assistant
+        console.print(f"[bold green]Assistant '{name}' created successfully.[/bold green]")
+        return assistant
+    except Exception as e:
+        console.print(
+            f"[bold red]Error: {str(e)}. Please ensure you are using a compatible version of the OpenAI API.[/bold red]"
+        )
+        return None
 
 
 def create_message(
@@ -292,13 +377,53 @@ def create_message(
     )
 
     try:
-        client.beta.threads.messages.create(
-            thread_id=thread_id, role="user", content=prompt_with_hash
-        )
+        # Si es un asistente dummy, usar la API de chat directamente
+        if assistant.id == "dummy_assistant_id":
+            messages = [
+                {"role": "system", "content": assistant.instructions},
+                {"role": "user", "content": prompt_with_hash}
+            ]
+            response = client.chat.completions.create(
+                model=assistant.model,
+                messages=messages,
+                temperature=0.7,
+                top_p=1.0,
+            )
+            return response.choices[0].message.content
 
-        run = client.beta.threads.runs.create(
-            thread_id=thread_id, assistant_id=assistant.id
-        )
+        # Si es un thread dummy, usar la API de chat directamente
+        if thread_id == "dummy_thread_id":
+            messages = [
+                {"role": "system", "content": assistant.instructions},
+                {"role": "user", "content": prompt_with_hash}
+            ]
+            response = client.chat.completions.create(
+                model=assistant.model,
+                messages=messages,
+                temperature=0.7,
+                top_p=1.0,
+            )
+            return response.choices[0].message.content
+
+        # Intentar con la API beta primero
+        try:
+            client.beta.threads.messages.create(
+                thread_id=thread_id, role="user", content=prompt_with_hash
+            )
+
+            run = client.beta.threads.runs.create(
+                thread_id=thread_id, assistant_id=assistant.id
+            )
+        except AttributeError:
+            # Si falla, intentar con la API más reciente
+            client.threads.messages.create(
+                thread_id=thread_id, role="user", content=prompt_with_hash
+            )
+
+            run = client.threads.runs.create(
+                thread_id=thread_id, assistant_id=assistant.id
+            )
+
         if internal_progress:
             progress.start()
 
@@ -307,11 +432,17 @@ def create_message(
 
         # Initial run to get the first part of the response
         while run.status in ["queued", "in_progress"]:
-            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+            try:
+                run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+            except AttributeError:
+                run = client.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
             progress.update(task_id, advance=1)
             time.sleep(0.5)
 
-        messages = client.beta.threads.messages.list(thread_id=thread_id)
+        try:
+            messages = client.beta.threads.messages.list(thread_id=thread_id)
+        except AttributeError:
+            messages = client.threads.messages.list(thread_id=thread_id)
         response_text = messages.data[0].content[0].text.value
 
         # Continue iterating if the response is incomplete or if multiple_answer is true
@@ -320,21 +451,37 @@ def create_message(
             console.print(
                 f"[bold blue]Requesting next part of the response...[/bold blue]"
             )
-            client.beta.threads.messages.create(
-                thread_id=thread_id, role="user", content="next"
-            )
-            run = client.beta.threads.runs.create(
-                thread_id=thread_id, assistant_id=assistant.id
-            )
+            try:
+                client.beta.threads.messages.create(
+                    thread_id=thread_id, role="user", content="next"
+                )
+                run = client.beta.threads.runs.create(
+                    thread_id=thread_id, assistant_id=assistant.id
+                )
+            except AttributeError:
+                client.threads.messages.create(
+                    thread_id=thread_id, role="user", content="next"
+                )
+                run = client.threads.runs.create(
+                    thread_id=thread_id, assistant_id=assistant.id
+                )
 
             while run.status in ["queued", "in_progress"]:
-                run = client.beta.threads.runs.retrieve(
-                    thread_id=thread_id, run_id=run.id
-                )
+                try:
+                    run = client.beta.threads.runs.retrieve(
+                        thread_id=thread_id, run_id=run.id
+                    )
+                except AttributeError:
+                    run = client.threads.runs.retrieve(
+                        thread_id=thread_id, run_id=run.id
+                    )
                 progress.update(task_id, advance=1)
                 time.sleep(0.5)
 
-            messages = client.beta.threads.messages.list(thread_id=thread_id)
+            try:
+                messages = client.beta.threads.messages.list(thread_id=thread_id)
+            except AttributeError:
+                messages = client.threads.messages.list(thread_id=thread_id)
             part_text = messages.data[0].content[0].text.value
             response_text += part_text + "\n\n"
 
@@ -370,21 +517,37 @@ def create_message(
                 "Remove any redundant instructions, clean up formatting, and provide the final output in a markdown format ready to use:\n\n"
                 f"{response_text}"
             )
-            client.beta.threads.messages.create(
-                thread_id=thread_id, role="user", content=post_process_prompt
-            )
-            run = client.beta.threads.runs.create(
-                thread_id=thread_id, assistant_id=assistant.id
-            )
+            try:
+                client.beta.threads.messages.create(
+                    thread_id=thread_id, role="user", content=post_process_prompt
+                )
+                run = client.beta.threads.runs.create(
+                    thread_id=thread_id, assistant_id=assistant.id
+                )
+            except AttributeError:
+                client.threads.messages.create(
+                    thread_id=thread_id, role="user", content=post_process_prompt
+                )
+                run = client.threads.runs.create(
+                    thread_id=thread_id, assistant_id=assistant.id
+                )
 
             while run.status in ["queued", "in_progress"]:
-                run = client.beta.threads.runs.retrieve(
-                    thread_id=thread_id, run_id=run.id
-                )
+                try:
+                    run = client.beta.threads.runs.retrieve(
+                        thread_id=thread_id, run_id=run.id
+                    )
+                except AttributeError:
+                    run = client.threads.runs.retrieve(
+                        thread_id=thread_id, run_id=run.id
+                    )
                 progress.update(task_id, advance=1)
                 time.sleep(0.5)
 
-            messages = client.beta.threads.messages.list(thread_id=thread_id)
+            try:
+                messages = client.beta.threads.messages.list(thread_id=thread_id)
+            except AttributeError:
+                messages = client.threads.messages.list(thread_id=thread_id)
             response_text = messages.data[0].content[0].text.value
 
         return response_text.replace(done_flag, "")
@@ -405,7 +568,24 @@ def get_thread(book_path: str):
         object: The thread object.
     """
     client = initialize_openai_client(book_path)
-    return client.beta.threads.create()
+    try:
+        # Intentar con la API beta primero
+        thread = client.beta.threads.create()
+        return thread
+    except AttributeError:
+        # Si falla, intentar con la API más reciente
+        try:
+            thread = client.threads.create()
+            return thread
+        except Exception as e:
+            console.print(
+                f"[bold red]Error creating thread: {str(e)}. Please ensure you are using a compatible version of the OpenAI API.[/bold red]"
+            )
+            # Crear un thread dummy para evitar errores
+            class DummyThread:
+                def __init__(self):
+                    self.id = "dummy_thread_id"
+            return DummyThread()
 
 
 def update_agent_files(book_path: str, assistant):
