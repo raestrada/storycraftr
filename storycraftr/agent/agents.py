@@ -323,13 +323,47 @@ def create_message(
             f"[bold blue]Creating message in thread {thread_id}...[/bold blue]"
         )
 
+    if file_path and os.path.exists(file_path):
+        if should_print:
+            console.print(
+                f"[bold blue]Reading content from {file_path} for improvement...[/bold blue]"
+            )
+        with open(file_path, "r", encoding="utf-8") as f:
+            file_content = f.read()
+            content = (
+                f"{content}\n\nHere is the existing content to improve:\n{file_content}"
+            )
+    else:
+        if should_print:
+            console.print(
+                f"[bold blue]Using provided prompt to generate new content...[/bold blue]"
+            )
+
+    # Add instructions for multiple answers if the flag is true and force_single_answer is false
+    if config.multiple_answer and not force_single_answer:
+        console.print(
+            "[bold blue]Adding multi-part response generation instructions (3 parts total)...[/bold blue]"
+        )
+        content = (
+            "Please provide the response in exactly 3 parts to avoid output token limitations. "
+            "ONLY in the final (third) part, indicate 'END_OF_RESPONSE' when the response is complete. "
+            "Continue providing the next part of the response when you receive the prompt 'next'.\n\n"
+            + content
+        )
+
     # Generar el prompt con hash
     prompt_with_hash = generate_prompt_with_hash(
-        content, datetime.now().strftime("%B %d, %Y"), book_path
+        f"{FORMAT_OUTPUT.format(reference_author=config.reference_author, language=config.primary_language)}\n\n{content}",
+        datetime.now().strftime("%B %d, %Y"),
+        book_path=book_path,
     )
 
     try:
-        # Usar la API de Assistants
+        if config.multiple_answer and not force_single_answer:
+            console.print(
+                "[bold blue]Starting multi-part response generation (3 parts total)...[/bold blue]"
+            )
+
         client.beta.threads.messages.create(
             thread_id=thread_id, role="user", content=prompt_with_hash
         )
@@ -353,23 +387,37 @@ def create_message(
         messages = client.beta.threads.messages.list(thread_id=thread_id)
         response_text = messages.data[0].content[0].text.value
 
+        if config.multiple_answer and not force_single_answer:
+            console.print(
+                "[bold green]✓ First part of the response received[/bold green]"
+            )
+
         # Continue iterating if the response is incomplete or if multiple_answer is true
         iter = 0
-        while not force_single_answer and (done_flag not in response_text) and iter < 3:
+        while (
+            not force_single_answer and (done_flag not in response_text) and iter < 2
+        ):  # Changed to 2 to limit to 3 parts total
             iter += 1
             if should_print:
                 console.print(
-                    f"[bold blue]Iteration {iter} of response generation...[/bold blue]"
+                    f"[bold blue]Requesting part {iter + 1} of 3...[/bold blue]"
                 )
 
-            # Create a new run to continue the response
+            # Add reminder for last part
+            next_prompt = "next"
+            if iter == 2:  # This is the third and final part
+                next_prompt = "THIS IS THE FINAL PART. PLEASE COMPLETE YOUR RESPONSE AND END WITH 'END_OF_RESPONSE'."
+                console.print(
+                    "[bold yellow]⚠ This is the final part. The response should be completed and include END_OF_RESPONSE.[/bold yellow]"
+                )
+
+            client.beta.threads.messages.create(
+                thread_id=thread_id, role="user", content=next_prompt
+            )
             run = client.beta.threads.runs.create(
-                thread_id=thread_id,
-                assistant_id=assistant.id,
-                instructions=f"Continue the response from where you left off. If you have finished, end with {done_flag}.",
+                thread_id=thread_id, assistant_id=assistant.id
             )
 
-            # Wait for the run to complete
             while run.status in ["queued", "in_progress"]:
                 run = client.beta.threads.runs.retrieve(
                     thread_id=thread_id, run_id=run.id
@@ -377,9 +425,13 @@ def create_message(
                 progress.update(task_id, advance=1)
                 time.sleep(0.5)
 
-            # Get the updated messages
             messages = client.beta.threads.messages.list(thread_id=thread_id)
             new_response = messages.data[0].content[0].text.value
+
+            if config.multiple_answer and not force_single_answer:
+                console.print(
+                    f"[bold green]✓ Part {iter + 1} of 3 received[/bold green]"
+                )
 
             # Append the new response to the existing one
             response_text += "\n" + new_response
@@ -390,6 +442,10 @@ def create_message(
         # Remove the done flag if it exists
         if done_flag in response_text:
             response_text = response_text.replace(done_flag, "")
+            if config.multiple_answer and not force_single_answer:
+                console.print(
+                    "[bold green]✓ END_OF_RESPONSE detected - Response completed successfully with all 3 parts[/bold green]"
+                )
 
         return response_text
 
