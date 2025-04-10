@@ -1,8 +1,8 @@
-# PaperCraftr 0.10.0-beta3
+# PaperCraftr 0.10.1-beta4
 
 ## 🎉 Major Release: Complete Command Implementation
 
-We're excited to announce the release of PaperCraftr 0.10.0-beta3, which marks a significant milestone in the development of our academic paper writing tool. This release implements all the core commands that were previously missing, providing a complete workflow for academic paper creation and management.
+We're excited to announce the release of PaperCraftr 0.10.1-beta4, which marks a significant milestone in the development of our academic paper writing tool. This release implements all the core commands that were previously missing, providing a complete workflow for academic paper creation and management.
 
 ## ✨ New Features
 
@@ -66,7 +66,7 @@ PaperCraftr now supports a complete academic paper writing workflow:
 
 ## 🚀 Getting Started
 
-To get started with PaperCraftr 0.10.0-beta3:
+To get started with PaperCraftr 0.10.1-beta4:
 
 ```bash
 # Initialize a new paper project

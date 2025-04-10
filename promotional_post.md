@@ -1,6 +1,6 @@
 # 🚀 Introducing PaperCraftr: Your AI-Powered Academic Paper Writing Assistant
 
-We're thrilled to announce the release of **PaperCraftr 0.10.0-beta3**, a powerful tool designed to streamline your academic paper writing process. And yes, it's powered by the same engine as our beloved **StoryCraftr**!
+We're thrilled to announce the release of **PaperCraftr 0.10.1-beta4**, a powerful tool designed to streamline your academic paper writing process. And yes, it's powered by the same engine as our beloved **StoryCraftr**!
 
 ## 📚 What is PaperCraftr?
 
