@@ -109,7 +109,7 @@ storycraftr init "La purga de los dioses" --primary-language "es" --alternate-la
 ### Generate a general outline:
 
 ```bash
-storycraftr outline general-outline "Summarize the overall plot of a dystopian science fiction where advanced technology, resembling magic, has led to the fall of humanity’s elite and the rise of a manipulative villain who seeks to destroy both the ruling class and the workers."
+storycraftr outline general-outline "Summarize the overall plot of a dystopian science fiction where advanced technology, resembling magic, has led to the fall of humanity's elite and the rise of a manipulative villain who seeks to destroy both the ruling class and the workers."
 ```
 
 ## 💬 Introducing Chat!!! – A Simple Yet Powerful Tool to Supercharge Your Conversations! 💥
@@ -119,6 +119,102 @@ Whether you're brainstorming ideas, refining your story, or just need a little c
 🚀 Sometimes, all you need is a little chat to get the gears turning! Try it out and watch your creativity soar!
 
 ![chat](https://res.cloudinary.com/dyknhuvxt/image/upload/v1729551304/chat-example_hdo9yu.png)
+
+## 🔍 NEW: LlamaIndex Integration for Knowledge-Enhanced Storytelling! 
+
+StoryCraftr now includes powerful semantic search capabilities powered by LlamaIndex! This integration allows you to search your book content with natural language queries and get accurate, context-aware responses to enhance your storytelling process.
+
+### Knowledge-Driven Storytelling:
+
+- **Non-Fiction Stories**: Create factually accurate content with direct references to your research materials. LlamaIndex helps retrieve specific facts, quotes, and references to maintain scholarly accuracy.
+  
+- **Fiction Stories**: Use knowledge bases as creative guides for worldbuilding, character development, and plot consistency. LlamaIndex helps maintain internal consistency in your fictional world.
+
+### Key Features:
+
+- **Smart Search**: Search your entire book content with natural language questions
+- **Enhanced Responses**: Get AI responses informed by your specific book's content
+- **Context-Aware Writing**: Maintain consistency across your book by quickly finding related content
+- **Knowledge References**: Automatically incorporate facts, quotes, and background material
+- **Story Flow Support**: Use indexed content to guide narrative development and character arcs
+- **Python 3.11 Support**: Built with modern Python for better performance
+
+### Story Enhancement Examples:
+
+For non-fiction works, retrieve accurate citations:
+```bash
+storycraftr llamaindex query "Find relevant quotes about climate change from my research materials"
+```
+
+For fiction, ensure worldbuilding consistency:
+```bash
+storycraftr llamaindex query "What are the established rules of magic in my fantasy world?"
+```
+
+In chat mode for creative guidance:
+```bash
+!llamaindex query "How have I described the protagonist's relationship with their father?"
+```
+
+### Quick Usage:
+
+Build a semantic index of all your materials:
+```bash
+storycraftr llamaindex build-index
+```
+
+Query your knowledge base during writing:
+```bash
+storycraftr llamaindex query "What are the main conflicts in my story?"
+```
+
+Use in chat for interactive guidance:
+```bash
+!llamaindex query "What are the protagonist's motivations?"
+```
+
+### Integration Architecture
+
+LlamaIndex seamlessly integrates with StoryCraftr's existing systems:
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  StoryCraftr    │     │    LlamaIndex   │     │  OpenAI API     │
+│  CLI Interface  │─────▶   Integration   │─────▶  (or similar)   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+         │                       │                       │
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Book Content   │     │  Vector Store   │     │    Embeddings   │
+│   Directories   │─────▶      Index      │─────▶      API        │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+### Storytelling Workflow Enhancement:
+
+1. **Research Phase**: Index all your research materials, notes, and references
+2. **Outlining Phase**: Query the index to establish key story elements and factual foundations
+3. **Writing Phase**: Use context-aware queries to maintain consistency and accuracy
+4. **Editing Phase**: Verify factual claims and narrative consistency against your knowledge base
+
+### Development Setup:
+
+Set up with Python 3.11 in a virtual environment:
+
+```bash
+# Create Python 3.11 venv
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Test the installation
+python test_llamaindex.py
+```
+
+For more details about the LlamaIndex integration, see the [LlamaIndex documentation](storycraftr/llamaindex/README.md).
 
 ## Full Guide
 
@@ -156,7 +252,7 @@ The **StoryCraftr Chat** feature allows users to engage directly with an AI assi
   !outline general-outline "Summarize the overall plot of a dystopian sci-fi novel."
   ```
 
-- **Worldbuilding**: Build the world’s history, geography, and technology, or develop the magic system.  
+- **Worldbuilding**: Build the world's history, geography, and technology, or develop the magic system.  
   Example:
 
   ```bash
@@ -211,7 +307,7 @@ Let your creativity flow with the power of AI! ✨
 
 ## Contributing
 
-We welcome contributions of all kinds! Whether you’re a developer, writer, or simply interested in improving the tool, you can help. Here’s how you can contribute:
+We welcome contributions of all kinds! Whether you're a developer, writer, or simply interested in improving the tool, you can help. Here's how you can contribute:
 
 1. **Fork the repository** and create your branch:
 
