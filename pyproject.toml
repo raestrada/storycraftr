@@ -52,7 +52,7 @@ testpaths = [
     "tests"
 ]
 filterwarnings = [
-    "ignore::LangChainDeprecationWarning",
+    "ignore::langchain_core._api.LangChainDeprecationWarning",
     "ignore:invalid escape sequence:SyntaxWarning",
 ]
 
