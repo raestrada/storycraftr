@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from storycraftr.rag.vector_store import VectorStore
+from storycraftr.rag.models import DocumentChunk
 
 @pytest.fixture
 def mock_embedding_generator():
@@ -39,13 +40,16 @@ def test_vector_store_store_documents(MockChromaClient, mock_embedding_generator
     
     store = VectorStore(collection_name="test_collection", embedding_generator=mock_embedding_generator)
     
-    documents = ["doc1", "doc2"]
+    documents = [
+        DocumentChunk(page_content="doc1", metadata={"source": "test"}),
+        DocumentChunk(page_content="doc2", metadata={"source": "test"}),
+    ]
     store.store_documents(documents)
     
     mock_collection.add.assert_called_once()
     args, kwargs = mock_collection.add.call_args
     assert "documents" in kwargs
-    assert kwargs["documents"] == documents
+    assert kwargs["documents"] == ["doc1", "doc2"]
     assert isinstance(kwargs["ids"], list)
     assert len(kwargs["ids"]) == len(documents)
 

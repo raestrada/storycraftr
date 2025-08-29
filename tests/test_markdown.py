@@ -38,7 +38,7 @@ def test_save_to_markdown_backup(mock_copy, mock_console, temp_book_dir):
     save_to_markdown(book_path, file_name, header, content)
 
     # Verificar que se realizó una copia de seguridad
-    mock_copy.assert_called_with(str(file_path), str(file_path) + ".back")
+    mock_copy.assert_called_with(file_path, Path(f"{file_path}.back"))
     assert file_path.read_text() == f"# {header}\n\n{content}"
 
 

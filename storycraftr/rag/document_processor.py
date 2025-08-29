@@ -1,8 +1,10 @@
 """
 Functions to load and chunk Markdown files.
 """
+from typing import List
+from .models import DocumentChunk
 
-def load_and_chunk_markdown(book_path: str, chunk_size: int, chunk_overlap: int) -> list:
+def load_and_chunk_markdown(book_path: str, chunk_size: int, chunk_overlap: int) -> List[DocumentChunk]:
     """
     Loads Markdown files from the given path, chunks them, and returns a list of document chunks.
 
@@ -13,6 +15,6 @@ def load_and_chunk_markdown(book_path: str, chunk_size: int, chunk_overlap: int)
     :param chunk_overlap: The overlap between chunks in characters.
     :type chunk_overlap: int
     :return: A list of document chunks.
-    :rtype: list
+    :rtype: List[DocumentChunk]
     """
     raise NotImplementedError

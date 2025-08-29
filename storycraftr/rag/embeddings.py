@@ -1,6 +1,8 @@
 """
 Handles embedding generation.
 """
+from typing import List
+from sentence_transformers import SentenceTransformer
 
 class EmbeddingGenerator:
     """
@@ -13,26 +15,26 @@ class EmbeddingGenerator:
         :param model_name: The name of the sentence-transformer model to use.
         :type model_name: str
         """
-        raise NotImplementedError
+        self.model = SentenceTransformer(model_name)
 
-    def generate_embeddings(self, documents: list) -> list:
+    def generate_embeddings(self, documents: List[str]) -> List[List[float]]:
         """
         Generates embeddings for a list of documents.
 
         :param documents: A list of document chunks (strings).
-        :type documents: list
+        :type documents: List[str]
         :return: A list of embeddings.
-        :rtype: list
+        :rtype: List[List[float]]
         """
         raise NotImplementedError
 
-    def __call__(self, input: list) -> list:
+    def __call__(self, input: List[str]) -> List[List[float]]:
         """
         Makes the class callable for ChromaDB's embedding function.
 
         :param input: A list of document chunks (strings).
-        :type input: list
+        :type input: List[str]
         :return: A list of embeddings.
-        :rtype: list
+        :rtype: List[List[float]]
         """
         return self.generate_embeddings(input)
