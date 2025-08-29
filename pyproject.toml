@@ -22,6 +22,7 @@ sentence-transformers = "^5.1"
 pypdf = "^6.0"
 unstructured = "^0.18"
 onnxruntime = "^1.18.1"
+ragas = "^0.1.9"
 torch = {version = "^2.8.0", source = "pytorch_cpu"}
 
 [tool.poetry.scripts]
