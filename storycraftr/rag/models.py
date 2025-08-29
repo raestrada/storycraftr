@@ -4,7 +4,7 @@ from typing import Protocol, List
 @dataclass
 class DocumentChunk:
     """A chunk of a document."""
-    page_content: str
+    content: str
     metadata: dict
 
 class EmbeddingFunction(Protocol):

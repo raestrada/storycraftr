@@ -31,9 +31,23 @@ class VectorStore:
         :param documents: A list of document chunks to store.
         :type documents: List[DocumentChunk]
         """
-        raise NotImplementedError
+        if not documents:
+            return
 
-    def query(self, query_text: str, n_results: int = 5) -> List[str]:
+        import hashlib
+
+        contents = [doc.content for doc in documents]
+        metadatas = [doc.metadata for doc in documents]
+        ids = [
+            hashlib.sha256(
+                f"{doc.metadata.get('source', '')}:{doc.content}".encode()
+            ).hexdigest()
+            for doc in documents
+        ]
+
+        self.collection.upsert(documents=contents, metadatas=metadatas, ids=ids)
+
+    def query(self, query_text: str, n_results: int = 5) -> List[DocumentChunk]:
         """
         Queries the vector store for relevant document chunks.
 
@@ -41,7 +55,20 @@ class VectorStore:
         :type query_text: str
         :param n_results: The number of results to return.
         :type n_results: int
-        :return: A list of relevant document chunk contents.
-        :rtype: List[str]
+        :return: A list of relevant document chunks.
+        :rtype: List[DocumentChunk]
         """
-        raise NotImplementedError
+        results = self.collection.query(query_texts=[query_text], n_results=n_results)
+
+        retrieved_chunks = []
+        if results and results.get("documents"):
+            # ChromaDB query returns a list of lists, one for each query text.
+            # We are only querying with one text.
+            for content, metadata in zip(
+                results["documents"][0], results["metadatas"][0]
+            ):
+                retrieved_chunks.append(
+                    DocumentChunk(content=content, metadata=metadata)
+                )
+
+        return retrieved_chunks

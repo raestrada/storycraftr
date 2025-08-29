@@ -26,7 +26,8 @@ class EmbeddingGenerator:
         :return: A list of embeddings.
         :rtype: List[List[float]]
         """
-        raise NotImplementedError
+        embeddings = self.model.encode(documents, convert_to_tensor=False)
+        return embeddings.tolist()
 
     def __call__(self, input: List[str]) -> List[List[float]]:
         """

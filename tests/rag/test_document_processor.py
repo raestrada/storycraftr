@@ -25,9 +25,9 @@ def test_load_and_chunk_markdown_loads_files(book_path):
     """
     chunks = load_and_chunk_markdown(book_path, chunk_size=50, chunk_overlap=10)
     assert len(chunks) > 0
-    assert any("Chapter 1" in chunk.page_content for chunk in chunks)
-    assert any("Chapter 2" in chunk.page_content for chunk in chunks)
-    assert not any("Some notes" in chunk.page_content for chunk in chunks)
+    assert any("Chapter 1" in chunk.content for chunk in chunks)
+    assert any("Chapter 2" in chunk.content for chunk in chunks)
+    assert not any("Some notes" in chunk.content for chunk in chunks)
 
 def test_load_and_chunk_markdown_chunking(book_path):
     """
@@ -35,10 +35,10 @@ def test_load_and_chunk_markdown_chunking(book_path):
     """
     # Using content from chapter2.md: "# Chapter 2\n\nThis is the second chapter, it is a bit longer to test chunking."
     chunks = load_and_chunk_markdown(book_path, chunk_size=30, chunk_overlap=5)
-    
+
     # We expect multiple chunks from the files.
-    assert len(chunks) > 2 
-    
+    assert len(chunks) > 2
+
     # This test is somewhat implementation-specific and might need adjustment.
     # We check if one of the chunks has a smaller size than chunk_size.
-    assert any(len(chunk.page_content) <= 30 for chunk in chunks)
+    assert any(len(chunk.content) <= 30 for chunk in chunks)
