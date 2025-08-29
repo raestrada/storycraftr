@@ -213,15 +213,21 @@ Let your creativity flow with the power of AI! ✨
 
 We welcome contributions of all kinds! Whether you’re a developer, writer, or simply interested in improving the tool, you can help. Here’s how you can contribute:
 
-1. **Fork the repository** and create your branch:
+1. **Set up your development environment**:
+   ```bash
+   poetry install --with dev
+   poetry run pre-commit install
+   ```
 
-```bash
-git checkout -b feature/YourFeature
-```
+2. **Fork the repository** and create your branch:
 
-2. **Make your changes**, ensuring all tests pass.
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
 
-3. **Submit a pull request** detailing your changes.
+3. **Make your changes**, ensuring all tests pass and pre-commit hooks succeed.
+
+4. **Submit a pull request** detailing your changes.
 
 Join us on this journey to create an amazing open-source tool for writers everywhere. Together, we can make StoryCraftr the go-to AI writing assistant! 💡
 
