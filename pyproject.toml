@@ -51,6 +51,10 @@ build-backend = "poetry.core.masonry.api"
 testpaths = [
     "tests"
 ]
+filterwarnings = [
+    "ignore::LangChainDeprecationWarning",
+    "ignore:invalid escape sequence:SyntaxWarning",
+]
 
 [tool.black]
 line-length = 88
