@@ -25,11 +25,13 @@ The test suite is configured to mock external services, such as the Hugging Face
 Some tests evaluate integration with LLM providers like OpenAI. These tests are skipped by default. To enable them, you must set the following environment variables:
 
 - `OPENAI_API_KEY`: Your OpenAI API key.
+- `OPENAI_BASE_URL` (optional): The base URL for a compatible API endpoint (e.g., Mistral AI).
 
 You can set these variables in a `.env` file in the project root or export them in your shell:
 
 ```bash
 export OPENAI_API_KEY="sk-..."
+export OPENAI_BASE_URL="https://api.mistral.ai/v1/"
 poetry run pytest
 ```
 
