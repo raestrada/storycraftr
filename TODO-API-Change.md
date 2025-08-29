@@ -1,5 +1,10 @@
 # StoryCraftr Migration Action Plan
 
+Do not commit this file. Do not mention it in .gitignore, etc.
+
+Generally keep the code complexity low. Refactor common code into one place. Keep modules
+to reasonable lengths (e.g. 500 lines) if possible.
+
 ## 1. Executive Summary
 
 This document outlines the action plan for migrating StoryCraftr from its current dependency on OpenAI's Assistants API to a more flexible architecture using the Chat Completions API and a custom Retrieval-Augmented Generation (RAG) system.
@@ -18,6 +23,13 @@ The migration is broken down into three phases to manage complexity and risk.
 
 **Goal:** Build the core components for a provider-agnostic RAG system without modifying the existing OpenAI integration. This allows for isolated development and testing.
 
+IMPORTANT general policy for tests:
+- they should provide as much coverage as possible, mock external services as needed.
+- they can integrate with LLM API providers conditionally if well documented API access variables are set (document them in a top level file TESTS.md)
+- use the time when you have access to API keys to capture mock content.
+- avoid using adhoc tests, consider if the test suite could be improved by adding a test that tests what you want to test in an adhoc manner.
+- provide pauses for the user to do reviews of your changes.
+
 **Estimated Effort:** 3-5 days.
 
 | Task ID | Description | Key Actions |
@@ -25,6 +37,8 @@ The migration is broken down into three phases to manage complexity and risk.
 | **1.1** | **Add Dependencies** | Modify `pyproject.toml` to include: `chromadb` (for local vector store), `sentence-transformers` (for local embeddings), `pypdf` and `unstructured` (for document parsing). Run `poetry lock` and `poetry install`. |
 | **1.2** | **Create RAG Core Modules** | Create a new `storycraftr/rag/` directory with the following modules: <br> - `document_processor.py`: Functions to load and chunk Markdown files from the book path. <br> - `embeddings.py`: A class/module to handle embedding generation. Start with a local CPU-based model from `sentence-transformers`. <br> - `vector_store.py`: An abstraction layer for ChromaDB to handle storing and retrieving document chunks. |
 | **1.3** | **Establish Test Suite** | Create a `tests/` directory and configure `pytest`. Write unit tests for the new RAG modules (`document_processor`, `embeddings`, `vector_store`) to ensure they function correctly before integration. |
+| **1.4** | build quality measurement tests for the RAG. 
+| **1.5** | evaluate the RAG.
 
 ### Phase 2: Core Logic Migration
 
