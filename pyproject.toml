@@ -21,11 +21,8 @@ chromadb = "^1.0"
 sentence-transformers = "^5.1"
 pypdf = "^6.0"
 unstructured = "^0.18"
-onnxruntime-cpu = "^1.18.1"
+onnxruntime = "^1.18.1"
 torch = {version = "^2.8.0", source = "pytorch_cpu"}
-
-[tool.poetry.dev-dependencies]
-pytest = ">=6.2.4"
 
 [tool.poetry.scripts]
 storycraftr = "storycraftr.cli:cli"
