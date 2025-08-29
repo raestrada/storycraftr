@@ -22,7 +22,8 @@ def mock_console():
 
 # Test download_file function
 @mock.patch("requests.get")
-def test_download_file_success(mock_get, mock_console):
+@mock.patch("storycraftr.init.console")
+def test_download_file_success(mock_console, mock_get):
     mock_response = mock.Mock()
     mock_response.text = "file content"
     mock_response.raise_for_status = mock.Mock()
@@ -44,7 +45,8 @@ def test_download_file_success(mock_get, mock_console):
 
 
 @mock.patch("requests.get", side_effect=requests.exceptions.RequestException("Error"))
-def test_download_file_failure(mock_get, mock_console):
+@mock.patch("storycraftr.init.console")
+def test_download_file_failure(mock_console, mock_get):
     with pytest.raises(SystemExit):
         download_file("http://example.com", "test_dir", "test_file.txt")
 
@@ -54,25 +56,25 @@ def test_download_file_failure(mock_get, mock_console):
 
 
 # Test verify_book_path function
-@mock.patch("pathlib.Path.exists", return_value=True)
-def test_verify_book_path_success(mock_console):  # Se agrega el parámetro mock_console
+@mock.patch("os.path.exists", return_value=True)
+def test_verify_book_path_success(mock_exists):
     assert verify_book_path("test_path") == "test_path"
 
 
-@mock.patch("pathlib.Path.exists", return_value=False)
-def test_verify_book_path_failure(mock_console):  # Se agrega el parámetro mock_console
+@mock.patch("os.path.exists", return_value=False)
+def test_verify_book_path_failure(mock_exists):
     with pytest.raises(ClickException):
         verify_book_path("invalid_path")
 
 
 # Test is_initialized function
-@mock.patch("pathlib.Path.exists", return_value=True)
-def test_is_initialized_true(mock_console):  # Se agrega el parámetro mock_console
+@mock.patch("os.path.exists", return_value=True)
+def test_is_initialized_true(mock_exists):
     assert is_initialized("test_path")
 
 
-@mock.patch("pathlib.Path.exists", return_value=False)
-def test_is_initialized_false(mock_console):  # Se agrega el parámetro mock_console
+@mock.patch("os.path.exists", return_value=False)
+def test_is_initialized_false(mock_exists):
     assert not is_initialized("test_path")
 
 
