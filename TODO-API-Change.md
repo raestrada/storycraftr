@@ -29,6 +29,7 @@ IMPORTANT general policy for tests:
 - use the time when you have access to API keys to capture mock content.
 - avoid using adhoc tests, consider if the test suite could be improved by adding a test that tests what you want to test in an adhoc manner.
 - provide pauses for the user to do reviews of your changes.
+- new Python code should follow ReST documentation conventions for docstrings.
 
 **Estimated Effort:** 3-5 days.
 
@@ -36,7 +37,7 @@ IMPORTANT general policy for tests:
 |---|---|---|---|
 | **1.1** | **Add Dependencies** | Modify `pyproject.toml` to include: `chromadb`, `sentence-transformers`, `pypdf`, and `unstructured`. Ensure CPU-only versions of `torch` and `onnxruntime` are used to avoid CUDA dependencies. | **Done** |
 | **1.2** | **Create RAG Core Modules** | Create a new `storycraftr/rag/` directory with the following modules: <br> - `document_processor.py`: Functions to load and chunk Markdown files from the book path. <br> - `embeddings.py`: A class/module to handle embedding generation. Start with a local CPU-based model from `sentence-transformers`. <br> - `vector_store.py`: An abstraction layer for ChromaDB to handle storing and retrieving document chunks. | To Do |
-| **1.3** | **Establish Test Suite** | Create a `tests/` directory and configure `pytest`. Write unit tests for the new RAG modules (`document_processor`, `embeddings`, `vector_store`) to ensure they function correctly before integration. | To Do |
+| **1.3** | **Establish Test Suite** | Create a `tests/` directory and configure `pytest`. Write unit tests for the new RAG modules (`document_processor`, `embeddings`, `vector_store`) to ensure they function correctly before integration. | In Progress |
 | **1.4** | build quality measurement tests for the RAG. | | To Do |
 | **1.5** | evaluate the RAG. | | To Do |
 
