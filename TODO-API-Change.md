@@ -38,8 +38,8 @@ IMPORTANT general policy for tests:
 | **1.1** | **Add Dependencies** | Modify `pyproject.toml` to include: `chromadb`, `sentence-transformers`, `pypdf`, and `unstructured`. Ensure CPU-only versions of `torch` and `onnxruntime` are used to avoid CUDA dependencies. | **Done** |
 | **1.2** | **Create RAG Core Modules** | Create a new `storycraftr/rag/` directory with the following modules: <br> - `document_processor.py`: Functions to load and chunk Markdown files from the book path. <br> - `embeddings.py`: A class/module to handle embedding generation. Start with a local CPU-based model from `sentence-transformers`. <br> - `vector_store.py`: An abstraction layer for ChromaDB to handle storing and retrieving document chunks. | **Done** |
 | **1.3** | **Establish Test Suite** | Create a `tests/` directory and configure `pytest`. Write unit tests for the new RAG modules (`document_processor`, `embeddings`, `vector_store`) to ensure they function correctly before integration. | **Done** |
-| **1.4** | build quality measurement tests for the RAG. | | To Do |
-| **1.5** | evaluate the RAG. | | To Do |
+| **1.4** | **Design RAG Quality Measurement Tests** | Review `RAG-eval-report.md` to select a framework (e.g., RAGAS) and define metrics for faithfulness, context relevance, and answer relevancy. | To Do |
+| **1.5** | **Evaluate and Refine RAG Retrieval** | Implement evaluation tests. Refine retrieval to use confidence scores instead of a fixed number of results, considering context limits and merging overlapping chunks to optimize context quality. | To Do |
 
 ### Phase 2: Core Logic Migration
 
