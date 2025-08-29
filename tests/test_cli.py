@@ -6,13 +6,11 @@ from unittest import mock
 from pathlib import Path
 from click import ClickException
 from storycraftr.cli import (
-    load_openai_api_key,
-    download_file,
     verify_book_path,
     is_initialized,
     project_not_initialized_error,
-    init_structure,
 )
+from storycraftr.init import download_file
 
 
 # Mock the console object to avoid printing to the console during tests
