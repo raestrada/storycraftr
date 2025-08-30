@@ -24,27 +24,24 @@ from storycraftr.utils.markdown import save_to_markdown
 console = Console()
 
 
-def iterate_check_names(book_path: str):
+def iterate_check_names(book_path: str) -> None:
     """
     Check for name consistency across all chapters in the book.
+    The results are saved to markdown files.
 
     Args:
         book_path (str): The path to the book's directory.
-
-    Returns:
-        Corrections made to ensure name consistency.
     """
-    corrections = process_chapters(
+    process_chapters(
         save_to_markdown,
         book_path,
         prompt_template=CHECK_NAMES_PROMPT,
         task_description="Checking name consistency...",
         file_suffix="Name Consistency Check",
     )
-    return corrections
 
 
-def fix_name_in_chapters(book_path: str, original_name: str, new_name: str):
+def fix_name_in_chapters(book_path: str, original_name: str, new_name: str) -> None:
     """
     Update character names across all chapters.
 
@@ -66,7 +63,7 @@ def fix_name_in_chapters(book_path: str, original_name: str, new_name: str):
 
 def refine_character_motivation(
     book_path: str, character_name: str, story_context: str
-):
+) -> None:
     """
     Refine the motivations of a character across all chapters.
 
@@ -86,7 +83,7 @@ def refine_character_motivation(
     )
 
 
-def strengthen_core_argument(book_path: str, argument: str):
+def strengthen_core_argument(book_path: str, argument: str) -> None:
     """
     Strengthen the core argument across all chapters.
 
@@ -104,7 +101,7 @@ def strengthen_core_argument(book_path: str, argument: str):
     )
 
 
-def check_consistency_across(book_path: str, consistency_type: str):
+def check_consistency_across(book_path: str, consistency_type: str) -> None:
     """
     Check for overall consistency across chapters.
 
@@ -128,10 +125,17 @@ def insert_new_chapter(
     prompt: str,
     flashback: bool = False,
     split: bool = False,
-):
+) -> None:
     """
     Insert a new chapter at a specific position, renumbering subsequent chapters.
     Optionally handles flashbacks and chapter splits.
+
+    Args:
+        book_path (str): Path to the book directory.
+        position (int): The position to insert the new chapter (1-based index).
+        prompt (str): The prompt for generating the new chapter's content.
+        flashback (bool): Whether the new chapter is a flashback.
+        split (bool): Whether the new chapter is a result of a split.
     """
     chapters_dir = Path(book_path) / "chapters"
     if not chapters_dir.is_dir():
@@ -144,6 +148,13 @@ def insert_new_chapter(
         [f for f in chapters_dir.glob("chapter-*.md")],
         key=lambda p: int(p.stem.split("-")[1]),
     )
+
+    # Validate position
+    if not (1 <= position <= len(chapter_files) + 1):
+        console.print(
+            f"[bold red]Error: Invalid position. Must be between 1 and {len(chapter_files) + 1}.[/bold red]"
+        )
+        return
 
     # Rename subsequent chapters to make space for the new one
     for i in range(len(chapter_files) - 1, position - 2, -1):
@@ -214,10 +225,20 @@ def rewrite_surrounding_chapter(
     split: bool,
     progress: Progress,
     task_chapters,
-):
+) -> None:
     """
     Rewrite a chapter to ensure it fits seamlessly with surrounding chapters,
     especially after an insertion.
+
+    Args:
+        book_path (str): The path to the book's directory.
+        chapter_path (Path): The path to the chapter file to rewrite.
+        chapter_num (int): The number of the chapter being rewritten.
+        position (int): The position where a new chapter was inserted.
+        flashback (bool): Whether the inserted chapter was a flashback.
+        split (bool): Whether the inserted chapter was from a split.
+        progress (Progress): The Rich Progress object for UI feedback.
+        task_chapters: The Rich Task object for chapter processing.
     """
     if not chapter_path.exists():
         console.print(
