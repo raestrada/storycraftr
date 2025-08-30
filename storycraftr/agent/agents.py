@@ -48,7 +48,8 @@ def ingest_book_data(book_path: str):
     chunk_size = 1024
     chunk_overlap = 200
     console.print(
-        f"Loading and chunking documents with chunk size {chunk_size} and overlap {chunk_overlap}..."
+        f"Loading and chunking documents with chunk size {chunk_size} and "
+        f"overlap {chunk_overlap}..."
     )
     document_chunks = load_and_chunk_markdown(book_path, chunk_size, chunk_overlap)
 
@@ -124,8 +125,9 @@ def create_message(
 
     # 3. Construct the prompt
     system_prompt = (
-        "You are a helpful assistant. Use the following context from the book to answer the user's question. "
-        "If the answer is not in the context, say that you don't know.\n\n"
+        "You are a helpful assistant. Use the following context from the book to answer "
+        "the user's question. If the answer is not in the context, say that you "
+        "don't know.\n\n"
         "--- CONTEXT ---\n"
         f"{context}\n"
         "--- END CONTEXT ---"
