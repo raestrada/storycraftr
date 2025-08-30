@@ -74,8 +74,8 @@ class BookConfig(NamedTuple):
         reference_author (str): A reference author for style guidance.
         keywords (str): Keywords for the paper (optional).
         cli_name (str): The name of the CLI tool used.
-        openai_url (str): The URL of the OpenAI API.
-        openai_model (str): The OpenAI model to use.
+        api_base_url (str): The URL of the OpenAI-compatible API.
+        model_name (str): The model to use for completions.
         multiple_answer (bool): Whether multiple answers are allowed.
     """
 
@@ -89,8 +89,8 @@ class BookConfig(NamedTuple):
     reference_author: str
     keywords: str
     cli_name: str
-    openai_url: str
-    openai_model: str
+    api_base_url: str
+    model_name: str
     multiple_answer: bool
 
 
@@ -134,8 +134,8 @@ def load_book_config(book_path: str):
             "reference_author": "",
             "keywords": "",
             "cli_name": "papercraftr",
-            "openai_url": "https://api.openai.com/v1",
-            "openai_model": "gpt-4o",
+            "api_base_url": "https://api.openai.com/v1",
+            "model_name": "gpt-4o",
             "multiple_answer": True,
         }
 
