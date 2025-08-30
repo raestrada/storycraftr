@@ -2,12 +2,7 @@ import os
 from pathlib import Path
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.agents import (
-    create_or_get_assistant,
-    get_thread,
-    create_message,
-    update_agent_files,
-)
+from storycraftr.agent.agents import create_message
 from storycraftr.utils.markdown import save_to_markdown
 from storycraftr.prompts.paper.generate_section import (
     INTRODUCTION_PROMPT_NEW,
@@ -40,8 +35,6 @@ def _generate_section(
     console.print(f"[bold blue]Generating {section_name} section...[/bold blue]")
 
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "sections", f"{section_name}.md")
     paper_title = config.book_name
 
@@ -54,9 +47,8 @@ def _generate_section(
 
     section_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=file_path,
     )
 
@@ -67,7 +59,6 @@ def _generate_section(
     console.print(
         f"[bold green]✔ {section_name.title()} generated successfully[/bold green]"
     )
-    update_agent_files(book_path, assistant)
     return section_content
 
 

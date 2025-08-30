@@ -7,11 +7,7 @@ from storycraftr.prompts.paper.generate_pdf import (
     GENERATE_LATEX_PROMPT,
     VALIDATE_LATEX_PROMPT,
 )
-from storycraftr.agent.agents import (
-    create_or_get_assistant,
-    get_thread,
-    create_message,
-)
+from storycraftr.agent.agents import create_message
 
 console = Console()
 
@@ -30,25 +26,20 @@ def generate_pdf_file(book_path: str, language: str, template: str, output: str)
     if not config:
         return None
 
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
-
     # Generate LaTeX content
     response = create_message(
         book_path=book_path,
-        thread_id=thread.id,
         content=GENERATE_LATEX_PROMPT.format(
             language=language, template=template, paper_path=book_path
         ),
-        assistant=assistant,
+        history=[],
     )
 
     # Validate LaTeX
     validation = create_message(
         book_path=book_path,
-        thread_id=thread.id,
         content=VALIDATE_LATEX_PROMPT.format(latex_content=response),
-        assistant=assistant,
+        history=[],
     )
 
     if "VALID" not in validation:
