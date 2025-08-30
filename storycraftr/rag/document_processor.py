@@ -1,10 +1,11 @@
 """
 Functions to load and chunk Markdown files.
 """
+import os
 from typing import List
+
 from .models import DocumentChunk
 
-import os
 
 def load_and_chunk_markdown(
     book_path: str, chunk_size: int, chunk_overlap: int
@@ -34,7 +35,7 @@ def load_and_chunk_markdown(
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
-        except Exception:
+        except (OSError, UnicodeDecodeError):
             # Skip files that can't be read.
             continue
 

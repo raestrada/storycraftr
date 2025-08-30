@@ -1,18 +1,19 @@
 import os
 import time
 from datetime import datetime
+from pathlib import Path
+from typing import Dict, List
+
 from dotenv import load_dotenv
 from openai import OpenAI
 from rich.console import Console
 from rich.progress import Progress
-from storycraftr.prompts.story.core import FORMAT_OUTPUT
-from storycraftr.utils.core import load_book_config, generate_prompt_with_hash
-from pathlib import Path
-from typing import List, Dict
 
+from storycraftr.prompts.story.core import FORMAT_OUTPUT
 from storycraftr.rag.document_processor import load_and_chunk_markdown
 from storycraftr.rag.embeddings import EmbeddingGenerator
 from storycraftr.rag.vector_store import VectorStore
+from storycraftr.utils.core import generate_prompt_with_hash, load_book_config
 
 load_dotenv()
 
