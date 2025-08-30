@@ -3,6 +3,7 @@ import os
 import tempfile
 from storycraftr.rag.document_processor import load_and_chunk_markdown
 
+
 @pytest.fixture
 def book_path():
     """
@@ -13,11 +14,14 @@ def book_path():
         with open(os.path.join(tmpdir, "chapter1.md"), "w") as f:
             f.write("# Chapter 1\n\nThis is the first chapter.")
         with open(os.path.join(tmpdir, "chapter2.md"), "w") as f:
-            f.write("# Chapter 2\n\nThis is the second chapter, it is a bit longer to test chunking.")
+            f.write(
+                "# Chapter 2\n\nThis is the second chapter, it is a bit longer to test chunking."
+            )
         # Create a non-markdown file that should be ignored
         with open(os.path.join(tmpdir, "notes.txt"), "w") as f:
             f.write("Some notes.")
         yield tmpdir
+
 
 def test_load_and_chunk_markdown_loads_files(book_path):
     """
@@ -28,6 +32,7 @@ def test_load_and_chunk_markdown_loads_files(book_path):
     assert any("Chapter 1" in chunk.content for chunk in chunks)
     assert any("Chapter 2" in chunk.content for chunk in chunks)
     assert not any("Some notes" in chunk.content for chunk in chunks)
+
 
 def test_load_and_chunk_markdown_chunking(book_path):
     """
