@@ -1,9 +1,12 @@
+import logging
 import os
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
+import chromadb
 from dotenv import load_dotenv
 from openai import APIError, OpenAI
 from rich.console import Console
@@ -18,6 +21,11 @@ from storycraftr.utils.core import generate_prompt_with_hash, load_book_config
 load_dotenv()
 
 console = Console()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
+)
 
 
 def initialize_openai_client(book_path: str):
@@ -41,30 +49,49 @@ def ingest_book_data(book_path: str):
 
     :param book_path: The path to the book directory.
     """
+    logging.info(f"Starting data ingestion check for '{book_path}'.")
     console.print(
         f"[bold blue]Starting data ingestion check for '{book_path}'...[/bold blue]"
     )
 
-    # Initialize vector store to check for existing data
     collection_name = Path(book_path).name.replace(" ", "_").lower()
-    embedding_generator = EmbeddingGenerator()
-    vector_store = VectorStore(
-        collection_name=collection_name, embedding_generator=embedding_generator
-    )
 
-    if vector_store.count() > 0:
+    # Check for existing data without loading the embedding model
+    try:
+        client = chromadb.PersistentClient()
+        collection = client.get_collection(name=collection_name)
+        if collection.count() > 0:
+            logging.info(f"Data for '{book_path}' has already been ingested. Skipping.")
+            console.print(
+                f"[bold yellow]Data for '{book_path}' has already been ingested. Skipping.[/bold yellow]"
+            )
+            return
+    except ValueError:
+        # Collection does not exist, so we proceed with ingestion.
+        logging.info(
+            f"Collection for '{collection_name}' not found. Proceeding with ingestion."
+        )
+        pass
+    except Exception as e:
+        logging.error(
+            f"An unexpected error occurred while checking ChromaDB collection: {e}"
+        )
         console.print(
-            f"[bold yellow]Data for '{book_path}' has already been ingested. Skipping.[/bold yellow]"
+            f"[bold red]An unexpected error occurred with ChromaDB: {e}. Ingestion aborted.[/bold red]"
         )
         return
 
+    logging.info(f"No existing data found. Starting ingestion for '{book_path}'.")
     console.print(
         f"[bold blue]No existing data found. Starting ingestion for '{book_path}'...[/bold blue]"
     )
 
+    config = load_book_config(book_path)
+
     # 1. Load and chunk documents
-    chunk_size = 1024
-    chunk_overlap = 200
+    # Use OpenAI's recommended defaults for file search chunking
+    chunk_size = getattr(config, "chunk_size", 800)
+    chunk_overlap = getattr(config, "chunk_overlap", 400)
     console.print(
         f"Loading and chunking documents with chunk size {chunk_size} and "
         f"overlap {chunk_overlap}..."
@@ -77,9 +104,17 @@ def ingest_book_data(book_path: str):
 
     console.print(f"Found {len(document_chunks)} chunks to process.")
 
-    # 2. Store in vector store
+    # 2. Generate embeddings and store in vector store
+    console.print("Initializing embedding generator...")
+    embedding_generator = EmbeddingGenerator()
+    vector_store = VectorStore(
+        collection_name=collection_name, embedding_generator=embedding_generator
+    )
+
     console.print("Storing document chunks in the vector store...")
     vector_store.store_documents(document_chunks)
+
+    logging.info(f"Data ingestion complete for '{book_path}'.")
     console.print("[bold green]Data ingestion complete.[/bold green]")
 
 
@@ -127,7 +162,13 @@ def create_message(
         collection_name=collection_name, embedding_generator=embedding_generator
     )
 
-    retrieved_chunks = vector_store.query(content, n_results=5, distance_threshold=1.2)
+    # The distance_threshold is a configurable value that determines how similar
+    # the retrieved documents must be to the query. A lower value means stricter
+    # similarity. This value is based on L2 distance.
+    distance_threshold = getattr(config, "distance_threshold", 1.2)
+    retrieved_chunks = vector_store.query(
+        content, n_results=5, distance_threshold=distance_threshold
+    )
 
     if not retrieved_chunks:
         console.print(
