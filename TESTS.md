@@ -30,7 +30,7 @@ Some tests evaluate integration with LLM providers like OpenAI. These tests are 
 You can set these variables in a `.env` file in the project root or export them in your shell:
 
 ```bash
-export OPENAI_API_KEY="sk-..."  # pragma: allowlist secret
+export OPENAI_API_KEY="YOUR_API_KEY_HERE"  # pragma: allowlist secret
 export OPENAI_BASE_URL="https://api.mistral.ai/v1/"
 poetry run pytest
 ```
@@ -48,7 +48,7 @@ RAG evaluation tests make live calls to an LLM provider to "judge" the quality o
 These tests are located in `tests/rag/test_evaluation.py` and are marked to be skipped by default. To run them, you must provide an API key, similar to other integration tests:
 
 ```bash
-export OPENAI_API_KEY="sk-..."  # pragma: allowlist secret
+export OPENAI_API_KEY="YOUR_API_KEY_HERE"  # pragma: allowlist secret
 poetry run pytest tests/rag/test_evaluation.py
 ```
 
