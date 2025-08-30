@@ -83,3 +83,12 @@ class VectorStore:
                     )
 
         return retrieved_chunks
+
+    def count(self) -> int:
+        """
+        Returns the number of documents in the collection.
+
+        :return: The number of documents.
+        :rtype: int
+        """
+        return self.collection.count()

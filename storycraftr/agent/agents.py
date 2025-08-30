@@ -37,12 +37,29 @@ def initialize_openai_client(book_path: str):
 def ingest_book_data(book_path: str):
     """
     Loads all Markdown files from the book directory, chunks them, generates embeddings,
-    and stores them in a vector store.
+    and stores them in a vector store if not already ingested.
 
     :param book_path: The path to the book directory.
     """
     console.print(
-        f"[bold blue]Starting data ingestion for '{book_path}'...[/bold blue]"
+        f"[bold blue]Starting data ingestion check for '{book_path}'...[/bold blue]"
+    )
+
+    # Initialize vector store to check for existing data
+    collection_name = Path(book_path).name.replace(" ", "_").lower()
+    embedding_generator = EmbeddingGenerator()
+    vector_store = VectorStore(
+        collection_name=collection_name, embedding_generator=embedding_generator
+    )
+
+    if vector_store.count() > 0:
+        console.print(
+            f"[bold yellow]Data for '{book_path}' has already been ingested. Skipping.[/bold yellow]"
+        )
+        return
+
+    console.print(
+        f"[bold blue]No existing data found. Starting ingestion for '{book_path}'...[/bold blue]"
     )
 
     # 1. Load and chunk documents
@@ -60,17 +77,7 @@ def ingest_book_data(book_path: str):
 
     console.print(f"Found {len(document_chunks)} chunks to process.")
 
-    # 2. Generate embeddings
-    console.print("Initializing embedding generator...")
-    embedding_generator = EmbeddingGenerator()
-
-    # 3. Store in vector store
-    collection_name = Path(book_path).name.replace(" ", "_").lower()
-    console.print(f"Initializing vector store with collection: '{collection_name}'...")
-    vector_store = VectorStore(
-        collection_name=collection_name, embedding_generator=embedding_generator
-    )
-
+    # 2. Store in vector store
     console.print("Storing document chunks in the vector store...")
     vector_store.store_documents(document_chunks)
     console.print("[bold green]Data ingestion complete.[/bold green]")
@@ -120,7 +127,7 @@ def create_message(
         collection_name=collection_name, embedding_generator=embedding_generator
     )
 
-    retrieved_chunks = vector_store.query(content, n_results=5)
+    retrieved_chunks = vector_store.query(content, n_results=5, distance_threshold=1.2)
 
     if not retrieved_chunks:
         console.print(
@@ -138,7 +145,8 @@ def create_message(
         "don't know.\n\n"
         "--- CONTEXT ---\n"
         f"{context}\n"
-        "--- END CONTEXT ---"
+        "--- END CONTEXT ---\n\n"
+        f"{FORMAT_OUTPUT}"
     )
 
     messages = [{"role": "system", "content": system_prompt}]
