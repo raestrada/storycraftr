@@ -198,8 +198,6 @@ def insert_new_chapter(
             position=position,
             flashback=flashback,
             split=split,
-            progress=None,
-            task_chapters=None,
         )
 
     # Next chapter
@@ -211,8 +209,6 @@ def insert_new_chapter(
         position=position,
         flashback=flashback,
         split=split,
-        progress=None,
-        task_chapters=None,
     )
 
 
@@ -223,8 +219,6 @@ def rewrite_surrounding_chapter(
     position: int,
     flashback: bool,
     split: bool,
-    progress: Progress,
-    task_chapters,
 ) -> None:
     """
     Rewrite a chapter to ensure it fits seamlessly with surrounding chapters,
@@ -237,8 +231,6 @@ def rewrite_surrounding_chapter(
         position (int): The position where a new chapter was inserted.
         flashback (bool): Whether the inserted chapter was a flashback.
         split (bool): Whether the inserted chapter was from a split.
-        progress (Progress): The Rich Progress object for UI feedback.
-        task_chapters: The Rich Task object for chapter processing.
     """
     if not chapter_path.exists():
         console.print(
