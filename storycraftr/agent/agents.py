@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, List
 
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import APIError, OpenAI
 from rich.console import Console
 from rich.progress import Progress
 
@@ -121,8 +121,15 @@ def create_message(
     )
 
     retrieved_chunks = vector_store.query(content, n_results=5)
-    context = "\n".join([chunk.content for chunk in retrieved_chunks])
-    console.print(f"Retrieved {len(retrieved_chunks)} context chunks.")
+
+    if not retrieved_chunks:
+        console.print(
+            "[bold yellow]Warning: No relevant context found in the book for this query.[/bold yellow]"
+        )
+        context = "No context was found in the book for this query."
+    else:
+        context = "\n".join([chunk.content for chunk in retrieved_chunks])
+        console.print(f"Retrieved {len(retrieved_chunks)} context chunks.")
 
     # 3. Construct the prompt
     system_prompt = (
@@ -157,10 +164,8 @@ def create_message(
         response_text = completion.choices[0].message.content
         return response_text
 
-    except Exception as e:
-        console.print(
-            f"[bold red]Error calling Chat Completions API: {str(e)}[/bold red]"
-        )
+    except APIError as e:
+        console.print(f"[bold red]Error calling Chat Completions API: {e}[/bold red]")
         raise
 
 

@@ -1,6 +1,7 @@
 import os
 import click
 import shlex
+from openai import APIError
 from rich.console import Console
 from rich.markdown import Markdown
 from storycraftr.utils.core import load_book_config
@@ -65,19 +66,28 @@ def chat(book_path=None):
                 continue
 
             try:
+                # State management fix: Append user input before the API call
+                history.append({"role": "user", "content": user_input})
+
+                # Add instruction for Markdown formatting
+                formatted_input = (
+                    f"Answer the next prompt formatted on markdown (text): {user_input}"
+                )
                 # Generate the response
                 response = create_message(
-                    book_path, content=user_input, history=history
+                    book_path, content=formatted_input, history=history
                 )
-                history.append({"role": "user", "content": user_input})
                 history.append({"role": "assistant", "content": response})
 
                 # Render Markdown response
                 markdown_response = Markdown(response)
                 console.print(markdown_response)
 
-            except Exception as e:
-                console.print(f"[bold red]Error: {str(e)}[/bold red]")
+            except APIError as e:
+                console.print(f"[bold red]API Error: {e}[/bold red]")
+                # If the API call fails, remove the user's message from history
+                if history:
+                    history.pop()
 
         except KeyboardInterrupt:
             console.print("[bold red]Exiting chat...[/bold red]")
