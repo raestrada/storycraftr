@@ -129,11 +129,80 @@ def insert_new_chapter(
     flashback: bool = False,
     split: bool = False,
 ):
-    # TODO: Refactor this function to use the new RAG-based agent.
-    console.print(
-        "[bold yellow]Warning: Chapter insertion is disabled during refactoring.[/bold yellow]"
+    """
+    Insert a new chapter at a specific position, renumbering subsequent chapters.
+    Optionally handles flashbacks and chapter splits.
+    """
+    chapters_dir = Path(book_path) / "chapters"
+    if not chapters_dir.is_dir():
+        console.print(
+            f"[bold red]Error: Chapters directory not found at '{chapters_dir}'[/bold red]"
+        )
+        return
+
+    chapter_files = sorted(
+        [f for f in chapters_dir.glob("chapter-*.md")],
+        key=lambda p: int(p.stem.split("-")[1]),
     )
-    pass
+
+    # Rename subsequent chapters to make space for the new one
+    for i in range(len(chapter_files) - 1, position - 2, -1):
+        old_path = chapter_files[i]
+        old_num = int(old_path.stem.split("-")[1])
+        new_path = old_path.with_name(f"chapter-{old_num + 1}.md")
+        old_path.rename(new_path)
+        console.print(f"Renamed '{old_path.name}' to '{new_path.name}'")
+
+    # Select the appropriate prompt template
+    if flashback:
+        prompt_template = INSERT_FLASHBACK_CHAPTER_PROMPT
+    elif split:
+        prompt_template = INSERT_SPLIT_CHAPTER_PROMPT
+    else:
+        prompt_template = INSERT_CHAPTER_PROMPT
+
+    full_prompt = prompt_template.format(position=position, prompt=prompt)
+
+    console.print(f"Generating content for new chapter at position {position}...")
+    new_chapter_content = create_message(book_path, content=full_prompt, history=[])
+
+    new_chapter_path = chapters_dir / f"chapter-{position}.md"
+    with open(new_chapter_path, "w", encoding="utf-8") as f:
+        f.write(new_chapter_content)
+
+    console.print(
+        f"[bold green]Successfully inserted new chapter: '{new_chapter_path.name}'[/bold green]"
+    )
+
+    # Rewrite surrounding chapters for consistency
+    console.print("Rewriting surrounding chapters for consistency...")
+
+    # Previous chapter
+    if position > 1:
+        prev_chapter_path = chapters_dir / f"chapter-{position - 1}.md"
+        rewrite_surrounding_chapter(
+            book_path,
+            prev_chapter_path,
+            chapter_num=position - 1,
+            position=position,
+            flashback=flashback,
+            split=split,
+            progress=None,
+            task_chapters=None,
+        )
+
+    # Next chapter
+    next_chapter_path = chapters_dir / f"chapter-{position + 1}.md"
+    rewrite_surrounding_chapter(
+        book_path,
+        next_chapter_path,
+        chapter_num=position + 1,
+        position=position,
+        flashback=flashback,
+        split=split,
+        progress=None,
+        task_chapters=None,
+    )
 
 
 def rewrite_surrounding_chapter(
@@ -146,8 +215,33 @@ def rewrite_surrounding_chapter(
     progress: Progress,
     task_chapters,
 ):
-    # TODO: Refactor this function to use the new RAG-based agent.
-    console.print(
-        "[bold yellow]Warning: Rewriting surrounding chapters is disabled during refactoring.[/bold yellow]"
+    """
+    Rewrite a chapter to ensure it fits seamlessly with surrounding chapters,
+    especially after an insertion.
+    """
+    if not chapter_path.exists():
+        console.print(
+            f"[bold yellow]Warning: Chapter to rewrite not found: {chapter_path}[/bold yellow]"
+        )
+        return
+
+    if flashback:
+        rewrite_prompt = REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT
+    elif split:
+        rewrite_prompt = REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT
+    else:
+        rewrite_prompt = REWRITE_SURROUNDING_CHAPTERS_PROMPT
+
+    console.print(f"Rewriting '{chapter_path.name}' for consistency...")
+
+    rewritten_content = create_message(
+        book_path,
+        content=rewrite_prompt,
+        history=[],
+        file_path=str(chapter_path),
     )
-    pass
+
+    with open(chapter_path, "w", encoding="utf-8") as f:
+        f.write(rewritten_content)
+
+    console.print(f"Successfully rewrote '{chapter_path.name}'.")
