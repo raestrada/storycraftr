@@ -1,12 +1,7 @@
 import os
 from pathlib import Path
 from storycraftr.utils.core import load_book_config, file_has_more_than_three_lines
-from storycraftr.agent.agents import (
-    create_or_get_assistant,
-    get_thread,
-    create_message,
-    update_agent_files,
-)
+from storycraftr.agent.agents import create_message
 from storycraftr.utils.markdown import save_to_markdown
 from storycraftr.prompts.story.outline import (
     GENERAL_OUTLINE_PROMPT_NEW,
@@ -38,8 +33,6 @@ def generate_general_outline(book_path: str, prompt: str) -> str:
 
     # Load the book configuration and setup
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = Path(book_path) / "outline" / "general_outline.md"
     book_name = config.book_name
 
@@ -58,9 +51,8 @@ def generate_general_outline(book_path: str, prompt: str) -> str:
     # Generate the outline using the assistant
     general_outline_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=str(file_path),
     )
 
@@ -73,7 +65,6 @@ def generate_general_outline(book_path: str, prompt: str) -> str:
     )
     console.print("[bold green]✔ General outline generated successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return general_outline_content
 
 
@@ -91,8 +82,6 @@ def generate_character_summary(book_path: str, prompt: str) -> str:
     console.print("[bold blue]Generating character summary...[/bold blue]")
 
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = Path(book_path) / "outline" / "character_summary.md"
     book_name = config.book_name
 
@@ -111,9 +100,8 @@ def generate_character_summary(book_path: str, prompt: str) -> str:
     # Generate the character summary using the assistant
     character_summary_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=str(file_path),
     )
 
@@ -126,7 +114,6 @@ def generate_character_summary(book_path: str, prompt: str) -> str:
     )
     console.print("[bold green]✔ Character summary generated successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return character_summary_content
 
 
@@ -144,8 +131,6 @@ def generate_plot_points(book_path: str, prompt: str) -> str:
     console.print("[bold blue]Generating main plot points...[/bold blue]")
 
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = Path(book_path) / "outline" / "plot_points.md"
     book_name = config.book_name
 
@@ -164,9 +149,8 @@ def generate_plot_points(book_path: str, prompt: str) -> str:
     # Generate the plot points using the assistant
     plot_points_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=str(file_path),
     )
 
@@ -176,7 +160,6 @@ def generate_plot_points(book_path: str, prompt: str) -> str:
     )
     console.print("[bold green]✔ Main plot points generated successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return plot_points_content
 
 
@@ -194,8 +177,6 @@ def generate_chapter_synopsis(book_path: str, prompt: str) -> str:
     console.print("[bold blue]Generating chapter-by-chapter synopsis...[/bold blue]")
 
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = Path(book_path) / "outline" / "chapter_synopsis.md"
     book_name = config.book_name
 
@@ -214,9 +195,8 @@ def generate_chapter_synopsis(book_path: str, prompt: str) -> str:
     # Generate the chapter synopsis using the assistant
     chapter_synopsis_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=str(file_path),
     )
 
@@ -231,5 +211,4 @@ def generate_chapter_synopsis(book_path: str, prompt: str) -> str:
         "[bold green]✔ Chapter-by-chapter synopsis generated successfully[/bold green]"
     )
 
-    update_agent_files(book_path, assistant)
     return chapter_synopsis_content
