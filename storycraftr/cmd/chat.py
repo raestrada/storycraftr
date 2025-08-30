@@ -75,7 +75,7 @@ def chat(book_path=None):
                 )
                 # Generate the response
                 response = create_message(
-                    book_path, content=formatted_input, history=history
+                    book_path, content=formatted_input, history=history.copy()
                 )
                 history.append({"role": "assistant", "content": response})
 

@@ -1,6 +1,7 @@
 import os
 from unittest.mock import MagicMock, patch
 
+import httpx
 import pytest
 from click.testing import CliRunner
 from openai import APIError
@@ -66,8 +67,11 @@ def test_chat_api_error_handling(mock_dependencies, tmp_path):
     Test that API errors are handled gracefully and history is managed correctly.
     """
     # Simulate an APIError on the first call, then successful exit
+    mock_request = httpx.Request(
+        method="POST", url="https://api.openai.com/v1/chat/completions"
+    )
     mock_dependencies["create"].side_effect = [
-        APIError("Test API Error", response=None, body=None),
+        APIError("Test API Error", request=mock_request),
     ]
     mock_dependencies["session"].return_value.prompt.side_effect = [
         "first message",
