@@ -11,13 +11,12 @@ from storycraftr.cmd.chat import chat
 @pytest.fixture
 def mock_dependencies():
     """Fixture to mock dependencies for the chat command."""
-    with patch("storycraftr.cmd.chat.load_book_config") as mock_load, patch(
-        "storycraftr.cmd.chat.ingest_book_data"
-    ) as mock_ingest, patch(
-        "storycraftr.cmd.chat.create_message"
-    ) as mock_create, patch(
-        "storycraftr.cmd.chat.PromptSession"
-    ) as mock_session:
+    with (
+        patch("storycraftr.cmd.chat.load_book_config") as mock_load,
+        patch("storycraftr.cmd.chat.ingest_book_data") as mock_ingest,
+        patch("storycraftr.cmd.chat.create_message") as mock_create,
+        patch("storycraftr.cmd.chat.PromptSession") as mock_session,
+    ):
         # Simulate successful book config loading
         config = MagicMock()
         mock_load.return_value = config
