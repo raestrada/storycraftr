@@ -76,3 +76,27 @@ IMPORTANT general policy for tests:
 - **Total Estimated Effort:** **10-16 working days**.
 - **Assigned Resources:** 1 Senior Python Developer with AI experience
 - **Primary Risk:** The complete absence of an existing test suite significantly increases the risk of introducing regressions. The timeline includes a buffer for manual testing and building a foundational test suite for the new components, which is non-negotiable for a refactoring of this scale.
+
+
+## Appendix: Future Considerations and Best Practices
+
+This appendix captures insights and recommendations from code reviews. These are "nice-to-have" items and general principles to consider during future development or when modifying related parts of the codebase.
+
+### 1. Resource Management
+
+- **Lazy Initialization**: Resource-intensive components like the `EmbeddingGenerator` should be initialized only when needed. For instance, in data ingestion pipelines, check if data already exists _before_ loading heavy models.
+
+### 2. Configuration and Flexibility
+
+- **Avoid Magic Numbers**: Hardcoded values (e.g., `distance_threshold`, `chunk_size`, `chunk_overlap`) should be avoided. Instead, make them configurable, for instance in the `storycraftr.json` file.
+- **Provide Sensible Defaults**: When making parameters configurable, always provide sensible default values that align with established standards or best practices (e.g., OpenAI's recommended chunking parameters).
+
+### 3. Robustness and Maintainability
+
+- **Comprehensive Testing**: Any new business logic, especially critical paths like data ingestion, should be accompanied by unit tests to prevent regressions and validate behavior.
+- **Monitoring and Logging**: Implement structured logging for key processes. This provides visibility into the system's behavior, such as whether a data ingestion task was performed or skipped.
+- **Specific Error Handling**: Avoid broad `except Exception` clauses. Catch specific exceptions where possible and provide descriptive error messages to aid in debugging.
+
+### 4. Documentation
+
+- **Document Rationale**: When adding configurable parameters or making specific implementation choices (like the metric for `distance_threshold`), add comments to the code to explain the "why" behind the decision.
