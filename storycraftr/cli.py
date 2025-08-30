@@ -44,7 +44,6 @@ load_openai_api_key()
 from storycraftr.state import debug_state
 from storycraftr.cmd.story.publish import publish
 from storycraftr.cmd.chat import chat
-from storycraftr.agent.agents import create_or_get_assistant, update_agent_files
 from storycraftr.utils.core import load_book_config
 
 # Imports StoryCraftr in storycraftr.cmd.story
@@ -285,17 +284,12 @@ def reload_files(book_path):
     Args:
         book_path (str): Path to the book project.
     """
-    book_path = book_path or os.getcwd()
-    if not load_book_config(book_path):
-        return
-    if is_initialized(book_path):
-        assistant = create_or_get_assistant(book_path)
-        update_agent_files(book_path, assistant)
-        console.print(
-            f"[green]Agent files reloaded successfully for project: {book_path}[/green]"
-        )
-    else:
-        project_not_initialized_error(book_path)
+    # TODO: This command is obsolete with the RAG agent. It should be repurposed
+    # to trigger re-ingestion or removed.
+    console.print(
+        "[bold yellow]Warning: `reload-files` is disabled during refactoring.[/bold yellow]"
+    )
+    pass
 
 
 @click.command()

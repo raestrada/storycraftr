@@ -3,7 +3,7 @@ from pathlib import Path
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
 from storycraftr.utils.markdown import save_to_markdown
-from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message
+from storycraftr.agent.agents import create_message
 
 console = Console()
 
@@ -35,10 +35,6 @@ def abstract(prompt: str, book_path: str = None):
     sections_dir = Path(book_path) / "sections"
     sections_dir.mkdir(exist_ok=True)
 
-    # Create or get the assistant and thread
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
-
     # Generate abstract
     console.print("[bold blue]Generating abstract...[/bold blue]")
 
@@ -57,9 +53,7 @@ Additional context for this paper:
 Please write the abstract in a clear, academic style, avoiding unnecessary jargon. The abstract should be between 200-300 words."""
 
     # Get the abstract from the assistant
-    abstract_content = create_message(
-        book_path, thread_id=thread.id, content=detailed_prompt, assistant=assistant
-    )
+    abstract_content = create_message(book_path, content=detailed_prompt, history=[])
 
     # Save the abstract
     save_to_markdown(
