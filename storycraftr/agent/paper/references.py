@@ -2,12 +2,7 @@ import os
 from pathlib import Path
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.agents import (
-    create_or_get_assistant,
-    get_thread,
-    create_message,
-    update_agent_files,
-)
+from storycraftr.agent.agents import create_message
 from storycraftr.utils.markdown import save_to_markdown
 from storycraftr.prompts.paper.references import (
     ADD_REFERENCE_PROMPT,
@@ -35,8 +30,6 @@ def add_reference(book_path: str, prompt: str) -> str:
 
     # Load configuration and setup
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "references", "references.md")
     paper_title = config.book_name
 
@@ -45,9 +38,8 @@ def add_reference(book_path: str, prompt: str) -> str:
 
     reference_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=file_path,
     )
 
@@ -57,7 +49,6 @@ def add_reference(book_path: str, prompt: str) -> str:
 
     console.print("[bold green]✔ Reference added successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return reference_content
 
 
@@ -76,8 +67,6 @@ def format_references(book_path: str, prompt: str) -> str:
 
     # Load configuration and setup
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "references", "references.md")
     paper_title = config.book_name
 
@@ -86,9 +75,8 @@ def format_references(book_path: str, prompt: str) -> str:
 
     formatted_references = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=file_path,
     )
 
@@ -98,7 +86,6 @@ def format_references(book_path: str, prompt: str) -> str:
     )
     console.print("[bold green]✔ References formatted successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return formatted_references
 
 
@@ -117,8 +104,6 @@ def check_citations(book_path: str, prompt: str) -> str:
 
     # Load configuration and setup
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "reviews", "citation_check.md")
     paper_title = config.book_name
 
@@ -127,9 +112,8 @@ def check_citations(book_path: str, prompt: str) -> str:
 
     citation_report = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=file_path,
     )
 
@@ -139,7 +123,6 @@ def check_citations(book_path: str, prompt: str) -> str:
     )
     console.print("[bold green]✔ Citations checked successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return citation_report
 
 
@@ -159,8 +142,6 @@ def generate_citation(book_path: str, prompt: str, citation_format: str) -> str:
 
     # Load configuration and setup
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "references", "references.md")
     paper_title = config.book_name
 
@@ -171,9 +152,8 @@ def generate_citation(book_path: str, prompt: str, citation_format: str) -> str:
 
     citation_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=file_path,
     )
 
@@ -183,7 +163,6 @@ def generate_citation(book_path: str, prompt: str, citation_format: str) -> str:
 
     console.print("[bold green]✔ Citation generated successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return citation_content
 
 
@@ -202,8 +181,6 @@ def generate_bibtex(book_path: str, bibtex_style: str) -> str:
 
     # Load configuration and setup
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "references", "references.bib")
     paper_title = config.book_name
 
@@ -214,9 +191,8 @@ def generate_bibtex(book_path: str, bibtex_style: str) -> str:
 
     bibtex_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=file_path,
     )
 
@@ -226,5 +202,4 @@ def generate_bibtex(book_path: str, bibtex_style: str) -> str:
     )
     console.print("[bold green]✔ BibTeX references generated successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return bibtex_content
