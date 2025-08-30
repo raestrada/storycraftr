@@ -322,9 +322,8 @@ def consolidate_paper_md(
                 translation_prompt = f"Translate the following references from {primary_language} to {translate}. Maintain all formatting, including markdown syntax, LaTeX formulas, and code blocks. Only translate the actual text content:\n\n{references_content}"
                 references_content = create_message(
                     book_path,
-                    thread_id=thread.id,
                     content=translation_prompt,
-                    assistant=assistant,
+                    history=[],
                 )
 
             consolidated_content.append("# References\n\n")
