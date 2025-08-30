@@ -59,19 +59,22 @@ def ingest_book_data(book_path: str):
     # Check for existing data without loading the embedding model
     try:
         client = chromadb.PersistentClient()
-        collection = client.get_collection(name=collection_name)
-        if collection.count() > 0:
-            logging.info(f"Data for '{book_path}' has already been ingested. Skipping.")
-            console.print(
-                f"[bold yellow]Data for '{book_path}' has already been ingested. Skipping.[/bold yellow]"
-            )
-            return
-    except ValueError:
-        # Collection does not exist, so we proceed with ingestion.
-        logging.info(
-            f"Collection for '{collection_name}' not found. Proceeding with ingestion."
-        )
-        pass
+        # Use list_collections to check for existence, as get_collection's
+        # exception for not-found collections can be inconsistent.
+        existing_collections = [c.name for c in client.list_collections()]
+
+        if collection_name in existing_collections:
+            collection = client.get_collection(name=collection_name)
+            if collection.count() > 0:
+                logging.info(
+                    f"Data for '{book_path}' has already been ingested. Skipping."
+                )
+                console.print(
+                    f"[bold yellow]Data for '{book_path}' has already been ingested. Skipping.[/bold yellow]"
+                )
+                return
+        # If collection is not found, or is found but empty, proceed with ingestion.
+
     except Exception as e:
         logging.error(
             f"An unexpected error occurred while checking ChromaDB collection: {e}"
@@ -107,9 +110,7 @@ def ingest_book_data(book_path: str):
     # 2. Generate embeddings and store in vector store
     console.print("Initializing embedding generator...")
     embedding_generator = EmbeddingGenerator()
-    vector_store = VectorStore(
-        collection_name=collection_name, embedding_generator=embedding_generator
-    )
+    vector_store = VectorStore(book_path, embedding_generator=embedding_generator)
 
     console.print("Storing document chunks in the vector store...")
     vector_store.store_documents(document_chunks)
@@ -157,10 +158,7 @@ def create_message(
     # 2. Query vector store for relevant context (RAG)
     console.print("Querying vector store for relevant context...")
     embedding_generator = EmbeddingGenerator()
-    collection_name = Path(book_path).name.replace(" ", "_").lower()
-    vector_store = VectorStore(
-        collection_name=collection_name, embedding_generator=embedding_generator
-    )
+    vector_store = VectorStore(book_path, embedding_generator=embedding_generator)
 
     # The distance_threshold is a configurable value that determines how similar
     # the retrieved documents must be to the query. A lower value means stricter

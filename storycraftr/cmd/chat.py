@@ -66,9 +66,6 @@ def chat(book_path=None):
                 continue
 
             try:
-                # State management fix: Append user input before the API call
-                history.append({"role": "user", "content": user_input})
-
                 # Add instruction for Markdown formatting
                 formatted_input = (
                     f"Answer the next prompt formatted on markdown (text): {user_input}"
@@ -77,6 +74,10 @@ def chat(book_path=None):
                 response = create_message(
                     book_path, content=formatted_input, history=history.copy()
                 )
+
+                # State management: Append user input and assistant response to history
+                # *after* a successful API call to avoid a polluted history on error.
+                history.append({"role": "user", "content": user_input})
                 history.append({"role": "assistant", "content": response})
 
                 # Render Markdown response
@@ -85,9 +86,7 @@ def chat(book_path=None):
 
             except APIError as e:
                 console.print(f"[bold red]API Error: {e}[/bold red]")
-                # If the API call fails, remove the user's message from history
-                if history:
-                    history.pop()
+                # History is not modified on error, so no cleanup needed.
 
         except KeyboardInterrupt:
             console.print("[bold red]Exiting chat...[/bold red]")
