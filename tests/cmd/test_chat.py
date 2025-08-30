@@ -71,7 +71,7 @@ def test_chat_api_error_handling(mock_dependencies, tmp_path):
         method="POST", url="https://api.openai.com/v1/chat/completions"
     )
     mock_dependencies["create"].side_effect = [
-        APIError("Test API Error", request=mock_request),
+        APIError("Test API Error", request=mock_request, body=None),
     ]
     mock_dependencies["session"].return_value.prompt.side_effect = [
         "first message",
