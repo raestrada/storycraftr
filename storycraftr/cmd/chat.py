@@ -4,11 +4,7 @@ import shlex
 from rich.console import Console
 from rich.markdown import Markdown
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.agents import (
-    get_thread,
-    create_or_get_assistant,
-    create_message,
-)
+from storycraftr.agent.agents import create_message, ingest_book_data
 import storycraftr.cmd.story as story_cmd
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import InMemoryHistory
@@ -42,11 +38,11 @@ def chat(book_path=None):
         f"Starting chat for [bold]{book_path}[/bold]. Type [bold green]exit()[/bold green] to quit or [bold green]help()[/bold green] for a list of available commands."
     )
 
-    console.print("[bold blue]Starting chat session...[/bold blue]")
-    language = load_book_config(book_path).primary_language
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
+    # Ingest book data into the vector store
+    ingest_book_data(book_path)
 
+    console.print("[bold blue]Starting chat session...[/bold blue]")
+    history = []
     session = PromptSession(history=InMemoryHistory())
 
     console.print("[bold green]USE help() to get help and exit() to exit[/bold green]")
@@ -68,20 +64,13 @@ def chat(book_path=None):
                 execute_cli_command(user_input[1:])
                 continue
 
-            # Pass the user input to the assistant for processing
-            user_input = (
-                f"Answer the next prompt formatted on markdown (text): {user_input}"
-            )
-
             try:
                 # Generate the response
                 response = create_message(
-                    book_path,
-                    thread_id=thread.id,
-                    content=user_input,
-                    assistant=assistant,
-                    force_single_answer=True,
+                    book_path, content=user_input, history=history
                 )
+                history.append({"role": "user", "content": user_input})
+                history.append({"role": "assistant", "content": response})
 
                 # Render Markdown response
                 markdown_response = Markdown(response)
