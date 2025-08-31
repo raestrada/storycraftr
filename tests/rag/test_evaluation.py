@@ -42,17 +42,17 @@ def rag_retriever():
     (book_path / "chapters" / "chapter-1.md").write_text(SAMPLE_MARKDOWN_CONTENT)
 
     # 1. Load and chunk documents from the temporary book path.
-    # Assuming load_and_chunk_markdown returns a list of objects with a 'page_content' attribute.
+    # load_and_chunk_markdown returns a list of DocumentChunk objects.
     chunks = load_and_chunk_markdown(str(book_path), chunk_size=150, chunk_overlap=30)
 
     # 2. Initialize the embedding generator.
     embedding_generator = EmbeddingGenerator()
 
-    # 3. Create and populate an in-memory vector store.
-    # This assumes VectorStore can be initialized for in-memory use and has an interface
-    # compatible with sentence-transformers and methods like `add_documents` and `query`.
-    vector_store = VectorStore(embedding_function=embedding_generator, in_memory=True)
-    vector_store.add_documents(chunks)
+    # 3. Create and populate the vector store.
+    vector_store = VectorStore(
+        book_path=str(book_path), embedding_generator=embedding_generator
+    )
+    vector_store.store_documents(chunks)
 
     yield vector_store
 
@@ -89,7 +89,7 @@ def test_rag_retrieval_quality(rag_retriever):
 
     # 3. Format the retrieved contexts for RAGAS.
     # RAGAS expects a list of lists of strings.
-    contexts = [[chunk.page_content for chunk in retrieved_chunks]]
+    contexts = [[chunk.content for chunk in retrieved_chunks]]
 
     # 4. Create a new dataset containing the question, retrieved contexts, and ground truth.
     eval_dataset = Dataset.from_dict(

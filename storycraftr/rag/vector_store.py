@@ -24,6 +24,11 @@ class VectorStore:
         :param embedding_generator: An instance of a callable embedding generator.
         :type embedding_generator: EmbeddingFunction
         """
+        if not os.path.isdir(book_path):
+            raise ValueError(
+                f"The provided book path is not a valid directory: {book_path}"
+            )
+
         # Store the ChromaDB database inside the book's directory to make it portable.
         db_path = os.path.join(book_path, ".chroma")
         client = chromadb.PersistentClient(path=db_path)

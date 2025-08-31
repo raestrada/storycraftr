@@ -51,7 +51,7 @@ def initialize_openai_client(book_path: str):
     """
     config = load_book_config(book_path)
     # Si no hay configuración o no hay URL específica, usar la URL por defecto
-    api_base = getattr(config, "api_base_url", "https://api.openai.com/v1")
+    api_base = getattr(config, "openai_url", "https://api.openai.com/v1")
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url=api_base)
     return client
 
@@ -68,13 +68,15 @@ def ingest_book_data(book_path: str):
         f"[bold blue]Starting data ingestion check for '{book_path}'...[/bold blue]"
     )
 
-    collection_name = Path(book_path).name.replace(" ", "_").lower()
+    db_path = os.path.join(book_path, ".chroma")
+    collection_name = "book"
 
     # Check for existing data without loading the embedding model
     try:
-        client = chromadb.PersistentClient()
-        # Use list_collections to check for existence, as get_collection's
-        # exception for not-found collections can be inconsistent.
+        # Initialize the client. It will create the directory if it doesn't exist.
+        client = chromadb.PersistentClient(path=db_path)
+
+        # Use list_collections to check for existence.
         existing_collections = [c.name for c in client.list_collections()]
 
         if collection_name in existing_collections:
@@ -209,8 +211,9 @@ def create_message(
         if progress and task_id:
             progress.update(task_id, description="Generating response...", total=100)
 
+        model = getattr(config, "openai_model", "gpt-4o")
         completion = client.chat.completions.create(
-            model=config.model_name,
+            model=model,
             messages=messages,
             temperature=0.7,
             top_p=1.0,

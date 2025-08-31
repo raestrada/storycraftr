@@ -7,9 +7,13 @@ from typing import List
 
 
 class MockEmbeddingFunction:
-    def __call__(self, texts: List[str]) -> List[List[float]]:
+    def name(self) -> str:
+        """Returns the name of the mock embedding function."""
+        return "mock_embedding_function"
+
+    def __call__(self, input: List[str]) -> List[List[float]]:
         # Return a list of dummy embeddings, one for each text
-        return [[0.1 * (i + 1)] * 5 for i, _ in enumerate(texts)]
+        return [[0.1 * (i + 1)] * 5 for i, _ in enumerate(input)]
 
 
 @pytest.fixture
@@ -19,7 +23,7 @@ def mock_embedding_function():
 
 
 @patch("chromadb.PersistentClient")
-def test_vector_store_init(mock_chromadb_client, mock_embedding_function):
+def test_vector_store_init(mock_chromadb_client, mock_embedding_function, tmp_path):
     """
     Test that VectorStore initializes correctly and creates a collection.
     """
@@ -28,11 +32,12 @@ def test_vector_store_init(mock_chromadb_client, mock_embedding_function):
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    book_path = "test_book"
+    book_path = tmp_path / "book"
+    book_path.mkdir()
     expected_db_path = os.path.join(book_path, ".chroma")
 
     store = VectorStore(
-        book_path=book_path, embedding_generator=mock_embedding_function
+        book_path=str(book_path), embedding_generator=mock_embedding_function
     )
 
     mock_chromadb_client.assert_called_once_with(path=expected_db_path)
@@ -42,17 +47,32 @@ def test_vector_store_init(mock_chromadb_client, mock_embedding_function):
     assert store.collection is not None
 
 
+def test_vector_store_init_invalid_path(mock_embedding_function):
+    """
+    Test that VectorStore raises ValueError for a non-existent directory.
+    """
+    with pytest.raises(ValueError):
+        VectorStore(
+            book_path="non_existent_dir", embedding_generator=mock_embedding_function
+        )
+
+
 @patch("chromadb.PersistentClient")
-def test_store_documents(mock_chromadb_client, mock_embedding_function):
+def test_store_documents(mock_chromadb_client, mock_embedding_function, tmp_path):
     """
     Test adding documents to the vector store.
     """
+    book_path = tmp_path / "book"
+    book_path.mkdir()
+
     mock_client_instance = MagicMock()
     mock_collection = MagicMock()
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    store = VectorStore(book_path="test", embedding_generator=mock_embedding_function)
+    store = VectorStore(
+        book_path=str(book_path), embedding_generator=mock_embedding_function
+    )
 
     documents = [
         DocumentChunk(content="doc1 content", metadata={"source": "file1.md"}),
@@ -74,10 +94,13 @@ def test_store_documents(mock_chromadb_client, mock_embedding_function):
 
 
 @patch("chromadb.PersistentClient")
-def test_query(mock_chromadb_client, mock_embedding_function):
+def test_query(mock_chromadb_client, mock_embedding_function, tmp_path):
     """
     Test querying the vector store.
     """
+    book_path = tmp_path / "book"
+    book_path.mkdir()
+
     mock_client_instance = MagicMock()
     mock_collection = MagicMock()
 
@@ -92,7 +115,9 @@ def test_query(mock_chromadb_client, mock_embedding_function):
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    store = VectorStore(book_path="test", embedding_generator=mock_embedding_function)
+    store = VectorStore(
+        book_path=str(book_path), embedding_generator=mock_embedding_function
+    )
 
     query_text = "find this"
     results = store.query(query_text, n_results=1)
@@ -107,27 +132,37 @@ def test_query(mock_chromadb_client, mock_embedding_function):
 
 @patch("chromadb.PersistentClient")
 def test_store_documents_with_no_documents(
-    mock_chromadb_client, mock_embedding_function
+    mock_chromadb_client, mock_embedding_function, tmp_path
 ):
     """
     Test that store_documents handles an empty list without error.
     """
+    book_path = tmp_path / "book"
+    book_path.mkdir()
+
     mock_client_instance = MagicMock()
     mock_collection = MagicMock()
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    store = VectorStore(book_path="test", embedding_generator=mock_embedding_function)
+    store = VectorStore(
+        book_path=str(book_path), embedding_generator=mock_embedding_function
+    )
     store.store_documents([])
 
     mock_collection.upsert.assert_not_called()
 
 
 @patch("chromadb.PersistentClient")
-def test_query_with_distance_threshold(mock_chromadb_client, mock_embedding_function):
+def test_query_with_distance_threshold(
+    mock_chromadb_client, mock_embedding_function, tmp_path
+):
     """
     Test querying with a distance threshold.
     """
+    book_path = tmp_path / "book"
+    book_path.mkdir()
+
     mock_client_instance = MagicMock()
     mock_collection = MagicMock()
 
@@ -142,7 +177,9 @@ def test_query_with_distance_threshold(mock_chromadb_client, mock_embedding_func
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    store = VectorStore(book_path="test", embedding_generator=mock_embedding_function)
+    store = VectorStore(
+        book_path=str(book_path), embedding_generator=mock_embedding_function
+    )
 
     # Test case 1: Threshold includes 2 results
     results = store.query("find this", n_results=3, distance_threshold=1.0)
@@ -161,3 +198,27 @@ def test_query_with_distance_threshold(mock_chromadb_client, mock_embedding_func
     assert len(results) == 0
 
     assert mock_collection.query.call_count == 3
+
+
+def test_vector_store_reinitialization(tmp_path, mock_embedding_function):
+    """
+    Tests that re-initializing a VectorStore with an existing database works.
+    This simulates the scenario of running a command multiple times.
+    """
+    book_path = tmp_path / "book"
+    book_path.mkdir()
+
+    # First initialization (creates the DB)
+    store1 = VectorStore(
+        book_path=str(book_path), embedding_generator=mock_embedding_function
+    )
+    store1.store_documents(
+        [DocumentChunk(content="doc1", metadata={"source": "f1.md"})]
+    )
+    assert store1.count() == 1
+
+    # Second initialization (should load the existing DB without error)
+    store2 = VectorStore(
+        book_path=str(book_path), embedding_generator=mock_embedding_function
+    )
+    assert store2.count() == 1

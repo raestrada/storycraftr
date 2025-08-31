@@ -18,6 +18,7 @@ class EmbeddingGenerator:
         :type model_name: str
         """
         self.model = SentenceTransformer(model_name)
+        self.model_name = model_name
 
     def generate_embeddings(self, documents: List[str]) -> List[List[float]]:
         """
@@ -41,3 +42,13 @@ class EmbeddingGenerator:
         :rtype: List[List[float]]
         """
         return self.generate_embeddings(input)
+
+    def name(self) -> str:
+        """
+        Returns the name of the embedding model.
+        Required by ChromaDB for embedding function validation.
+
+        :return: The model name.
+        :rtype: str
+        """
+        return self.model_name

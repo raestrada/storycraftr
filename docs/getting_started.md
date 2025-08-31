@@ -29,7 +29,7 @@ Once installed and the API key is set, you can run the tool using the command `s
 
 StoryCraftr is designed to be provider-agnostic. You can use any service that supports the OpenAI Chat Completions API, such as Mistral, DeepSeek, or others. This flexibility allows you to choose the best model for your needs.
 
-To configure a custom provider, add the following lines to your configuration file located at `~/.storycraftr/config.json`:
+To configure a custom provider, you can add or edit the following lines in the `storycraftr.json` file located in your book's root directory:
 
 ```json
 {
