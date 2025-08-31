@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Dict, List
 
 import chromadb
+from chromadb.errors import ChromaError
 from dotenv import load_dotenv
 from openai import APIError, OpenAI
 from rich.console import Console
@@ -88,7 +89,7 @@ def ingest_book_data(book_path: str):
                 return
         # If collection is not found, or is found but empty, proceed with ingestion.
 
-    except chromadb.errors.ChromaError as e:
+    except ChromaError as e:
         logging.error(f"A ChromaDB error occurred while checking collection: {e}")
         console.print(
             f"[bold red]A ChromaDB error occurred: {e}. Ingestion aborted.[/bold red]"
