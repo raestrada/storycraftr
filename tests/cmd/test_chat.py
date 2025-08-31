@@ -97,6 +97,9 @@ def test_chat_api_error_handling(mock_dependencies, tmp_path):
 @pytest.fixture
 def mock_integration_dependencies(tmp_path, monkeypatch):
     """Fixture for chat command integration tests, mocking external services."""
+    # Reset singleton cache to ensure our mock is used.
+    monkeypatch.setattr("storycraftr.agent.agents._embedding_generator", None)
+
     # Use an absolute path for file setup
     abs_book_path = tmp_path
     chapters_dir = abs_book_path / "chapters"

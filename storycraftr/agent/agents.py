@@ -28,6 +28,19 @@ logging.basicConfig(
 )
 
 
+# Cache for the embedding generator
+_embedding_generator = None
+
+
+def get_embedding_generator():
+    """Lazily initialize and return a singleton EmbeddingGenerator instance."""
+    global _embedding_generator
+    if _embedding_generator is None:
+        console.print("Initializing embedding generator...")
+        _embedding_generator = EmbeddingGenerator()
+    return _embedding_generator
+
+
 def initialize_openai_client(book_path: str):
     """
     Initialize the OpenAI client with the configuration from the book.
@@ -75,12 +88,10 @@ def ingest_book_data(book_path: str):
                 return
         # If collection is not found, or is found but empty, proceed with ingestion.
 
-    except Exception as e:
-        logging.error(
-            f"An unexpected error occurred while checking ChromaDB collection: {e}"
-        )
+    except chromadb.errors.ChromaError as e:
+        logging.error(f"A ChromaDB error occurred while checking collection: {e}")
         console.print(
-            f"[bold red]An unexpected error occurred with ChromaDB: {e}. Ingestion aborted.[/bold red]"
+            f"[bold red]A ChromaDB error occurred: {e}. Ingestion aborted.[/bold red]"
         )
         return
 
@@ -108,8 +119,7 @@ def ingest_book_data(book_path: str):
     console.print(f"Found {len(document_chunks)} chunks to process.")
 
     # 2. Generate embeddings and store in vector store
-    console.print("Initializing embedding generator...")
-    embedding_generator = EmbeddingGenerator()
+    embedding_generator = get_embedding_generator()
     vector_store = VectorStore(book_path, embedding_generator=embedding_generator)
 
     console.print("Storing document chunks in the vector store...")
@@ -157,7 +167,7 @@ def create_message(
 
     # 2. Query vector store for relevant context (RAG)
     console.print("Querying vector store for relevant context...")
-    embedding_generator = EmbeddingGenerator()
+    embedding_generator = get_embedding_generator()
     vector_store = VectorStore(book_path, embedding_generator=embedding_generator)
 
     # The distance_threshold is a configurable value that determines how similar

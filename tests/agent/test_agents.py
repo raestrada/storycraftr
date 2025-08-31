@@ -2,6 +2,7 @@ import logging
 from unittest.mock import MagicMock, patch
 
 import pytest
+import chromadb
 
 from storycraftr.agent.agents import ingest_book_data
 
@@ -81,13 +82,15 @@ def test_ingest_book_data_already_ingested(mock_load_and_chunk, mock_chromadb, c
 def test_ingest_book_data_chromadb_error(mock_load_and_chunk, mock_chromadb, caplog):
     """Test that ingestion is aborted on unexpected ChromaDB error."""
     mock_client, mock_collection = mock_chromadb
-    mock_client.list_collections.side_effect = Exception("Some ChromaDB error")
+    mock_client.list_collections.side_effect = chromadb.errors.ChromaError(
+        "Some ChromaDB error"
+    )
 
     with caplog.at_level(logging.ERROR):
         ingest_book_data("fake/book/path")
 
     assert (
-        "An unexpected error occurred while checking ChromaDB collection: Some ChromaDB error"
+        "A ChromaDB error occurred while checking collection: Some ChromaDB error"
         in caplog.text
     )
     mock_load_and_chunk.assert_not_called()

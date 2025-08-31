@@ -293,6 +293,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# ChromaDB
+chroma/
 
 Deep Learning in Medical Imaging
 *._checkpoint
