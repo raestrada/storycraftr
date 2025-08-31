@@ -25,20 +25,20 @@ echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
 
 Once installed and the API key is set, you can run the tool using the command `storycraftr`.
 
-### New: Specify OpenAI Model and URL
+### New: Use Any OpenAI-Compatible Provider
 
-StoryCraftr now allows you to specify the OpenAI model and URL, which can be any service that supports the OpenAI API with file search capabilities, such as DeepSeek or others. This is essential as StoryCraftr relies on file search for its functionality.
+StoryCraftr is designed to be provider-agnostic. You can use any service that supports the OpenAI Chat Completions API, such as Mistral, DeepSeek, or others. This flexibility allows you to choose the best model for your needs.
 
-To configure the model and URL, add the following lines to your configuration file located at `~/.storycraftr/config.json`:
+To configure a custom provider, add the following lines to your configuration file located at `~/.storycraftr/config.json`:
 
 ```json
 {
   "openai_model": "your-preferred-model",
-  "openai_url": "https://api.your-preferred-service.com"
+  "openai_url": "https://api.your-preferred-service.com/v1"
 }
 ```
 
-Make sure to replace `"your-preferred-model"` with the model you want to use and `"https://api.your-preferred-service.com"` with the URL of the service that supports the OpenAI API with file search.
+Make sure to replace `"your-preferred-model"` with the model you want to use (e.g., `mistral-large-latest`) and `"https://api.your-preferred-service.com/v1"` with the API base URL of your chosen service. You will also need to store the corresponding API key in `~/.storycraftr/openai_api_key.txt`.
 
 ### Supported LLMs
 
@@ -81,9 +81,16 @@ Here are some examples of LLMs that are compatible with the OpenAI API:
    - Documentation: [Together AI API](https://together.ai/docs)
 
 7. **DeepInfra**:
+
    - Model: `Qwen2.5-Coder-32B-Instruct`
    - URL Base: `https://api.deepinfra.com/v1/`
    - Documentation: [DeepInfra API](https://deepinfra.com/docs)
+
+8. **Mistral AI**:
+
+   - Models: `mistral-large-latest`, `mistral-small-latest`, `open-mistral-7b`
+   - URL Base: `https://api.mistral.ai/v1/`
+   - Documentation: [Mistral AI Platform](https://docs.mistral.ai/)
 
 ## Step 2: Create the Behavior File
 
