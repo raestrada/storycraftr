@@ -1,6 +1,8 @@
 """
 An abstraction layer for a vector store.
 """
+import hashlib
+import os
 from typing import List
 
 import chromadb
@@ -13,16 +15,20 @@ class VectorStore:
     An abstraction layer for ChromaDB to handle storing and retrieving document chunks.
     """
 
-    def __init__(self, collection_name: str, embedding_generator: EmbeddingFunction):
+    def __init__(self, book_path: str, embedding_generator: EmbeddingFunction):
         """
         Initializes the VectorStore.
 
-        :param collection_name: The name of the collection in ChromaDB.
-        :type collection_name: str
+        :param book_path: The path to the book's root directory.
+        :type book_path: str
         :param embedding_generator: An instance of a callable embedding generator.
         :type embedding_generator: EmbeddingFunction
         """
-        client = chromadb.PersistentClient()
+        # Store the ChromaDB database inside the book's directory to make it portable.
+        db_path = os.path.join(book_path, ".chroma")
+        client = chromadb.PersistentClient(path=db_path)
+        # Use a constant collection name as the DB is scoped to the book.
+        collection_name = "book"
         self.collection = client.get_or_create_collection(
             name=collection_name, embedding_function=embedding_generator
         )
@@ -36,8 +42,6 @@ class VectorStore:
         """
         if not documents:
             return
-
-        import hashlib
 
         contents = [doc.content for doc in documents]
         metadatas = [doc.metadata for doc in documents]

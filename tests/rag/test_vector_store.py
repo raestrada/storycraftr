@@ -1,3 +1,4 @@
+import os
 import pytest
 from unittest.mock import MagicMock, patch
 from storycraftr.rag.vector_store import VectorStore
@@ -27,14 +28,16 @@ def test_vector_store_init(mock_chromadb_client, mock_embedding_function):
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    collection_name = "test_collection"
+    book_path = "test_book"
+    expected_db_path = os.path.join(book_path, ".chroma")
 
     store = VectorStore(
-        collection_name=collection_name, embedding_generator=mock_embedding_function
+        book_path=book_path, embedding_generator=mock_embedding_function
     )
 
+    mock_chromadb_client.assert_called_once_with(path=expected_db_path)
     mock_client_instance.get_or_create_collection.assert_called_once_with(
-        name=collection_name, embedding_function=mock_embedding_function
+        name="book", embedding_function=mock_embedding_function
     )
     assert store.collection is not None
 
@@ -49,9 +52,7 @@ def test_store_documents(mock_chromadb_client, mock_embedding_function):
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    store = VectorStore(
-        collection_name="test", embedding_generator=mock_embedding_function
-    )
+    store = VectorStore(book_path="test", embedding_generator=mock_embedding_function)
 
     documents = [
         DocumentChunk(content="doc1 content", metadata={"source": "file1.md"}),
@@ -91,9 +92,7 @@ def test_query(mock_chromadb_client, mock_embedding_function):
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    store = VectorStore(
-        collection_name="test", embedding_generator=mock_embedding_function
-    )
+    store = VectorStore(book_path="test", embedding_generator=mock_embedding_function)
 
     query_text = "find this"
     results = store.query(query_text, n_results=1)
@@ -118,9 +117,7 @@ def test_store_documents_with_no_documents(
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    store = VectorStore(
-        collection_name="test", embedding_generator=mock_embedding_function
-    )
+    store = VectorStore(book_path="test", embedding_generator=mock_embedding_function)
     store.store_documents([])
 
     mock_collection.upsert.assert_not_called()
@@ -145,9 +142,7 @@ def test_query_with_distance_threshold(mock_chromadb_client, mock_embedding_func
     mock_client_instance.get_or_create_collection.return_value = mock_collection
     mock_chromadb_client.return_value = mock_client_instance
 
-    store = VectorStore(
-        collection_name="test", embedding_generator=mock_embedding_function
-    )
+    store = VectorStore(book_path="test", embedding_generator=mock_embedding_function)
 
     # Test case 1: Threshold includes 2 results
     results = store.query("find this", n_results=3, distance_threshold=1.0)
