@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10"
+python = ">=3.10,<4.0"
 openai = ">=1.51.2"
 click = ">=8.1"
 markdown = ">=3.7"
@@ -24,19 +24,26 @@ unstructured = "^0.18"
 onnxruntime = "^1.18.1"
 ragas = "^0.1.9"
 torch = {version = "^2.8.0", source = "pytorch_cpu"}
+evaluate = "^0.4.2"
+rouge_score = "^0.1.1"
+sacrebleu = "^2.4.2"
+anyio = "^4.10.0"
+pytest-asyncio = "0.24.0"
 
 [tool.poetry.scripts]
 storycraftr = "storycraftr.cli:cli"
 papercraftr = "storycraftr.cli:cli"
 
 [tool.poetry.group.dev.dependencies]
-pytest = ">=6.2.4"
+pytest = "^8.1.0"
+pytest-asyncio = "^0.24.0"
 ipdb = ">=0.13.13"
 black = ">=24.10.0"
 pre-commit = ">=4.0.1"
 sphinx = ">=8.1.3"
 sphinx-click = ">=6.0.0"
 datasets = "^2.20.0"
+langchain-openai = "^0.2.10"
 
 [[tool.poetry.source]]
 name = "pytorch_cpu"
@@ -52,9 +59,17 @@ testpaths = [
     "tests"
 ]
 filterwarnings = [
-    "ignore::langchain_core._api.LangChainDeprecationWarning",
+    'ignore:.*pydantic.*v1.*:DeprecationWarning',
+    'ignore:::ragas.metrics.__init__',
+    'error:::.*models/__init__.py',
     "ignore:invalid escape sequence:SyntaxWarning",
 ]
+markers = [
+    "slow: marks tests as slow to run",
+    "asyncio: marks tests as asyncio",
+]
+log_cli = true
+log_cli_level = "INFO"
 
 [tool.black]
 line-length = 88

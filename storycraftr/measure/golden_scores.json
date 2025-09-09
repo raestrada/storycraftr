@@ -1,0 +1,20 @@
+{
+  "model_name": "gpt-4o",
+  "benchmarks": {
+    "summarization_1": {
+      "rouge1": 0.6470588235294117,
+      "rouge2": 0.33333333333333337,
+      "rougeL": 0.4411764705882353
+    },
+    "qa_1": {
+      "rouge1": 1.0,
+      "rouge2": 1.0,
+      "rougeL": 1.0
+    },
+    "creative_writing_1": {
+      "rouge1": 0.13636363636363635,
+      "rouge2": 0.06091370558375634,
+      "rougeL": 0.09595959595959595
+    }
+  }
+}

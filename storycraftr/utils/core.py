@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import NamedTuple
 
+import click
 import yaml
 from rich.console import Console
 from rich.markdown import Markdown  # Importar soporte de Markdown de Rich
@@ -76,8 +77,8 @@ class BookConfig(NamedTuple):
         reference_author (str): A reference author for style guidance.
         keywords (str): Keywords for the paper (optional).
         cli_name (str): The name of the CLI tool used.
-        api_base_url (str): The URL of the OpenAI-compatible API.
-        model_name (str): The model to use for completions.
+        openai_url (str): The URL of the OpenAI-compatible API.
+        openai_model (str): The model to use for completions.
         multiple_answer (bool): Whether multiple answers are allowed.
     """
 
@@ -91,22 +92,32 @@ class BookConfig(NamedTuple):
     reference_author: str
     keywords: str
     cli_name: str
-    api_base_url: str
-    model_name: str
+    openai_url: str
+    openai_model: str
     multiple_answer: bool
 
 
-def load_book_config(book_path: str):
+def load_book_config(book_path: str = None):
     """
     Load configuration from the book path.
+    If no path is provided, returns default configuration.
     """
     if not book_path:
-        console.print(
-            "[red]Error: Please either:\n"
-            "1. Run the command inside a StoryCraftr/PaperCraftr project directory, or\n"
-            "2. Specify the project path using --book-path[/red]"
+        return SimpleNamespace(
+            book_name="Untitled Paper",
+            authors=[],
+            primary_language="en",
+            alternate_languages=[],
+            default_author="Unknown Author",
+            genre="research",
+            license="CC BY",
+            reference_author="",
+            keywords="",
+            cli_name="papercraftr",
+            openai_url=os.getenv("OPENAI_API_URL", "https://api.openai.com/v1"),
+            openai_model=os.getenv("OPENAI_MODEL", "gpt-4o"),
+            multiple_answer=True,
         )
-        return None
 
     try:
         # Intentar cargar papercraftr.json primero
@@ -136,8 +147,8 @@ def load_book_config(book_path: str):
             "reference_author": "",
             "keywords": "",
             "cli_name": "papercraftr",
-            "api_base_url": "https://api.openai.com/v1",
-            "model_name": "gpt-4o",
+            "openai_url": "https://api.openai.com/v1",
+            "openai_model": "gpt-4o",
             "multiple_answer": True,
         }
 
@@ -145,10 +156,16 @@ def load_book_config(book_path: str):
         for key, value in config_data.items():
             default_config[key] = value
 
+        # Override with environment variables if they exist
+        if os.getenv("OPENAI_API_URL"):
+            default_config["openai_url"] = os.getenv("OPENAI_API_URL")
+        if os.getenv("OPENAI_MODEL"):
+            default_config["openai_model"] = os.getenv("OPENAI_MODEL")
+
         return SimpleNamespace(**default_config)
 
-    except Exception as e:
-        console.print(f"[red]Error loading configuration: {str(e)}[/red]")
+    except (json.JSONDecodeError, IOError) as e:
+        console.print(f"[red]Error loading configuration file: {e}[/red]")
         return None
 
 
@@ -172,3 +189,56 @@ def file_has_more_than_three_lines(file_path: str) -> bool:
         console.print(f"[red bold]Error:[/red bold] File not found: {file_path}")
         return False
     return False
+
+
+def verify_book_path(book_path=None):
+    """
+    Verifies if the specified directory contains `storycraftr.json` or `papercraftr.json`.
+
+    Args:
+        book_path (str): The path to the book directory.
+
+    Returns:
+        str: The verified book path.
+
+    Raises:
+        ClickException: If `storycraftr.json` or `papercraftr.json` file is not found.
+    """
+    book_path = book_path or os.getcwd()
+    storycraftr_file = os.path.join(book_path, "storycraftr.json")
+    papercraftr_file = os.path.join(book_path, "papercraftr.json")
+
+    if not os.path.exists(storycraftr_file) and not os.path.exists(papercraftr_file):
+        raise click.ClickException(
+            f"Neither storycraftr.json nor papercraftr.json was found in: {book_path}"
+        )
+
+    return book_path
+
+
+def is_initialized(book_path):
+    """
+    Checks if the book project is already initialized.
+
+    Args:
+        book_path (str): The path to the book project.
+
+    Returns:
+        bool: True if the project is initialized, False if not.
+    """
+    return os.path.exists(
+        os.path.join(book_path, "storycraftr.json")
+    ) or os.path.exists(os.path.join(book_path, "papercraftr.json"))
+
+
+def project_not_initialized_error(book_path):
+    """
+    Shows an error message if the project is not initialized.
+
+    Args:
+        book_path (str): The path to the book project.
+    """
+    console.print(
+        f"[red]✖ Project '{book_path}' is not initialized. "
+        "Run 'storycraftr init {book_path}' first.[/red]"
+    )

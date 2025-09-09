@@ -5,7 +5,7 @@ import requests
 from unittest import mock
 from pathlib import Path
 from click import ClickException
-from storycraftr.cli import (
+from storycraftr.utils.core import (
     verify_book_path,
     is_initialized,
     project_not_initialized_error,
@@ -16,7 +16,7 @@ from storycraftr.init import download_file
 # Mock the console object to avoid printing to the console during tests
 @pytest.fixture
 def mock_console():
-    with mock.patch("storycraftr.cli.console") as mock_console:
+    with mock.patch("storycraftr.utils.core.console") as mock_console:
         yield mock_console
 
 
