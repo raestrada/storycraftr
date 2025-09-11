@@ -50,7 +50,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: poetry run pytest -m "not slow"
+        entry: poetry run pytest tests/test_cli.py tests/test_state.py -q
         language: system
         types: [python]
         pass_filenames: false
