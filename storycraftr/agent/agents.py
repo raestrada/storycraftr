@@ -136,9 +136,9 @@ def create_message(
     book_path: str,
     content: str,
     history: List[Dict[str, str]],
-    file_path: str = None,
-    progress: Progress = None,
-    task_id=None,
+    file_path: str | None = None,
+    progress: Progress | None = None,
+    task_id: int | None = None,
 ) -> str:
     """
     Create a message using the Chat Completions API with RAG.
@@ -222,8 +222,36 @@ def create_message(
         if progress and task_id:
             progress.update(task_id, completed=100)
 
-        response_text = completion.choices[0].message.content
-        return response_text
+        response_content = completion.choices[0].message.content
+
+        # Handle case where content is None
+        if response_content is None:
+            return ""
+
+        # Handle Magistral models that return structured responses (same as evaluate.py)
+        if isinstance(response_content, list):
+            # The model might be returning a structured response (e.g., with reasoning).
+            # We will attempt to extract text from the structure.
+            text_parts = []
+            for part in response_content:
+                if isinstance(part, str):
+                    text_parts.append(part)
+                elif (
+                    isinstance(part, dict)
+                    and "text" in part
+                    and isinstance(part["text"], str)
+                ):
+                    text_parts.append(part["text"])
+            return "\n".join(text_parts)
+
+        if not isinstance(response_content, str):
+            error_message = (
+                f"Unexpected response type from API: {type(response_content)}. "
+                f"Expected str or list, got {type(response_content)}."
+            )
+            raise ValueError(error_message)
+
+        return response_content
 
     except APIError as e:
         console.print(f"[bold red]Error calling Chat Completions API: {e}[/bold red]")
