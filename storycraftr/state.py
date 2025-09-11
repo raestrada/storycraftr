@@ -33,3 +33,4 @@ class DebugState:
 
 # Singleton to manage global debug state
 debug_state = DebugState()
+# Test

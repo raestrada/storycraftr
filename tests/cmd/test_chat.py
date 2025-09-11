@@ -48,6 +48,7 @@ def mock_dependencies():
         }
 
 
+@pytest.mark.slow
 def test_chat_happy_path(mock_dependencies, tmp_path):
     """
     Test the normal flow of a chat session: ingest, prompt, response, exit.
@@ -75,6 +76,7 @@ def test_chat_happy_path(mock_dependencies, tmp_path):
     assert "A mock response." in result.output
 
 
+@pytest.mark.slow
 def test_chat_api_error_handling(mock_dependencies, tmp_path):
     """
     Test that API errors are handled gracefully and history is managed correctly.
@@ -186,6 +188,7 @@ def mock_integration_dependencies(tmp_path, monkeypatch):
         }
 
 
+@pytest.mark.slow
 def test_chat_integration_with_rag(mock_integration_dependencies):
     """
     Integration test for the chat command with the RAG pipeline.

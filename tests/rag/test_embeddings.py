@@ -80,6 +80,7 @@ def has_internet_connection():
 @pytest.mark.skipif(
     not has_internet_connection(), reason="No internet connection available"
 )
+@pytest.mark.slow
 def test_embedding_generator_with_real_model():
     """
     Test that EmbeddingGenerator can download and use a real model.
