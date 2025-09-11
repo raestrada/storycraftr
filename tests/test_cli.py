@@ -85,6 +85,3 @@ def test_project_not_initialized_error(mock_console):
     mock_console.print.assert_called_with(
         "[red]✖ Project 'test_path' is not initialized. Run 'storycraftr init {book_path}' first.[/red]"
     )
-
-
-# Final test
