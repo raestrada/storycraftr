@@ -9,7 +9,14 @@ BENCHMARKS = [
         "id": "qa_1",
         "name": "Question Answering",
         "prompt": "Based on the following text, who designed the Eiffel Tower? The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France. It is named after the engineer Gustave Eiffel, whose company designed and built the tower.",
-        "reference_text": "The Eiffel Tower was designed by the company of Gustave Eiffel.",
+        "reference_text": "Gustave Eiffel.",
+    },
+    {
+        "id": "structured_output_1",
+        "name": "Structured Output",
+        "prompt": "Extract information about the Eiffel Tower from this text and respond in valid JSON format with exactly these fields: designer, location, construction_start, construction_end, purpose. Text: The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France. It is named after the engineer Gustave Eiffel, whose company designed and built the tower. Constructed from 1887 to 1889 as the centerpiece of the 1889 World's Fair.",
+        "reference_text": '{"designer": "Gustave Eiffel", "location": "Paris, France", "construction_start": "1887", "construction_end": "1889", "purpose": "1889 World\'s Fair centerpiece"}',
+        "type": "structured",
     },
     {
         "id": "creative_writing_1",

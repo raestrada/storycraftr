@@ -84,6 +84,11 @@ cli_name = detect_invocation()
 def cli(debug):
     """
     StoryCraftr CLI - A tool to assist in writing books using AI tools.
+
+    Environment Variables:
+      OPENAI_API_KEY    OpenAI API key (can also be in ~/.storycraftr/openai_api_key.txt)
+      OPENAI_API_URL    OpenAI API base URL (default: https://api.openai.com/v1)
+      OPENAI_MODEL      OpenAI model name (default: gpt-4o)
     """
     debug_state.set_debug(debug)
     if debug:

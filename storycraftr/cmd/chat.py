@@ -28,6 +28,11 @@ def chat(book_path=None):
     """
     Start a chat session with the assistant for the given book name.
     Allows executing commands dynamically from various modules.
+
+    Environment Variables:
+      OPENAI_API_KEY    OpenAI API key (can also be in ~/.storycraftr/openai_api_key.txt)
+      OPENAI_API_URL    OpenAI API base URL (default: https://api.openai.com/v1)
+      OPENAI_MODEL      OpenAI model name (default: gpt-4o)
     """
     if not book_path:
         book_path = os.getcwd()
