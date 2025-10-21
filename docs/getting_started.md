@@ -25,59 +25,72 @@ echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
 
 Once installed and the API key is set, you can run the tool using the command `storycraftr`.
 
-### New: Specify OpenAI Model and URL
+### New: Use Any OpenAI-Compatible Provider
 
-StoryCraftr now allows you to specify the OpenAI model and URL, which can be any service that supports the OpenAI API with file search capabilities, such as DeepSeek or others. This is essential as StoryCraftr relies on file search for its functionality.
+StoryCraftr is designed to be provider-agnostic. You can use any service that supports the OpenAI Chat Completions API, such as Mistral, DeepSeek, or others. This flexibility allows you to choose the best model for your needs.
 
-To configure the model and URL, add the following lines to your configuration file located at `~/.storycraftr/config.json`:
+To configure a custom provider, you can add or edit the following lines in the `storycraftr.json` file located in your book's root directory:
 
 ```json
 {
   "openai_model": "your-preferred-model",
-  "openai_url": "https://api.your-preferred-service.com"
+  "openai_url": "https://api.your-preferred-service.com/v1"
 }
 ```
 
-Make sure to replace `"your-preferred-model"` with the model you want to use and `"https://api.your-preferred-service.com"` with the URL of the service that supports the OpenAI API with file search.
+Make sure to replace `"your-preferred-model"` with the model you want to use (e.g., `mistral-large-latest`) and `"https://api.your-preferred-service.com/v1"` with the API base URL of your chosen service. You will also need to store the corresponding API key in `~/.storycraftr/openai_api_key.txt`.
 
 ### Supported LLMs
 
 Here are some examples of LLMs that are compatible with the OpenAI API:
 
 1. **OpenAI GPT Series**:
-    - Models: `gpt-3.5-turbo`, `gpt-4`
-    - URL Base: `https://api.openai.com/v1/`
-    - Documentation: [OpenAI API Models](https://beta.openai.com/docs/models)
+
+   - Models: `gpt-3.5-turbo`, `gpt-4`
+   - URL Base: `https://api.openai.com/v1/`
+   - Documentation: [OpenAI API Models](https://beta.openai.com/docs/models)
 
 2. **Azure OpenAI Service**:
-    - Models: `gpt-3.5-turbo`, `gpt-4`
-    - URL Base: Depends on the region and configuration.
-    - Documentation: [Azure OpenAI Service](https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/)
+
+   - Models: `gpt-3.5-turbo`, `gpt-4`
+   - URL Base: Depends on the region and configuration.
+   - Documentation: [Azure OpenAI Service](https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/)
 
 3. **DeepSeek**:
-    - Model: `DeepSeek-R1`
-    - URL Base: `https://api.deepseek.com/v1/`
-    - Documentation: [DeepSeek API Documentation](https://deepseek.com/docs)
+
+   - Model: `DeepSeek-R1`
+   - URL Base: `https://api.deepseek.com/v1/`
+   - Documentation: [DeepSeek API Documentation](https://deepseek.com/docs)
 
 4. **Qwen (Alibaba Cloud)**:
-    - Models: `qwen-7b`, `qwen-13b`
-    - URL Base: `https://dashscope.aliyuncs.com/`
-    - Documentation: [DashScope API](https://dashscope.aliyuncs.com/docs)
+
+   - Models: `qwen-7b`, `qwen-13b`
+   - URL Base: `https://dashscope.aliyuncs.com/`
+   - Documentation: [DashScope API](https://dashscope.aliyuncs.com/docs)
 
 5. **Gemini (Google AI)**:
-    - Models: `gemini-1`, `gemini-1.5`
-    - URL Base: `https://api.gemini.google.com/v1/`
-    - Documentation: [Gemini API](https://gemini.google.com/docs)
+
+   - Models: `gemini-1`, `gemini-1.5`
+   - URL Base: `https://api.gemini.google.com/v1/`
+   - Documentation: [Gemini API](https://gemini.google.com/docs)
 
 6. **Together AI**:
-    - Model: `together-gpt-neoxt-chat-20b`
-    - URL Base: `https://api.together.ai/v1/`
-    - Documentation: [Together AI API](https://together.ai/docs)
+
+   - Model: `together-gpt-neoxt-chat-20b`
+   - URL Base: `https://api.together.ai/v1/`
+   - Documentation: [Together AI API](https://together.ai/docs)
 
 7. **DeepInfra**:
-    - Model: `Qwen2.5-Coder-32B-Instruct`
-    - URL Base: `https://api.deepinfra.com/v1/`
-    - Documentation: [DeepInfra API](https://deepinfra.com/docs)
+
+   - Model: `Qwen2.5-Coder-32B-Instruct`
+   - URL Base: `https://api.deepinfra.com/v1/`
+   - Documentation: [DeepInfra API](https://deepinfra.com/docs)
+
+8. **Mistral AI**:
+
+   - Models: `mistral-large-latest`, `mistral-small-latest`, `open-mistral-7b`
+   - URL Base: `https://api.mistral.ai/v1/`
+   - Documentation: [Mistral AI Platform](https://docs.mistral.ai/)
 
 ## Step 2: Create the Behavior File
 

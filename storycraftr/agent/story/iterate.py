@@ -16,10 +16,7 @@ from storycraftr.prompts.story.iterate import (
     REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT,
 )
 from storycraftr.agent.agents import (
-    update_agent_files,
     create_message,
-    get_thread,
-    create_or_get_assistant,
     process_chapters,
 )
 from storycraftr.utils.markdown import save_to_markdown
@@ -27,27 +24,24 @@ from storycraftr.utils.markdown import save_to_markdown
 console = Console()
 
 
-def iterate_check_names(book_path: str):
+def iterate_check_names(book_path: str) -> None:
     """
     Check for name consistency across all chapters in the book.
+    The results are saved to markdown files.
 
     Args:
         book_path (str): The path to the book's directory.
-
-    Returns:
-        Corrections made to ensure name consistency.
     """
-    corrections = process_chapters(
+    process_chapters(
         save_to_markdown,
         book_path,
         prompt_template=CHECK_NAMES_PROMPT,
         task_description="Checking name consistency...",
         file_suffix="Name Consistency Check",
     )
-    return corrections
 
 
-def fix_name_in_chapters(book_path: str, original_name: str, new_name: str):
+def fix_name_in_chapters(book_path: str, original_name: str, new_name: str) -> None:
     """
     Update character names across all chapters.
 
@@ -69,7 +63,7 @@ def fix_name_in_chapters(book_path: str, original_name: str, new_name: str):
 
 def refine_character_motivation(
     book_path: str, character_name: str, story_context: str
-):
+) -> None:
     """
     Refine the motivations of a character across all chapters.
 
@@ -89,7 +83,7 @@ def refine_character_motivation(
     )
 
 
-def strengthen_core_argument(book_path: str, argument: str):
+def strengthen_core_argument(book_path: str, argument: str) -> None:
     """
     Strengthen the core argument across all chapters.
 
@@ -107,7 +101,7 @@ def strengthen_core_argument(book_path: str, argument: str):
     )
 
 
-def check_consistency_across(book_path: str, consistency_type: str):
+def check_consistency_across(book_path: str, consistency_type: str) -> None:
     """
     Check for overall consistency across chapters.
 
@@ -131,122 +125,91 @@ def insert_new_chapter(
     prompt: str,
     flashback: bool = False,
     split: bool = False,
-):
+) -> None:
     """
-    Insert a new chapter at the specified position and adjust subsequent chapters.
+    Insert a new chapter at a specific position, renumbering subsequent chapters.
+    Optionally handles flashbacks and chapter splits.
 
     Args:
-        book_path (str): The path to the book's directory.
-        position (int): The position to insert the new chapter.
-        prompt (str): The prompt to guide chapter generation.
-        flashback (bool, optional): If True, the new chapter will be a flashback. Defaults to False.
-        split (bool, optional): If True, the new chapter will be a split. Defaults to False.
+        book_path (str): Path to the book directory.
+        position (int): The position to insert the new chapter (1-based index).
+        prompt (str): The prompt for generating the new chapter's content.
+        flashback (bool): Whether the new chapter is a flashback.
+        split (bool): Whether the new chapter is a result of a split.
     """
     chapters_dir = Path(book_path) / "chapters"
-    if not chapters_dir.exists():
-        raise FileNotFoundError(
-            f"The chapter directory '{chapters_dir}' does not exist."
+    if not chapters_dir.is_dir():
+        console.print(
+            f"[bold red]Error: Chapters directory not found at '{chapters_dir}'[/bold red]"
         )
+        return
 
-    # Función para extraer el número del capítulo
-    def extract_chapter_number(filename):
-        # Esto supone que los archivos tienen el formato "chapter-<numero>.md"
-        return int(filename.stem.split("-")[1])
-
-    # Ordenar los archivos por el número del capítulo
-    files_to_process = sorted(
-        [
-            f
-            for f in chapters_dir.iterdir()
-            if f.is_file() and f.suffix == ".md" and f.stem.startswith("chapter-")
-        ],
-        key=extract_chapter_number,
+    chapter_files = sorted(
+        [f for f in chapters_dir.glob("chapter-*.md")],
+        key=lambda p: int(p.stem.split("-")[1]),
     )
 
-    if len(files_to_process) < position or position < 1:
-        raise ValueError(
-            f"Invalid position: {position}. Position must be between 1 and {len(files_to_process)}."
+    # Validate position
+    if not (1 <= position <= len(chapter_files) + 1):
+        console.print(
+            f"[bold red]Error: Invalid position. Must be between 1 and {len(chapter_files) + 1}.[/bold red]"
         )
+        return
 
-    # Create progress bar for chapter renaming and content insertion
-    with Progress() as progress:
-        task_chapters = progress.add_task(
-            "[cyan]Inserting new chapter and renaming chapters...",
-            total=len(files_to_process) + 2,
-        )
+    # Rename subsequent chapters to make space for the new one
+    for i in range(len(chapter_files) - 1, position - 2, -1):
+        old_path = chapter_files[i]
+        old_num = int(old_path.stem.split("-")[1])
+        new_path = old_path.with_name(f"chapter-{old_num + 1}.md")
+        old_path.rename(new_path)
+        console.print(f"Renamed '{old_path.name}' to '{new_path.name}'")
 
-        # Renaming chapters from the insert point onward
-        for i in range(len(files_to_process) - 1, position - 1, -1):
-            old_chapter_path = chapters_dir / files_to_process[i]
-            new_chapter_path = chapters_dir / f"chapter-{i + 2}.md"
-            old_chapter_path.rename(new_chapter_path)
-            progress.update(task_chapters, advance=1)
+    # Select the appropriate prompt template
+    if flashback:
+        prompt_template = INSERT_FLASHBACK_CHAPTER_PROMPT
+    elif split:
+        prompt_template = INSERT_SPLIT_CHAPTER_PROMPT
+    else:
+        prompt_template = INSERT_CHAPTER_PROMPT
 
-        # Get or create the assistant and thread
-        assistant = create_or_get_assistant(book_path)
-        thread = get_thread(book_path)
+    full_prompt = prompt_template.format(position=position, prompt=prompt)
 
-        # Determine prompt type (flashback or regular chapter)
-        prompt_text = (
-            INSERT_FLASHBACK_CHAPTER_PROMPT
-            if flashback
-            else INSERT_SPLIT_CHAPTER_PROMPT
-            if split
-            else INSERT_CHAPTER_PROMPT
-        ).format(prompt=prompt, position=position)
+    console.print(f"Generating content for new chapter at position {position}...")
+    new_chapter_content = create_message(book_path, content=full_prompt, history=[])
 
-        # Generate new chapter content
-        new_chapter_text = create_message(
+    new_chapter_path = chapters_dir / f"chapter-{position}.md"
+    with open(new_chapter_path, "w", encoding="utf-8") as f:
+        f.write(new_chapter_content)
+
+    console.print(
+        f"[bold green]Successfully inserted new chapter: '{new_chapter_path.name}'[/bold green]"
+    )
+
+    # Rewrite surrounding chapters for consistency
+    console.print("Rewriting surrounding chapters for consistency...")
+
+    # Previous chapter
+    if position > 1:
+        prev_chapter_path = chapters_dir / f"chapter-{position - 1}.md"
+        rewrite_surrounding_chapter(
             book_path,
-            thread_id=thread.id,
-            content=prompt_text,
-            assistant=assistant,
-            progress=progress,
-            task_id=task_chapters,
+            prev_chapter_path,
+            chapter_num=position - 1,
+            position=position,
+            flashback=flashback,
+            split=split,
         )
 
-        # Save the new chapter
-        new_chapter_path = chapters_dir / f"chapter-{position}.md"
-        save_to_markdown(
-            book_path,
-            new_chapter_path,
-            f"Chapter {position}",
-            new_chapter_text,
-            progress,
-            task_chapters,
-        )
-
-        progress.update(task_chapters, advance=1)
-
-        # Upload updated files to the agent's retrieval system
-        update_agent_files(book_path, assistant)
-
-        # Rewrite adjacent chapters for consistency
-        if position > 1:
-            prev_chapter_path = chapters_dir / f"chapter-{position - 1}.md"
-            rewrite_surrounding_chapter(
-                book_path,
-                prev_chapter_path,
-                position - 1,
-                position,
-                flashback,
-                split,
-                progress,
-                task_chapters,
-            )
-
-        if position < len(files_to_process):
-            next_chapter_path = chapters_dir / f"chapter-{position + 1}.md"
-            rewrite_surrounding_chapter(
-                book_path,
-                next_chapter_path,
-                position + 1,
-                position,
-                flashback,
-                split,
-                progress,
-                task_chapters,
-            )
+    # Next chapter
+    next_chapter_path = chapters_dir / f"chapter-{position + 1}.md"
+    rewrite_surrounding_chapter(
+        book_path,
+        next_chapter_path,
+        chapter_num=position + 1,
+        position=position,
+        flashback=flashback,
+        split=split,
+    )
 
 
 def rewrite_surrounding_chapter(
@@ -256,53 +219,42 @@ def rewrite_surrounding_chapter(
     position: int,
     flashback: bool,
     split: bool,
-    progress: Progress,
-    task_chapters,
-):
+) -> None:
     """
-    Rewrite chapters adjacent to the inserted chapter for consistency.
+    Rewrite a chapter to ensure it fits seamlessly with surrounding chapters,
+    especially after an insertion.
 
     Args:
         book_path (str): The path to the book's directory.
-        chapter_path (Path): The path to the chapter file.
-        chapter_num (int): The chapter number to rewrite.
-        position (int): The position of the inserted chapter.
-        flashback (bool): Whether the inserted chapter is a flashback.
-        progress (Progress): Progress object for tracking progress.
-        task_chapters (Task): Task ID for tracking chapter rewrites.
+        chapter_path (Path): The path to the chapter file to rewrite.
+        chapter_num (int): The number of the chapter being rewritten.
+        position (int): The position where a new chapter was inserted.
+        flashback (bool): Whether the inserted chapter was a flashback.
+        split (bool): Whether the inserted chapter was from a split.
     """
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
-
-    prompt = (
-        REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT
-        if flashback
-        else (
-            REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT
-            if split
-            else REWRITE_SURROUNDING_CHAPTERS_PROMPT
+    if not chapter_path.exists():
+        console.print(
+            f"[bold yellow]Warning: Chapter to rewrite not found: {chapter_path}[/bold yellow]"
         )
-    ).format(prompt=chapter_num, position=position)
+        return
 
-    # Generate the rewritten chapter content
-    updated_chapter_text = create_message(
+    if flashback:
+        rewrite_prompt = REWRITE_SURROUNDING_CHAPTERS_FOR_FLASHBACK_PROMPT
+    elif split:
+        rewrite_prompt = REWRITE_SURROUNDING_CHAPTERS_FOR_SPLIT_PROMPT
+    else:
+        rewrite_prompt = REWRITE_SURROUNDING_CHAPTERS_PROMPT
+
+    console.print(f"Rewriting '{chapter_path.name}' for consistency...")
+
+    rewritten_content = create_message(
         book_path,
-        thread_id=thread.id,
-        content=prompt,
-        assistant=assistant,
-        progress=progress,
-        task_id=task_chapters,
+        content=rewrite_prompt,
+        history=[],
         file_path=str(chapter_path),
     )
 
-    # Save the rewritten chapter content
-    save_to_markdown(
-        book_path,
-        chapter_path,
-        f"Chapter {chapter_num} (Updated)",
-        updated_chapter_text,
-        progress,
-        task_chapters,
-    )
+    with open(chapter_path, "w", encoding="utf-8") as f:
+        f.write(rewritten_content)
 
-    progress.update(task_chapters, advance=1)
+    console.print(f"Successfully rewrote '{chapter_path.name}'.")

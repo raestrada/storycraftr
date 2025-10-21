@@ -1,11 +1,6 @@
 import os
 from pathlib import Path
-from storycraftr.agent.agents import (
-    create_or_get_assistant,
-    get_thread,
-    create_message,
-    update_agent_files,
-)
+from storycraftr.agent.agents import create_message
 from storycraftr.utils.core import load_book_config
 from storycraftr.utils.markdown import save_to_markdown
 from storycraftr.prompts.story.chapters import (
@@ -36,8 +31,6 @@ def generate_chapter(book_path: str, chapter_number: int, prompt: str) -> str:
     console.print(f"[bold blue]Generating chapter {chapter_number}...[/bold blue]")
 
     language = load_book_config(book_path).primary_language
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
 
     chapter_file = f"chapter-{chapter_number}.md"
     file_path = Path(book_path) / "chapters" / chapter_file
@@ -54,9 +47,8 @@ def generate_chapter(book_path: str, chapter_number: int, prompt: str) -> str:
 
     chapter_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=str(file_path),
     )
 
@@ -70,9 +62,6 @@ def generate_chapter(book_path: str, chapter_number: int, prompt: str) -> str:
     console.print(
         f"[bold green]✔ Chapter {chapter_number} generated successfully[/bold green]"
     )
-
-    # Update assistant with new chapter information
-    update_agent_files(book_path, assistant)
 
     return chapter_content
 
@@ -92,8 +81,6 @@ def generate_cover(book_path: str, prompt: str) -> str:
 
     config = load_book_config(book_path)
     language = config.primary_language
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
 
     prompt_content = COVER_PROMPT.format(
         title=config.book_name,
@@ -104,14 +91,11 @@ def generate_cover(book_path: str, prompt: str) -> str:
         language=language,
     )
 
-    cover_content = create_message(
-        book_path, thread_id=thread.id, content=prompt_content, assistant=assistant
-    )
+    cover_content = create_message(book_path, content=prompt_content, history=[])
 
     save_to_markdown(book_path, "chapters/cover.md", "Cover", cover_content)
     console.print("[bold green]✔ Cover generated successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return cover_content
 
 
@@ -130,8 +114,6 @@ def generate_back_cover(book_path: str, prompt: str) -> str:
 
     config = load_book_config(book_path)
     language = config.primary_language
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
 
     prompt_content = BACK_COVER_PROMPT.format(
         title=config.book_name,
@@ -143,16 +125,13 @@ def generate_back_cover(book_path: str, prompt: str) -> str:
         license=config.license,
     )
 
-    back_cover_content = create_message(
-        book_path, thread_id=thread.id, content=prompt_content, assistant=assistant
-    )
+    back_cover_content = create_message(book_path, content=prompt_content, history=[])
 
     save_to_markdown(
         book_path, "chapters/back-cover.md", "Back Cover", back_cover_content
     )
     console.print("[bold green]✔ Back cover generated successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return back_cover_content
 
 
@@ -170,8 +149,6 @@ def generate_epilogue(book_path: str, prompt: str) -> str:
     console.print("[bold blue]Generating epilogue...[/bold blue]")
 
     language = load_book_config(book_path).primary_language
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
 
     file_path = Path(book_path) / "chapters" / "epilogue.md"
 
@@ -187,14 +164,12 @@ def generate_epilogue(book_path: str, prompt: str) -> str:
 
     epilogue_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=str(file_path),
     )
 
     save_to_markdown(book_path, "chapters/epilogue.md", "Epilogue", epilogue_content)
     console.print("[bold green]✔ Epilogue generated successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return epilogue_content

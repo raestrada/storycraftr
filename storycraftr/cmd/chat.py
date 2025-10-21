@@ -1,14 +1,11 @@
 import os
 import click
 import shlex
+from openai import APIError
 from rich.console import Console
 from rich.markdown import Markdown
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.agents import (
-    get_thread,
-    create_or_get_assistant,
-    create_message,
-)
+from storycraftr.agent.agents import create_message, ingest_book_data
 import storycraftr.cmd.story as story_cmd
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import InMemoryHistory
@@ -31,6 +28,11 @@ def chat(book_path=None):
     """
     Start a chat session with the assistant for the given book name.
     Allows executing commands dynamically from various modules.
+
+    Environment Variables:
+      OPENAI_API_KEY    OpenAI API key (can also be in ~/.storycraftr/openai_api_key.txt)
+      OPENAI_API_URL    OpenAI API base URL (default: https://api.openai.com/v1)
+      OPENAI_MODEL      OpenAI model name (default: gpt-4o)
     """
     if not book_path:
         book_path = os.getcwd()
@@ -42,11 +44,11 @@ def chat(book_path=None):
         f"Starting chat for [bold]{book_path}[/bold]. Type [bold green]exit()[/bold green] to quit or [bold green]help()[/bold green] for a list of available commands."
     )
 
-    console.print("[bold blue]Starting chat session...[/bold blue]")
-    language = load_book_config(book_path).primary_language
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
+    # Ingest book data into the vector store
+    ingest_book_data(book_path)
 
+    console.print("[bold blue]Starting chat session...[/bold blue]")
+    history = []
     session = PromptSession(history=InMemoryHistory())
 
     console.print("[bold green]USE help() to get help and exit() to exit[/bold green]")
@@ -68,27 +70,28 @@ def chat(book_path=None):
                 execute_cli_command(user_input[1:])
                 continue
 
-            # Pass the user input to the assistant for processing
-            user_input = (
-                f"Answer the next prompt formatted on markdown (text): {user_input}"
-            )
-
             try:
+                # Add instruction for Markdown formatting
+                formatted_input = (
+                    f"Answer the next prompt formatted on markdown (text): {user_input}"
+                )
                 # Generate the response
                 response = create_message(
-                    book_path,
-                    thread_id=thread.id,
-                    content=user_input,
-                    assistant=assistant,
-                    force_single_answer=True,
+                    book_path, content=formatted_input, history=history.copy()
                 )
+
+                # State management: Append user input and assistant response to history
+                # *after* a successful API call to avoid a polluted history on error.
+                history.append({"role": "user", "content": user_input})
+                history.append({"role": "assistant", "content": response})
 
                 # Render Markdown response
                 markdown_response = Markdown(response)
                 console.print(markdown_response)
 
-            except Exception as e:
-                console.print(f"[bold red]Error: {str(e)}[/bold red]")
+            except APIError as e:
+                console.print(f"[bold red]API Error: {e}[/bold red]")
+                # History is not modified on error, so no cleanup needed.
 
         except KeyboardInterrupt:
             console.print("[bold red]Exiting chat...[/bold red]")

@@ -4,7 +4,6 @@ import requests
 from rich.console import Console
 from pathlib import Path
 import storycraftr.templates.folder_story
-from storycraftr.agent.agents import create_or_get_assistant
 from storycraftr.templates.tex import TEMPLATE_TEX
 from storycraftr.templates.paper_tex import TEMPLATE_PAPER_TEX
 from storycraftr.templates.ieee_tex import TEMPLATE_IEEE_TEX
@@ -111,8 +110,6 @@ def init_structure_story(
     for url, filename in zip(urls, filenames):
         download_file(url, Path(book_path) / "storycraftr", filename)
 
-    create_or_get_assistant(book_path)
-
 
 # Function to initialize PaperCraftr
 def init_structure_paper(
@@ -172,6 +169,3 @@ def init_structure_paper(
     ieee_template_file = template_dir / "ieee.tex"
     ieee_template_file.write_text(TEMPLATE_IEEE_TEX, encoding="utf-8")
     console.print(f"[green]IEEE template created: {ieee_template_file}[/green]")
-
-    # Initialize the assistant
-    create_or_get_assistant(paper_path)

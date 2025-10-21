@@ -62,39 +62,45 @@ Make sure to replace `"your-preferred-model"` with the model you want to use and
 Here are some examples of LLMs that are compatible with the OpenAI API:
 
 1. **OpenAI GPT Series**:
-    - Models: `gpt-3.5-turbo`, `gpt-4`
-    - URL Base: `https://api.openai.com/v1/`
-    - Documentation: [OpenAI API Models](https://beta.openai.com/docs/models)
+
+   - Models: `gpt-3.5-turbo`, `gpt-4`
+   - URL Base: `https://api.openai.com/v1/`
+   - Documentation: [OpenAI API Models](https://beta.openai.com/docs/models)
 
 2. **Azure OpenAI Service**:
-    - Models: `gpt-3.5-turbo`, `gpt-4`
-    - URL Base: Depends on the region and configuration.
-    - Documentation: [Azure OpenAI Service](https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/)
+
+   - Models: `gpt-3.5-turbo`, `gpt-4`
+   - URL Base: Depends on the region and configuration.
+   - Documentation: [Azure OpenAI Service](https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/)
 
 3. **DeepSeek**:
-    - Model: `DeepSeek-R1`
-    - URL Base: `https://api.deepseek.com/v1/`
-    - Documentation: [DeepSeek API Documentation](https://deepseek.com/docs)
+
+   - Model: `DeepSeek-R1`
+   - URL Base: `https://api.deepseek.com/v1/`
+   - Documentation: [DeepSeek API Documentation](https://deepseek.com/docs)
 
 4. **Qwen (Alibaba Cloud)**:
-    - Models: `qwen-7b`, `qwen-13b`
-    - URL Base: `https://dashscope.aliyuncs.com/`
-    - Documentation: [DashScope API](https://dashscope.aliyuncs.com/docs)
+
+   - Models: `qwen-7b`, `qwen-13b`
+   - URL Base: `https://dashscope.aliyuncs.com/`
+   - Documentation: [DashScope API](https://dashscope.aliyuncs.com/docs)
 
 5. **Gemini (Google AI)**:
-    - Models: `gemini-1`, `gemini-1.5`
-    - URL Base: `https://api.gemini.google.com/v1/`
-    - Documentation: [Gemini API](https://gemini.google.com/docs)
+
+   - Models: `gemini-1`, `gemini-1.5`
+   - URL Base: `https://api.gemini.google.com/v1/`
+   - Documentation: [Gemini API](https://gemini.google.com/docs)
 
 6. **Together AI**:
-    - Model: `together-gpt-neoxt-chat-20b`
-    - URL Base: `https://api.together.ai/v1/`
-    - Documentation: [Together AI API](https://together.ai/docs)
+
+   - Model: `together-gpt-neoxt-chat-20b`
+   - URL Base: `https://api.together.ai/v1/`
+   - Documentation: [Together AI API](https://together.ai/docs)
 
 7. **DeepInfra**:
-    - Model: `Qwen2.5-Coder-32B-Instruct`
-    - URL Base: `https://api.deepinfra.com/v1/`
-    - Documentation: [DeepInfra API](https://deepinfra.com/docs)
+   - Model: `Qwen2.5-Coder-32B-Instruct`
+   - URL Base: `https://api.deepinfra.com/v1/`
+   - Documentation: [DeepInfra API](https://deepinfra.com/docs)
 
 ## Quick Examples
 
@@ -213,15 +219,22 @@ Let your creativity flow with the power of AI! ✨
 
 We welcome contributions of all kinds! Whether you’re a developer, writer, or simply interested in improving the tool, you can help. Here’s how you can contribute:
 
-1. **Fork the repository** and create your branch:
+1. **Set up your development environment**:
 
-```bash
-git checkout -b feature/YourFeature
-```
+   ```bash
+   poetry install --with dev
+   poetry run pre-commit install
+   ```
 
-2. **Make your changes**, ensuring all tests pass.
+2. **Fork the repository** and create your branch:
 
-3. **Submit a pull request** detailing your changes.
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
+
+3. **Make your changes**, ensuring all tests pass and pre-commit hooks succeed.
+
+4. **Submit a pull request** detailing your changes.
 
 Join us on this journey to create an amazing open-source tool for writers everywhere. Together, we can make StoryCraftr the go-to AI writing assistant! 💡
 

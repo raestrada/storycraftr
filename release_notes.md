@@ -7,26 +7,31 @@ We're excited to announce the release of PaperCraftr 0.10.1-beta4, which marks a
 ## ✨ New Features
 
 ### 📝 Abstract Generation
+
 - Added `abstract generate` command to create abstracts for different journals
 - Implemented `abstract keywords` command to generate relevant keywords
 - Added support for multiple languages in abstract generation
 
 ### 📚 Reference Management
+
 - Implemented `references add` command to add new references
 - Added `references format` command to format references in BibTeX
 - Created `references check` command to verify citation consistency
 
 ### 📋 Outline and Organization
+
 - Added `outline outline-sections` command to generate paper structure
 - Implemented `organize-lit lit-summary` command to organize literature review
 - Created `organize-lit lit-map` command to visualize research connections
 
 ### 📄 Section Generation
+
 - Implemented `generate section` command to create paper sections
 - Added support for generating specific sections (introduction, methodology, etc.)
 - Integrated with AI to produce high-quality academic content
 
 ### 📊 Publishing
+
 - Enhanced `publish pdf` command with improved LaTeX template
 - Added support for IEEE format papers
 - Implemented translation options for multilingual papers
@@ -101,4 +106,4 @@ We're already working on the next release, which will include:
 - Advanced citation analysis
 - Integration with reference management systems
 
-Stay tuned for more updates! 
+Stay tuned for more updates!

@@ -20,8 +20,6 @@ def load_openai_api_key():
         os.path.join(home_dir, ".papercraftr", "openai_api_key.txt"),
     ]
 
-    print(possible_paths)
-
     for api_key_file in possible_paths:
         if os.path.exists(api_key_file):
             with open(api_key_file, "r") as file:
@@ -44,8 +42,12 @@ load_openai_api_key()
 from storycraftr.state import debug_state
 from storycraftr.cmd.story.publish import publish
 from storycraftr.cmd.chat import chat
-from storycraftr.agent.agents import create_or_get_assistant, update_agent_files
-from storycraftr.utils.core import load_book_config
+from storycraftr.cmd.measure import measure  # Import the new measure command
+from storycraftr.utils.core import (
+    load_book_config,
+    is_initialized,
+    project_not_initialized_error,
+)
 
 # Imports StoryCraftr in storycraftr.cmd.story
 from storycraftr.cmd.story.worldbuilding import worldbuilding as story_worldbuilding
@@ -77,64 +79,16 @@ def detect_invocation():
 cli_name = detect_invocation()
 
 
-# Verify if the directory contains storycraftr.json
-def verify_book_path(book_path=None):
-    """
-    Verifies if the specified directory contains `storycraftr.json`.
-
-    Args:
-        book_path (str): The path to the book directory.
-
-    Returns:
-        str: The verified book path.
-
-    Raises:
-        ClickException: If `storycraftr.json` file is not found.
-    """
-    book_path = book_path or os.getcwd()
-    storycraftr_file = os.path.join(book_path, "storycraftr.json")
-
-    if not os.path.exists(storycraftr_file):
-        raise click.ClickException(
-            f"The file storycraftr.json was not found in: {book_path}"
-        )
-
-    return book_path
-
-
-# Check if the project is already initialized
-def is_initialized(book_path):
-    """
-    Checks if the book project is already initialized.
-
-    Args:
-        book_path (str): The path to the book project.
-
-    Returns:
-        bool: True if the project is initialized, False if not.
-    """
-    return os.path.exists(os.path.join(book_path, "storycraftr.json"))
-
-
-# Show an error if the project is not initialized
-def project_not_initialized_error(book_path):
-    """
-    Shows an error message if the project is not initialized.
-
-    Args:
-        book_path (str): The path to the book project.
-    """
-    console.print(
-        f"[red]✖ Project '{book_path}' is not initialized. "
-        "Run 'storycraftr init {book_path}' first.[/red]"
-    )
-
-
 @click.group()
 @click.option("--debug", is_flag=True, help="Enable debug mode.")
 def cli(debug):
     """
     StoryCraftr CLI - A tool to assist in writing books using AI tools.
+
+    Environment Variables:
+      OPENAI_API_KEY    OpenAI API key (can also be in ~/.storycraftr/openai_api_key.txt)
+      OPENAI_API_URL    OpenAI API base URL (default: https://api.openai.com/v1)
+      OPENAI_MODEL      OpenAI model name (default: gpt-4o)
     """
     debug_state.set_debug(debug)
     if debug:
@@ -285,17 +239,12 @@ def reload_files(book_path):
     Args:
         book_path (str): Path to the book project.
     """
-    book_path = book_path or os.getcwd()
-    if not load_book_config(book_path):
-        return
-    if is_initialized(book_path):
-        assistant = create_or_get_assistant(book_path)
-        update_agent_files(book_path, assistant)
-        console.print(
-            f"[green]Agent files reloaded successfully for project: {book_path}[/green]"
-        )
-    else:
-        project_not_initialized_error(book_path)
+    # TODO: This command is obsolete with the RAG agent. It should be repurposed
+    # to trigger re-ingestion or removed.
+    console.print(
+        "[bold yellow]Warning: `reload-files` is disabled during refactoring.[/bold yellow]"
+    )
+    pass
 
 
 @click.command()
@@ -330,6 +279,7 @@ cli.add_command(reload_files)
 cli.add_command(chat)
 cli.add_command(publish)
 cli.add_command(cleanup)
+cli.add_command(measure)  # Add measure to common commands
 
 # CLI-specific group configuration
 if cli_name == "storycraftr":
@@ -340,6 +290,7 @@ if cli_name == "storycraftr":
     cli.add_command(publish)
     cli.add_command(chat)
     cli.add_command(reload_files)
+    cli.add_command(measure)  # Add measure to storycraftr-specific commands
 elif cli_name == "papercraftr":
     cli.add_command(paper_organize_lit)
     cli.add_command(paper_outline)
@@ -350,6 +301,7 @@ elif cli_name == "papercraftr":
     cli.add_command(paper_abstract)
     cli.add_command(chat)
     cli.add_command(reload_files)
+    cli.add_command(measure)  # Add measure to papercraftr-specific commands
 else:
     console.print(
         "[red]Unknown CLI tool name. Use 'storycraftr' or 'papercraftr'.[/red]"

@@ -159,8 +159,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-La purga de los dioses
-The Purge of the gods
 .DS_Store
 behavior.txt
 
@@ -295,6 +293,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# ChromaDB
+chroma/
 
 Deep Learning in Medical Imaging
 *._checkpoint

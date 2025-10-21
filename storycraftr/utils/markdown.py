@@ -2,11 +2,7 @@ import os
 import re
 import shutil
 from pathlib import Path
-from storycraftr.agent.agents import (
-    create_or_get_assistant,
-    get_thread,
-    create_message,
-)
+from storycraftr.agent.agents import create_message
 from storycraftr.utils.core import load_book_config
 from rich.console import Console
 from rich.progress import Progress
@@ -135,10 +131,6 @@ def consolidate_book_md(
     # Ensure the "book" folder exists
     output_file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Create or get the assistant and thread for translation (if needed)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
-
     # Collect chapters to process
     files_to_process = []
 
@@ -196,11 +188,11 @@ def consolidate_book_md(
                             task_translation,
                             description=f"Translating {chapter_file.name}...",
                         )
+                        translation_prompt = f"Translate the following text to {translate}. Maintain all formatting, including markdown syntax. Only translate the actual text content:\n\n{content}"
                         content = create_message(
                             book_path,
-                            thread_id=thread.id,
-                            content=content,
-                            assistant=assistant,
+                            content=translation_prompt,
+                            history=[],
                             progress=progress,
                             task_id=task_openai,
                         )
@@ -296,11 +288,8 @@ def consolidate_paper_md(
                 consolidated_content.append(f"{keywords}\n\n")
 
     # Create or get the assistant and thread for translation (if needed)
-    assistant = None
-    thread = None
     if translate:
-        assistant = create_or_get_assistant(book_path)
-        thread = get_thread(book_path)
+        pass
 
     # Add each section in order
     for section in section_order:
@@ -316,9 +305,8 @@ def consolidate_paper_md(
                     translation_prompt = f"Translate the following text from {primary_language} to {translate}. Maintain all formatting, including markdown syntax, LaTeX formulas, and code blocks. Only translate the actual text content:\n\n{content}"
                     content = create_message(
                         book_path,
-                        thread_id=thread.id,
                         content=translation_prompt,
-                        assistant=assistant,
+                        history=[],
                     )
 
                 consolidated_content.append(content.strip() + "\n\n")
@@ -334,9 +322,8 @@ def consolidate_paper_md(
                 translation_prompt = f"Translate the following references from {primary_language} to {translate}. Maintain all formatting, including markdown syntax, LaTeX formulas, and code blocks. Only translate the actual text content:\n\n{references_content}"
                 references_content = create_message(
                     book_path,
-                    thread_id=thread.id,
                     content=translation_prompt,
-                    assistant=assistant,
+                    history=[],
                 )
 
             consolidated_content.append("# References\n\n")

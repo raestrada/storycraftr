@@ -2,12 +2,7 @@ import os
 from pathlib import Path
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
-from storycraftr.agent.agents import (
-    create_or_get_assistant,
-    get_thread,
-    create_message,
-    update_agent_files,
-)
+from storycraftr.agent.agents import create_message
 from storycraftr.utils.markdown import save_to_markdown
 from storycraftr.prompts.paper.outline_sections import (
     OUTLINE_SECTIONS_PROMPT_NEW,
@@ -32,8 +27,6 @@ def generate_outline(book_path: str, prompt: str) -> str:
 
     # Load configuration and setup
     config = load_book_config(book_path)
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
     file_path = os.path.join(book_path, "sections", "outline.md")
     paper_title = config.book_name
 
@@ -52,9 +45,8 @@ def generate_outline(book_path: str, prompt: str) -> str:
     # Generate outline using the assistant
     outline_content = create_message(
         book_path,
-        thread_id=thread.id,
         content=content,
-        assistant=assistant,
+        history=[],
         file_path=file_path,
     )
 
@@ -62,5 +54,4 @@ def generate_outline(book_path: str, prompt: str) -> str:
     save_to_markdown(book_path, "sections/outline.md", "Paper Outline", outline_content)
     console.print("[bold green]✔ Paper outline generated successfully[/bold green]")
 
-    update_agent_files(book_path, assistant)
     return outline_content

@@ -5,7 +5,6 @@ from pathlib import Path
 from rich.console import Console
 from storycraftr.utils.core import load_book_config
 from storycraftr.utils.markdown import consolidate_paper_md
-from storycraftr.agent.agents import create_or_get_assistant, get_thread, create_message
 from storycraftr.agent.paper.references import generate_bibtex
 import shutil
 from rich.progress import Progress
