@@ -80,7 +80,6 @@ def rag_retriever():
 
 @pytest.mark.slow
 @pytest.mark.asyncio
-@pytest.mark.slow
 @pytest.mark.skipif(
     not os.getenv("OPENAI_API_KEY"),
     reason="OPENAI_API_KEY is required for RAGAS evaluation",
