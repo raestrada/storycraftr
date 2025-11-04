@@ -21,17 +21,28 @@ def ensure_local_docs(book_path: str, filenames):
 
     local_docs_root = Path(__file__).resolve().parent.parent / "docs"
 
+    missing_sources = []
     for filename in filenames:
         destination = target_dir / filename
         if destination.exists():
             continue
         source = local_docs_root / filename
-        if source.exists():
-            destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
-            console.print(f"[green]Local documentation copied to {destination}[/green]")
-        else:
-            console.print(
-                f"[yellow]Warning: Local documentation source not found for {filename}[/yellow]"
+        if not source.exists():
+            missing_sources.append(str(source))
+            continue
+        destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+        console.print(f"[green]Local documentation copied to {destination}[/green]")
+
+    if missing_sources:
+        raise FileNotFoundError(
+            "Required documentation files were not found in the package: "
+            + ", ".join(missing_sources)
+        )
+
+    for filename in filenames:
+        if not (target_dir / filename).exists():
+            raise FileNotFoundError(
+                f"Failed to materialise documentation file: {target_dir / filename}"
             )
 
 

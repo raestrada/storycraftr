@@ -7,9 +7,6 @@ import shutil
 from langchain_chroma import Chroma
 from chromadb import PersistentClient
 from chromadb.config import Settings
-from rich.console import Console
-
-console = Console()
 
 
 def build_chroma_store(
@@ -39,8 +36,7 @@ def build_chroma_store(
         setattr(store, "_persist_directory", str(store_path))
         return store
     except Exception as exc:
-        console.print(
-            f"[yellow]Warning: Could not initialize Chroma vector store ({exc}). Falling back to in-memory retrieval.[/yellow]"
-        )
         shutil.rmtree(store_path, ignore_errors=True)
-        return None
+        raise RuntimeError(
+            f"Failed to initialise Chroma vector store at {store_path}: {exc}"
+        ) from exc

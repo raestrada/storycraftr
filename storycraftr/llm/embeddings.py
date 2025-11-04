@@ -3,10 +3,8 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from typing import Optional
-import warnings
 
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.embeddings import FakeEmbeddings
 
 
 @dataclass
@@ -32,7 +30,9 @@ def build_embedding_model(settings: EmbeddingSettings):
 
     model_name_lower = settings.model_name.lower()
     if model_name_lower in {"fake", "offline", "offline-placeholder"}:
-        return FakeEmbeddings(size=1024)
+        raise RuntimeError(
+            "Embedding provider is set to a placeholder model. Configure a valid embedding model."
+        )
 
     model_kwargs = {}
     if settings.device and settings.device != "auto":
@@ -52,7 +52,7 @@ def build_embedding_model(settings: EmbeddingSettings):
             encode_kwargs=encode_kwargs,
         )
     except Exception as exc:
-        warnings.warn(
-            f"Falling back to FakeEmbeddings because '{settings.model_name}' could not be loaded ({exc})."
-        )
-        return FakeEmbeddings(size=1024)
+        raise RuntimeError(
+            f"Failed to load embedding model '{settings.model_name}'. "
+            "Install prerequisites or provide a reachable model."
+        ) from exc

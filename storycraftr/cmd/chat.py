@@ -27,7 +27,13 @@ command_modules = {
 
 @click.command()
 @click.option("--book-path", type=click.Path(), help="Path to the book directory")
-def chat(book_path=None):
+@click.option(
+    "--prompt",
+    type=str,
+    default=None,
+    help="Run a single prompt in non-interactive mode and print the response.",
+)
+def chat(book_path=None, prompt=None):
     """
     Start a chat session with the assistant for the given book name.
     Allows executing commands dynamically from various modules.
@@ -35,18 +41,29 @@ def chat(book_path=None):
     if not book_path:
         book_path = os.getcwd()
 
-    if not load_book_config(book_path):
+    config = load_book_config(book_path)
+    if not config:
         return None
+
+    assistant = create_or_get_assistant(book_path)
+    thread = get_thread(book_path)
+
+    if prompt is not None:
+        response = create_message(
+            book_path,
+            thread_id=thread.id,
+            content=prompt,
+            assistant=assistant,
+            force_single_answer=True,
+        )
+        console.print(Markdown(response))
+        return
 
     console.print(
         f"Starting chat for [bold]{book_path}[/bold]. Type [bold green]exit()[/bold green] to quit or [bold green]help()[/bold green] for a list of available commands."
     )
 
     console.print("[bold blue]Starting chat session...[/bold blue]")
-    language = load_book_config(book_path).primary_language
-    assistant = create_or_get_assistant(book_path)
-    thread = get_thread(book_path)
-
     session = PromptSession(history=InMemoryHistory())
 
     console.print("[bold green]USE help() to get help and exit() to exit[/bold green]")

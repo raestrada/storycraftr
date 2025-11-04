@@ -53,11 +53,9 @@ class LangChainAssistant:
         """
 
         if self.vector_store is None:
-            console.print(
-                "[yellow]Vector store is not available; retrieval will be disabled for this project.[/yellow]"
+            raise RuntimeError(
+                "Vector store is not initialised. Ensure embeddings are available before continuing."
             )
-            self.retriever = None
-            return
 
         persist_dir_str = getattr(
             self.vector_store,
@@ -78,8 +76,8 @@ class LangChainAssistant:
         if needs_refresh:
             documents = load_markdown_documents(self.book_path)
             if not documents:
-                console.print(
-                    f"[yellow]No Markdown documents found for {self.book_path}. Vector store left empty.[/yellow]"
+                raise RuntimeError(
+                    f"No Markdown documents available to index for project {self.book_path}."
                 )
             else:
                 splitter = RecursiveCharacterTextSplitter(
@@ -89,21 +87,16 @@ class LangChainAssistant:
                 try:
                     self.vector_store.add_documents(chunks)
                 except Exception as exc:
-                    console.print(
-                        f"[yellow]Warning: Failed to populate vector store ({exc}). Retrieval will be disabled.[/yellow]"
-                    )
-                    self.vector_store = None
-                    self.retriever = None
-                    return
+                    raise RuntimeError(
+                        f"Failed to populate vector store: {exc}"
+                    ) from exc
 
         try:
             self.retriever = self.vector_store.as_retriever(search_kwargs={"k": 6})
         except Exception as exc:
-            console.print(
-                f"[yellow]Warning: Could not create retriever from vector store ({exc}). Retrieval disabled.[/yellow]"
-            )
-            self.vector_store = None
-            self.retriever = None
+            raise RuntimeError(
+                f"Unable to construct retriever from vector store: {exc}"
+            ) from exc
 
     @property
     def system_prompt(self) -> str:
@@ -264,18 +257,29 @@ def create_message(
     )
 
     retrieved_context = ""
+    documents = []
     if assistant.retriever:
-        documents = []
         try:
+            documents = assistant.retriever.invoke({"query": content})
+        except TypeError:
             documents = assistant.retriever.invoke(content)
         except AttributeError:
-            documents = assistant.retriever.get_relevant_documents(content)
-        if documents:
-            serialized_docs = []
-            for doc in documents:
-                source = doc.metadata.get("source", "context")
-                serialized_docs.append(f"Source: {source}\n{doc.page_content.strip()}")
-            retrieved_context = "\n\n".join(serialized_docs)
+            documents = []
+
+    if not documents and assistant.vector_store is not None:
+        try:
+            documents = assistant.vector_store.similarity_search(content, k=6)
+        except Exception as exc:
+            raise RuntimeError(f"Vector store similarity search failed: {exc}") from exc
+
+    if documents:
+        if not isinstance(documents, list):
+            documents = [documents]
+        serialized_docs = []
+        for doc in documents:
+            source = doc.metadata.get("source", "context")
+            serialized_docs.append(f"Source: {source}\n{doc.page_content.strip()}")
+        retrieved_context = "\n\n".join(serialized_docs)
 
     system_messages: List[SystemMessage] = [
         SystemMessage(content=assistant.system_prompt)
