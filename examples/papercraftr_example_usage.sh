@@ -140,7 +140,7 @@ fi
 generate_behavior
 
 # Inicializar el proyecto
-run_command 'init "Deep Learning in Medical Imaging" --openai-model "gpt-4o-mini" --primary-language "en" --author "Rodrigo Estrada" --keywords "deep learning, medical imaging, CNN, diagnostic systems" --behavior "behavior.txt"' || exit 1
+run_command 'init "Deep Learning in Medical Imaging" --llm-provider "openai" --llm-model "gpt-4o-mini" --primary-language "en" --author "Rodrigo Estrada" --keywords "deep learning, medical imaging, CNN, diagnostic systems" --behavior "behavior.txt"' || exit 1
 
 cd "Deep Learning in Medical Imaging"
 

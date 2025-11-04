@@ -4,41 +4,12 @@ import sys
 from rich.console import Console
 from pathlib import Path
 from storycraftr.utils.cleanup import cleanup_vector_stores
+from storycraftr.llm.credentials import load_local_credentials
 
 console = Console()
 
 
-# Function to load the OpenAI API key from the user's home folder
-def load_openai_api_key():
-    """
-    Loads the OpenAI API key from `.storycraftr` or `.papercraftr` folders
-    in the user's home directory, using the first file it finds.
-    """
-    home_dir = Path.home()
-    possible_paths = [
-        os.path.join(home_dir, ".storycraftr", "openai_api_key.txt"),
-        os.path.join(home_dir, ".papercraftr", "openai_api_key.txt"),
-    ]
-
-    print(possible_paths)
-
-    for api_key_file in possible_paths:
-        if os.path.exists(api_key_file):
-            with open(api_key_file, "r") as file:
-                api_key = file.read().strip()
-            os.environ["OPENAI_API_KEY"] = api_key
-            console.print(
-                f"[green]OPENAI_API_KEY loaded successfully from {api_key_file}[/green]"
-            )
-            return  # Exit after first successful load
-
-    # Error if none of the files are found
-    console.print(
-        f"[red]The file 'openai_api_key.txt' was not found in either .storycraftr or .papercraftr folders.[/red]"
-    )
-
-
-load_openai_api_key()
+load_local_credentials()
 
 # Import statements grouped together for clarity
 from storycraftr.state import debug_state
@@ -168,9 +139,57 @@ def cli(debug):
 )
 @click.option("--keywords", help="Keywords for the paper (PaperCraftr only).")
 @click.option(
-    "--openai-url", default="https://api.openai.com/v1", help="URL of the OpenAI API."
+    "--llm-provider",
+    default="openai",
+    type=click.Choice(["openai", "openrouter", "ollama", "fake"]),
+    show_default=True,
+    help="LLM provider to use for generations.",
 )
-@click.option("--openai-model", default="gpt-4o", help="OpenAI model to use.")
+@click.option("--llm-model", default="gpt-4o", show_default=True, help="Model name.")
+@click.option(
+    "--llm-endpoint",
+    default="",
+    show_default=False,
+    help="Optional custom endpoint/base URL for the selected provider.",
+)
+@click.option(
+    "--llm-api-key-env",
+    default="",
+    show_default=False,
+    help="Environment variable to read the provider API key from.",
+)
+@click.option(
+    "--temperature",
+    default=0.7,
+    show_default=True,
+    type=float,
+    help="Sampling temperature.",
+)
+@click.option(
+    "--request-timeout",
+    default=120,
+    show_default=True,
+    type=int,
+    help="Timeout in seconds for LLM calls.",
+)
+@click.option(
+    "--embed-model",
+    default="BAAI/bge-large-en-v1.5",
+    show_default=True,
+    help="Embedding model used for local vector search.",
+)
+@click.option(
+    "--embed-device",
+    default="auto",
+    show_default=True,
+    help="Device hint for embedding inference (auto, cpu, cuda, mps, ...).",
+)
+@click.option(
+    "--embed-cache-dir",
+    default="",
+    show_default=False,
+    help="Optional cache directory for embedding artifacts.",
+)
 def init(
     project_path,
     license,
@@ -181,8 +200,15 @@ def init(
     behavior,
     reference_author,
     keywords,
-    openai_url,
-    openai_model,
+    llm_provider,
+    llm_model,
+    llm_endpoint,
+    llm_api_key_env,
+    temperature,
+    request_timeout,
+    embed_model,
+    embed_device,
+    embed_cache_dir,
 ):
     """
     Initialize the project structure with configuration and behavior content.
@@ -258,8 +284,15 @@ def init(
             behavior_content=behavior_content,
             reference_author=reference_author,
             cli_name=cli_name,
-            openai_url=openai_url,
-            openai_model=openai_model,
+            llm_provider=llm_provider,
+            llm_model=llm_model,
+            llm_endpoint=llm_endpoint,
+            llm_api_key_env=llm_api_key_env,
+            temperature=temperature,
+            request_timeout=request_timeout,
+            embed_model=embed_model,
+            embed_device=embed_device,
+            embed_cache_dir=embed_cache_dir,
         )
     elif cli_name == "papercraftr":
         init_structure_paper(
@@ -269,8 +302,15 @@ def init(
             keywords=keywords,
             behavior_content=behavior_content,
             cli_name=cli_name,
-            openai_url=openai_url,
-            openai_model=openai_model,
+            llm_provider=llm_provider,
+            llm_model=llm_model,
+            llm_endpoint=llm_endpoint,
+            llm_api_key_env=llm_api_key_env,
+            temperature=temperature,
+            request_timeout=request_timeout,
+            embed_model=embed_model,
+            embed_device=embed_device,
+            embed_cache_dir=embed_cache_dir,
         )
 
 
@@ -310,7 +350,7 @@ def cleanup(book_path, force):
         return
     if is_initialized(book_path):
         console.print(
-            "[bold red]WARNING: This will delete ALL vector stores and their files from OpenAI.[/bold red]"
+            "[bold red]WARNING: This will delete the local vector store and cached embeddings for this project.[/bold red]"
         )
         console.print("[bold red]This action cannot be undone![/bold red]")
 

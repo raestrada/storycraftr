@@ -7,11 +7,22 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Verificar si se pasó --use-poetry como argumento
+# Definir el comando base
+COMMAND="poetry run storycraftr"
+
+# Allow overriding provider/model for offline runs
+LLM_PROVIDER="${STORYCRAFTR_EXAMPLE_PROVIDER:-openrouter}"
+if [[ "$LLM_PROVIDER" == "fake" ]]; then
+    LLM_MODEL="${STORYCRAFTR_EXAMPLE_MODEL:-offline-placeholder}"
+    EMBED_MODEL="${STORYCRAFTR_EXAMPLE_EMBED_MODEL:-fake}"
+else
+    LLM_MODEL="${STORYCRAFTR_EXAMPLE_MODEL:-deepseek/deepseek-chat}"
+    EMBED_MODEL="${STORYCRAFTR_EXAMPLE_EMBED_MODEL:-BAAI/bge-large-en-v1.5}"
+fi
+
+# Permitir cambiar el comando con flags opcionales
 if [[ "$*" == *"--use-poetry"* ]]; then
     COMMAND="poetry run storycraftr"
-else
-    COMMAND="storycraftr"
 fi
 
 # Archivo de checkpoint
@@ -84,7 +95,7 @@ fi
 generate_behavior
 
 # Inicializar el proyecto
-run_command 'init "The Purge of the gods" --primary-language "en" --alternate-languages "es" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt" --reference-author="Brandon Sanderson" --openai-model "gpt-4o-mini"' || exit 1
+run_command "init \"The Purge of the gods\" --primary-language \"en\" --alternate-languages \"es\" --author \"Rodrigo Estrada\" --genre \"science fiction\" --behavior \"behavior.txt\" --reference-author=\"Brandon Sanderson\" --llm-provider \"${LLM_PROVIDER}\" --llm-model \"${LLM_MODEL}\" --embed-model \"${EMBED_MODEL}\"" || exit 1
 
 cd "The Purge of the gods"
 

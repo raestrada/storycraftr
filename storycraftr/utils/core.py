@@ -9,6 +9,8 @@ from storycraftr.prompts.permute import longer_date_formats
 from storycraftr.state import debug_state  # Importar el estado de debug
 from pathlib import Path
 from types import SimpleNamespace
+from storycraftr.llm.factory import LLMSettings
+from storycraftr.llm.embeddings import EmbeddingSettings
 
 console = Console()
 
@@ -61,22 +63,29 @@ def generate_prompt_with_hash(original_prompt: str, date: str, book_path: str) -
 
 class BookConfig(NamedTuple):
     """
-    A NamedTuple representing the configuration of a book.
+    Typed view over the project's persisted configuration.
 
     Attributes:
         book_path (str): The path to the book's directory.
         book_name (str): The name of the book.
-        primary_language (str): The primary language of the book.
+        primary_language (str): The primary language of the project.
         alternate_languages (list): A list of alternate languages.
-        default_author (str): The default author of the book.
-        genre (str): The genre of the book.
+        default_author (str): The default author of the book or paper.
+        genre (str): The genre of the book (StoryCraftr only).
         license (str): The license type for the book.
         reference_author (str): A reference author for style guidance.
         keywords (str): Keywords for the paper (optional).
-        cli_name (str): The name of the CLI tool used.
-        openai_url (str): The URL of the OpenAI API.
-        openai_model (str): The OpenAI model to use.
-        multiple_answer (bool): Whether multiple answers are allowed.
+        cli_name (str): The CLI tool name (`storycraftr` or `papercraftr`).
+        multiple_answer (bool): Whether multi-part responses are enabled.
+        llm_provider (str): Selected LLM provider (openai, openrouter, ollama).
+        llm_model (str): Target model identifier for the provider.
+        llm_endpoint (str): Optional custom endpoint/base URL.
+        llm_api_key_env (str): Optional environment variable override for API key lookup.
+        temperature (float): Sampling temperature for completions.
+        request_timeout (int): Timeout in seconds for LLM calls.
+        embed_model (str): Hugging Face model name for embeddings.
+        embed_device (str): Device directive passed to the embedding runtime.
+        embed_cache_dir (str): Local cache directory for embeddings.
     """
 
     book_path: str
@@ -89,9 +98,16 @@ class BookConfig(NamedTuple):
     reference_author: str
     keywords: str
     cli_name: str
-    openai_url: str
-    openai_model: str
     multiple_answer: bool
+    llm_provider: str
+    llm_model: str
+    llm_endpoint: str
+    llm_api_key_env: str
+    temperature: float
+    request_timeout: int
+    embed_model: str
+    embed_device: str
+    embed_cache_dir: str
 
 
 def load_book_config(book_path: str):
@@ -134,9 +150,16 @@ def load_book_config(book_path: str):
             "reference_author": "",
             "keywords": "",
             "cli_name": "papercraftr",
-            "openai_url": "https://api.openai.com/v1",
-            "openai_model": "gpt-4o",
             "multiple_answer": True,
+            "llm_provider": "openai",
+            "llm_model": "gpt-4o",
+            "llm_endpoint": "",
+            "llm_api_key_env": "",
+            "temperature": 0.7,
+            "request_timeout": 120,
+            "embed_model": "BAAI/bge-large-en-v1.5",
+            "embed_device": "auto",
+            "embed_cache_dir": "",
         }
 
         # Update default config with actual config data
@@ -148,6 +171,33 @@ def load_book_config(book_path: str):
     except Exception as e:
         console.print(f"[red]Error loading configuration: {str(e)}[/red]")
         return None
+
+
+def llm_settings_from_config(config: BookConfig) -> LLMSettings:
+    """
+    Map the persisted configuration to normalized LLM settings.
+    """
+
+    return LLMSettings(
+        provider=getattr(config, "llm_provider", "openai"),
+        model=getattr(config, "llm_model", "gpt-4o"),
+        endpoint=getattr(config, "llm_endpoint", ""),
+        api_key_env=getattr(config, "llm_api_key_env", ""),
+        temperature=getattr(config, "temperature", 0.7),
+        request_timeout=getattr(config, "request_timeout", 120),
+    )
+
+
+def embedding_settings_from_config(config: BookConfig) -> EmbeddingSettings:
+    """
+    Map the persisted configuration to embedding settings.
+    """
+
+    return EmbeddingSettings(
+        model_name=getattr(config, "embed_model", "BAAI/bge-large-en-v1.5"),
+        device=getattr(config, "embed_device", "auto"),
+        cache_dir=getattr(config, "embed_cache_dir", "") or None,
+    )
 
 
 def file_has_more_than_three_lines(file_path: str) -> bool:

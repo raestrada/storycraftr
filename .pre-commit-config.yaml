@@ -14,6 +14,8 @@ repos:
       - id: bandit
         name: Detect common security issues in Python code
         args: ["-s", "B101"] # Ignorar warnings por assert (opcional)
+        additional_dependencies:
+          - pbr
 
   # Detectar secretos en el código
   - repo: https://github.com/Yelp/detect-secrets

@@ -215,7 +215,7 @@
       }
 
       .vscode-logo,
-      .openai-logo,
+      .langchain-logo,
       .github-logo {
         position: absolute;
         top: 50px;
@@ -227,29 +227,35 @@
         z-index: 10;
       }
 
-      .openai-logo {
+      .langchain-logo,
+      .github-logo,
+      .vscode-logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .langchain-logo {
         left: 20px;
-        width: 120px; /* Ajuste del ancho del contenedor OpenAI */
+        width: auto;
+        padding: 10px 15px;
       }
 
       .github-logo {
         right: 20px;
-        display: flex;
-        align-items: center;
         padding: 10px 15px; /* Más espacio para el logo y texto */
       }
 
       .vscode-logo {
         top: 120px;
         right: 20px;
-        display: flex;
-        align-items: center;
         padding: 10px 15px; /* Más espacio para el logo y texto */
       }
 
-      .openai-logo img {
-        width: 100%; /* El logo de OpenAI ocupa todo el ancho del contenedor */
-        height: auto;
+      .langchain-logo img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
       }
 
       .github-logo img {
@@ -263,7 +269,7 @@
       }
 
       .vscode-logo p,
-      .openai-logo p,
+      .langchain-logo p,
       .github-logo p {
         margin: 5px 0 0;
         font-size: 12px;
@@ -271,21 +277,21 @@
       }
 
       .vscode-logo a,
-      .openai-logo a,
+      .langchain-logo a,
       .github-logo a {
         text-decoration: none;
         color: #333;
       }
 
       .vscode-logo a:hover,
-      .openai-logo a:hover,
+      .langchain-logo a:hover,
       .github-logo a:hover {
         color: #4a90e2;
       }
 
       @media (max-width: 768px) {
         .vscode-logo,
-        .openai-logo,
+        .langchain-logo,
         .github-logo {
           display: none; /* Ocultar los logos en pantallas más pequeñas */
         }
@@ -374,8 +380,8 @@
 
       <div class="release-link">
         <a
-          href="https://github.com/raestrada/storycraftr/releases/tag/v0.10.1-beta4"
-          >Release Notes v0.10.1-beta4</a
+          href="https://github.com/raestrada/storycraftr/releases/tag/v0.11.0-beta5"
+          >Release Notes v0.11.0-beta5</a
         >
       </div>
 
@@ -393,13 +399,13 @@
 
       <h1>Welcome to StoryCraftr 📚✨</h1>
       <p>Write your stories with the power of AI</p>
-      <div class="openai-logo">
-        <a href="https://openai.com" target="_blank">
+      <div class="langchain-logo">
+        <a href="https://langchain.com" target="_blank" style="display:flex; align-items:center; gap:8px;">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg"
-            alt="OpenAI Logo"
+            src="https://avatars.githubusercontent.com/u/126733545?s=200&v=4"
+            alt="LangChain Logo"
           />
-          <p>Made with OpenAI</p>
+          <p style="margin:0">Made with LangChain</p>
         </a>
       </div>
 
@@ -450,7 +456,7 @@
         🚀 Beta Release!, now supports Windows 🚀
         <code
           >pipx install
-          git+https://github.com/raestrada/storycraftr.git@v0.10.1-beta4</code
+          git+https://github.com/raestrada/storycraftr.git@v0.11.0-beta5</code
         >
       </div>
     </section>

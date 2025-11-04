@@ -11,73 +11,46 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.10.1-beta4
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.11.0-beta5
 ```
 
-### Important: Before running the `storycraftr` command
+### Configure credentials
 
-Store the key in a text file located at ~/.storycraftr/openai_api_key.txt for convenience.
+StoryCraftr loads provider secrets automatically. Create text files in `~/.storycraftr/` (or `~/.papercraftr/`) or set environment variables before calling the CLI.
 
 ```bash
-mkdir -p ~/.storycraftr/
-echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
+# OpenAI
+mkdir -p ~/.storycraftr
+echo "sk-your-openai-secret" > ~/.storycraftr/openai_api_key.txt
+
+# OpenRouter
+echo "or-your-openrouter-secret" > ~/.storycraftr/openrouter_api_key.txt
+
+# Ollama usually runs locally and does not require a key.
+export OLLAMA_BASE_URL="http://localhost:11434"
 ```
 
-Once installed and the API key is set, you can run the tool using the command `storycraftr`.
+### Project configuration
 
-### New: Specify OpenAI Model and URL
-
-StoryCraftr now allows you to specify the OpenAI model and URL, which can be any service that supports the OpenAI API with file search capabilities, such as DeepSeek or others. This is essential as StoryCraftr relies on file search for its functionality.
-
-To configure the model and URL, add the following lines to your configuration file located at `~/.storycraftr/config.json`:
+When you run `storycraftr init`, the generated `storycraftr.json` includes the new LangChain settings:
 
 ```json
 {
-  "openai_model": "your-preferred-model",
-  "openai_url": "https://api.your-preferred-service.com"
+  "llm_provider": "openai",
+  "llm_model": "gpt-4o",
+  "llm_endpoint": "",
+  "llm_api_key_env": "",
+  "temperature": 0.7,
+  "request_timeout": 120,
+  "embed_model": "BAAI/bge-large-en-v1.5",
+  "embed_device": "auto",
+  "embed_cache_dir": ""
 }
 ```
 
-Make sure to replace `"your-preferred-model"` with the model you want to use and `"https://api.your-preferred-service.com"` with the URL of the service that supports the OpenAI API with file search.
-
-### Supported LLMs
-
-Here are some examples of LLMs that are compatible with the OpenAI API:
-
-1. **OpenAI GPT Series**:
-    - Models: `gpt-3.5-turbo`, `gpt-4`
-    - URL Base: `https://api.openai.com/v1/`
-    - Documentation: [OpenAI API Models](https://beta.openai.com/docs/models)
-
-2. **Azure OpenAI Service**:
-    - Models: `gpt-3.5-turbo`, `gpt-4`
-    - URL Base: Depends on the region and configuration.
-    - Documentation: [Azure OpenAI Service](https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/)
-
-3. **DeepSeek**:
-    - Model: `DeepSeek-R1`
-    - URL Base: `https://api.deepseek.com/v1/`
-    - Documentation: [DeepSeek API Documentation](https://deepseek.com/docs)
-
-4. **Qwen (Alibaba Cloud)**:
-    - Models: `qwen-7b`, `qwen-13b`
-    - URL Base: `https://dashscope.aliyuncs.com/`
-    - Documentation: [DashScope API](https://dashscope.aliyuncs.com/docs)
-
-5. **Gemini (Google AI)**:
-    - Models: `gemini-1`, `gemini-1.5`
-    - URL Base: `https://api.gemini.google.com/v1/`
-    - Documentation: [Gemini API](https://gemini.google.com/docs)
-
-6. **Together AI**:
-    - Model: `together-gpt-neoxt-chat-20b`
-    - URL Base: `https://api.together.ai/v1/`
-    - Documentation: [Together AI API](https://together.ai/docs)
-
-7. **DeepInfra**:
-    - Model: `Qwen2.5-Coder-32B-Instruct`
-    - URL Base: `https://api.deepinfra.com/v1/`
-    - Documentation: [DeepInfra API](https://deepinfra.com/docs)
+- `llm_provider` can be `openai`, `openrouter`, or `ollama`.
+- `llm_endpoint` lets you point at custom-compatible bases.
+- `embed_model` defaults to `BAAI/bge-large-en-v1.5` for OpenAI-quality local embeddings; switch to a smaller model if resources are limited.
 
 ## Step 2: Create the Behavior File
 
@@ -133,7 +106,16 @@ The behavior file serves as the **creative guide** for your story. It helps the 
 A clear definition of genre and structure aligns with Sanderson’s emphasis on creating consistent rules for your world and plot ([Sanderson's First Law](https://www.brandonsanderson.com/sandersons-first-law/)). We've added an optional parameter `--reference-author`. If you use it, the system will try to emulate the style of that author; if not, it will assume the style based on what you write.
 
 ```bash
-storycraftr init "The Purge of the Gods" --primary-language "en" --alternate-languages "es" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt" --reference-author "Brandon Sanderson" --openai-model "gpt-4" --openai-url "https://api.openai.com/v1/"
+storycraftr init "The Purge of the Gods" \
+  --primary-language "en" \
+  --alternate-languages "es" \
+  --author "Rodrigo Estrada" \
+  --genre "science fiction" \
+  --behavior "behavior.txt" \
+  --reference-author "Brandon Sanderson" \
+  --llm-provider "openai" \
+  --llm-model "gpt-4o" \
+  --embed-model "BAAI/bge-large-en-v1.5"
 cd "The Purge of the Gods"
 ```
 
