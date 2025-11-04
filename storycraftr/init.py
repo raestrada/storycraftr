@@ -1,6 +1,5 @@
 import sys
 import json
-import requests
 from rich.console import Console
 from pathlib import Path
 import storycraftr.templates.folder_story
@@ -12,31 +11,28 @@ from storycraftr.templates.ieee_tex import TEMPLATE_IEEE_TEX
 console = Console()
 
 
-# Download files from a URL to a specified directory
-def download_file(url, save_dir, filename):
+def ensure_local_docs(book_path: str, filenames):
     """
-    Downloads a file from a URL and saves it in the specified directory.
-
-    Args:
-        url (str): The URL to download the file from.
-        save_dir (str): The directory where the file will be saved.
-        filename (str): The name of the file.
-
-    Raises:
-        SystemExit: If the file download fails.
+    Ensure StoryCraftr documentation files exist by copying from the local docs directory when downloads fail.
     """
-    save_dir = Path(save_dir)
-    save_dir.mkdir(parents=True, exist_ok=True)
-    save_path = save_dir / filename
 
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        save_path.write_text(response.text, encoding="utf-8")
-        console.print(f"[green]File downloaded successfully from {url}[/green]")
-    except requests.exceptions.RequestException as e:
-        console.print(f"[red]Error downloading the file from {url}: {e}[/red]")
-        sys.exit(1)
+    target_dir = Path(book_path) / "storycraftr"
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    local_docs_root = Path(__file__).resolve().parent.parent / "docs"
+
+    for filename in filenames:
+        destination = target_dir / filename
+        if destination.exists():
+            continue
+        source = local_docs_root / filename
+        if source.exists():
+            destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+            console.print(f"[green]Local documentation copied to {destination}[/green]")
+        else:
+            console.print(
+                f"[yellow]Warning: Local documentation source not found for {filename}[/yellow]"
+            )
 
 
 # Function to initialize StoryCraftr
@@ -50,8 +46,15 @@ def init_structure_story(
     behavior_content,
     reference_author,
     cli_name,
-    openai_url,
-    openai_model,
+    llm_provider,
+    llm_model,
+    llm_endpoint,
+    llm_api_key_env,
+    temperature,
+    request_timeout,
+    embed_model,
+    embed_device,
+    embed_cache_dir,
 ):
     """
     Initializes the StoryCraftr project structure by creating necessary files and folders.
@@ -79,9 +82,16 @@ def init_structure_story(
         "license": license,
         "reference_author": reference_author,
         "cli_name": cli_name,
-        "openai_url": openai_url,
-        "openai_model": openai_model,
         "multiple_answer": True,
+        "llm_provider": llm_provider,
+        "llm_model": llm_model,
+        "llm_endpoint": llm_endpoint,
+        "llm_api_key_env": llm_api_key_env,
+        "temperature": temperature,
+        "request_timeout": request_timeout,
+        "embed_model": embed_model,
+        "embed_device": embed_device,
+        "embed_cache_dir": embed_cache_dir,
     }
     config_file = Path(book_path) / "storycraftr.json"
     config_file.write_text(json.dumps(config_data, indent=4), encoding="utf-8")
@@ -101,15 +111,9 @@ def init_structure_story(
     template_file.write_text(TEMPLATE_TEX, encoding="utf-8")
     console.print(f"[green]LaTeX template created: {template_file}[/green]")
 
-    # Download additional files
-    urls = [
-        "https://raw.githubusercontent.com/raestrada/storycraftr/refs/heads/main/docs/getting_started.md",
-        "https://raw.githubusercontent.com/raestrada/storycraftr/refs/heads/main/docs/iterate.md",
-        "https://raw.githubusercontent.com/raestrada/storycraftr/refs/heads/main/docs/chat.md",
-    ]
+    # Ship core documentation alongside the project so the RAG can ingest it without network access
     filenames = ["getting_started.md", "iterate.md", "chat.md"]
-    for url, filename in zip(urls, filenames):
-        download_file(url, Path(book_path) / "storycraftr", filename)
+    ensure_local_docs(book_path, filenames)
 
     create_or_get_assistant(book_path)
 
@@ -122,8 +126,15 @@ def init_structure_paper(
     keywords,
     behavior_content,
     cli_name,
-    openai_url="https://api.openai.com/v1",
-    openai_model="gpt-4",
+    llm_provider="openai",
+    llm_model="gpt-4",
+    llm_endpoint="",
+    llm_api_key_env="",
+    temperature=0.7,
+    request_timeout=120,
+    embed_model="BAAI/bge-large-en-v1.5",
+    embed_device="auto",
+    embed_cache_dir="",
 ):
     """
     Initializes the PaperCraftr project structure by creating necessary files and folders.
@@ -148,10 +159,17 @@ def init_structure_paper(
         "default_author": author,
         "keywords": keywords,
         "cli_name": cli_name,
-        "openai_url": openai_url,
-        "openai_model": openai_model,
         "multiple_answer": True,
         "reference_author": "Leading experts in the field",  # Valor por defecto para papers
+        "llm_provider": llm_provider,
+        "llm_model": llm_model,
+        "llm_endpoint": llm_endpoint,
+        "llm_api_key_env": llm_api_key_env,
+        "temperature": temperature,
+        "request_timeout": request_timeout,
+        "embed_model": embed_model,
+        "embed_device": embed_device,
+        "embed_cache_dir": embed_cache_dir,
     }
 
     # Guardar configuración solo en el directorio del proyecto

@@ -13,9 +13,9 @@ Welcome to [**StoryCraftr**](https://storycraftr.app), the open-source project d
 
 ---
 
-## Release Notes v0.10.1-beta4
+## Release Notes v0.11.0-beta5
 
-You can find the release notes for version `v0.10.1-beta4` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.10.1-beta4).
+You can find the release notes for version `v0.11.0-beta5` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.11.0-beta5).
 
 ## Step 1: Install StoryCraftr
 
@@ -24,77 +24,60 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.10.1-beta4
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.11.0-beta5
 ```
 
 Alternatively, if you have `uv` and `uvx` installed on your system, you can run storycraftr without installing it first:
 
 ```bash
-uvx --from git+https://github.com/raestrada/storycraftr.git@v0.10.1-beta4 storycraftr
+uvx --from git+https://github.com/raestrada/storycraftr.git@v0.11.0-beta5 storycraftr
 ```
 
-### Important: Before using StoryCraftr, make sure to set your OpenAI API key:
+### Configure Provider Credentials
 
-Store the key in a text file located at `~/.storycraftr/openai_api_key.txt` for convenience.
+StoryCraftr now uses LangChain and supports OpenAI, OpenRouter, and Ollama out of the box. Credentials are discovered automatically from environment variables or text files inside `~/.storycraftr/` or `~/.papercraftr/`.
 
 ```bash
-mkdir -p ~/.storycraftr/
-echo "your-openai-api-key" > ~/.storycraftr/openai_api_key.txt
+# OpenAI
+mkdir -p ~/.storycraftr
+echo "sk-your-openai-secret" > ~/.storycraftr/openai_api_key.txt
+
+# OpenRouter
+echo "or-your-openrouter-secret" > ~/.storycraftr/openrouter_api_key.txt
+
+# Ollama usually runs locally and does not require a key.
+export OLLAMA_BASE_URL="http://localhost:11434"
 ```
 
-### New: Specify OpenAI Model and URL
+You can also set the variables directly (`OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `OLLAMA_API_KEY`) before invoking the CLI.
 
-StoryCraftr now allows you to specify the OpenAI model and URL, which can be any service that supports the OpenAI API with file search capabilities, such as DeepSeek or others. This is essential as StoryCraftr relies on file search for its functionality.
+### Configure the LLM and Embeddings
 
-To configure the model and URL, add the following lines to your configuration file located at `~/.storycraftr/config.json`:
+Each project stores its configuration in `storycraftr.json` or `papercraftr.json`. New projects include LangChain-centric settings:
 
 ```json
 {
-  "openai_model": "your-preferred-model",
-  "openai_url": "https://api.your-preferred-service.com"
+  "llm_provider": "openai",
+  "llm_model": "gpt-4o",
+  "llm_endpoint": "",
+  "llm_api_key_env": "",
+  "temperature": 0.7,
+  "request_timeout": 120,
+  "embed_model": "BAAI/bge-large-en-v1.5",
+  "embed_device": "auto",
+  "embed_cache_dir": ""
 }
 ```
 
-Make sure to replace `"your-preferred-model"` with the model you want to use and `"https://api.your-preferred-service.com"` with the URL of the service that supports the OpenAI API with file search.
+- `llm_provider` accepts `openai`, `openrouter`, or `ollama`.
+- `llm_endpoint` lets you target custom bases (e.g., `https://openrouter.ai/api/v1`).
+- `embed_model` defaults to `BAAI/bge-large-en-v1.5` for OpenAI-quality local embeddings. Use a lighter model (e.g., `sentence-transformers/all-MiniLM-L6-v2`) on constrained hardware.
 
-### Supported LLMs
+### Supported Providers
 
-Here are some examples of LLMs that are compatible with the OpenAI API:
-
-1. **OpenAI GPT Series**:
-    - Models: `gpt-3.5-turbo`, `gpt-4`
-    - URL Base: `https://api.openai.com/v1/`
-    - Documentation: [OpenAI API Models](https://beta.openai.com/docs/models)
-
-2. **Azure OpenAI Service**:
-    - Models: `gpt-3.5-turbo`, `gpt-4`
-    - URL Base: Depends on the region and configuration.
-    - Documentation: [Azure OpenAI Service](https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/)
-
-3. **DeepSeek**:
-    - Model: `DeepSeek-R1`
-    - URL Base: `https://api.deepseek.com/v1/`
-    - Documentation: [DeepSeek API Documentation](https://deepseek.com/docs)
-
-4. **Qwen (Alibaba Cloud)**:
-    - Models: `qwen-7b`, `qwen-13b`
-    - URL Base: `https://dashscope.aliyuncs.com/`
-    - Documentation: [DashScope API](https://dashscope.aliyuncs.com/docs)
-
-5. **Gemini (Google AI)**:
-    - Models: `gemini-1`, `gemini-1.5`
-    - URL Base: `https://api.gemini.google.com/v1/`
-    - Documentation: [Gemini API](https://gemini.google.com/docs)
-
-6. **Together AI**:
-    - Model: `together-gpt-neoxt-chat-20b`
-    - URL Base: `https://api.together.ai/v1/`
-    - Documentation: [Together AI API](https://together.ai/docs)
-
-7. **DeepInfra**:
-    - Model: `Qwen2.5-Coder-32B-Instruct`
-    - URL Base: `https://api.deepinfra.com/v1/`
-    - Documentation: [DeepInfra API](https://deepinfra.com/docs)
+- **OpenAI** – works with `ChatOpenAI` via `OPENAI_API_KEY`; set `llm_provider=openai`.
+- **OpenRouter** – set `OPENROUTER_API_KEY` and optionally `OPENROUTER_BASE_URL`; use `llm_provider=openrouter`.
+- **Ollama** – self-hosted models via `ollama serve`; set `llm_provider=ollama` and optionally `OLLAMA_BASE_URL`.
 
 ## Quick Examples
 
@@ -103,7 +86,15 @@ Here are a few ways to get started with **StoryCraftr**:
 ### Initialize a new book project:
 
 ```bash
-storycraftr init "La purga de los dioses" --primary-language "es" --alternate-languages "en" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt" --openai-model "gpt-4" --openai-url "https://api.openai.com/v1/"
+storycraftr init "La purga de los dioses" \
+  --primary-language "es" \
+  --alternate-languages "en" \
+  --author "Rodrigo Estrada" \
+  --genre "science fiction" \
+  --behavior "behavior.txt" \
+  --llm-provider "openrouter" \
+  --llm-model "meta-llama/llama-3.1-70b-instruct" \
+  --embed-model "BAAI/bge-large-en-v1.5"
 ```
 
 ### Generate a general outline:

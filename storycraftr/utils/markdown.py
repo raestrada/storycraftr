@@ -33,6 +33,7 @@ def save_to_markdown(
     """
     file_path = Path(book_path) / file_name
     backup_path = file_path.with_suffix(file_path.suffix + ".back")
+    file_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Create a backup if the file exists
     if file_path.exists():
@@ -180,7 +181,7 @@ def consolidate_book_md(
             if translate
             else None
         )
-        task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
+        task_llm = progress.add_task("[green]Calling language model...", total=1)
 
         with output_file_path.open("w", encoding="utf-8") as consolidated_md:
             for chapter_file in files_to_process:
@@ -202,7 +203,7 @@ def consolidate_book_md(
                             content=content,
                             assistant=assistant,
                             progress=progress,
-                            task_id=task_openai,
+                            task_id=task_llm,
                         )
 
                     # Write (translated or original) content to consolidated file

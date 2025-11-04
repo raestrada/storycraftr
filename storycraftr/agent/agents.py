@@ -1,566 +1,331 @@
-import os
+from __future__ import annotations
+
 import glob
-import time
-import openai
+import os
+import shutil
+from dataclasses import dataclass, field
 from datetime import datetime
-from dotenv import load_dotenv
-from openai import OpenAI
+from pathlib import Path
+from typing import Dict, Iterable, List, Optional
+from uuid import uuid4
+
+from langchain.schema import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_community.vectorstores import Chroma
 from rich.console import Console
 from rich.progress import Progress
-from storycraftr.prompts.story.core import FORMAT_OUTPUT
-from storycraftr.utils.core import load_book_config, generate_prompt_with_hash
-from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor
 
-load_dotenv()
+from storycraftr.llm import build_chat_model, build_embedding_model
+from storycraftr.prompts.story.core import FORMAT_OUTPUT
+from storycraftr.utils.core import (
+    generate_prompt_with_hash,
+    load_book_config,
+    llm_settings_from_config,
+    embedding_settings_from_config,
+)
+from storycraftr.vectorstores import build_chroma_store
 
 console = Console()
 
 
-def initialize_openai_client(book_path: str):
-    """
-    Initialize the OpenAI client with the configuration from the book.
+@dataclass
+class ConversationThread:
+    id: str
+    book_path: str
+    messages: List[HumanMessage | AIMessage] = field(default_factory=list)
 
-    Args:
-        book_path (str): Path to the book directory.
-    """
-    config = load_book_config(book_path)
-    # Si no hay configuración o no hay URL específica, usar la URL por defecto
-    api_base = getattr(config, "openai_url", "https://api.openai.com/v1")
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url=api_base)
 
-    # Verificar si la API es compatible con Assistants
-    try:
-        # Intentar listar los assistants para verificar la compatibilidad
-        client.beta.assistants.list()
-        return client
-    except Exception as e:
-        console.print(
-            f"[bold red]Error: The OpenAI API version being used does not support Assistants API. Please ensure you are using a compatible version.[/bold red]"
+@dataclass
+class LangChainAssistant:
+    id: str
+    book_path: str
+    config: object
+    llm: BaseChatModel
+    vector_store: Optional[Chroma]
+    behavior: str
+    retriever: Optional[object] = None
+
+    def ensure_vector_store(self, force: bool = False) -> None:
+        """
+        Ensure that the local Chroma store is populated with Markdown content.
+        """
+
+        if self.vector_store is None:
+            console.print(
+                "[yellow]Vector store is not available; retrieval will be disabled for this project.[/yellow]"
+            )
+            self.retriever = None
+            return
+
+        persist_dir_str = getattr(
+            self.vector_store,
+            "_persist_directory",
+            str(Path(self.book_path) / "vector_store"),
         )
-        console.print(f"[bold red]Error details: {str(e)}[/bold red]")
-        raise
+        persist_dir = Path(persist_dir_str)
+        if force and persist_dir.exists():
+            shutil.rmtree(persist_dir, ignore_errors=True)
 
-
-def get_vector_store_id_by_name(assistant_name: str, client) -> str:
-    """
-    Retrieve the vector store ID by the assistant's name.
-
-    Args:
-        assistant_name (str): The name of the assistant.
-        client (OpenAI): The OpenAI client.
-
-    Returns:
-        str: The ID of the vector store associated with the assistant's name, or None if not found.
-    """
-    try:
-        vector_stores = client.vector_stores.list()
-    except Exception as e:
-        console.print(
-            f"[bold red]Error: The OpenAI API version being used does not support vector stores. Please ensure you are using a compatible version.[/bold red]"
-        )
-        console.print(f"[bold red]Error details: {str(e)}[/bold red]")
-        return None
-
-    expected_name = f"{assistant_name} Docs"
-    for vector_store in vector_stores.data:
-        if vector_store.name == expected_name:
-            return vector_store.id
-
-    console.print(
-        f"[bold red]No vector store found with name '{expected_name}'.[/bold red]"
-    )
-    return None
-
-
-def upload_markdown_files_to_vector_store(
-    vector_store_id: str, book_path: str, client, progress: Progress = None, task=None
-):
-    """
-    Upload all Markdown files from the book directory to the specified vector store.
-
-    Args:
-        vector_store_id (str): ID of the vector store to upload files to.
-        book_path (str): Path to the book's directory containing markdown files.
-        client (OpenAI): The OpenAI client.
-        progress (Progress, optional): Progress bar object for tracking progress.
-        task (Task, optional): Task ID for progress tracking.
-
-    Returns:
-        None
-    """
-    try:
-        vector_stores_api = client.vector_stores
-    except Exception as e:
-        console.print(
-            f"[bold red]Error: The OpenAI API version being used does not support vector stores. Please ensure you are using a compatible version.[/bold red]"
-        )
-        console.print(f"[bold red]Error details: {str(e)}[/bold red]")
-        return
-
-    console.print(
-        f"[bold blue]Uploading all knowledge files from '{book_path}'...[/bold blue]"
-    )
-    md_files = load_markdown_files(book_path)
-
-    if not md_files:
-        console.print("[bold yellow]No Markdown files found to upload.[/bold yellow]")
-        return
-
-    file_streams = [open(file_path, "rb") for file_path in md_files]
-    file_batch = vector_stores_api.file_batches.upload_and_poll(
-        vector_store_id=vector_store_id, files=file_streams
-    )
-
-    # Monitor progress
-    while file_batch.status in ["queued", "in_progress"]:
-        status_message = f"{file_batch.status}..."
-        if progress and task:
-            progress.update(task, description=status_message)
-        else:
-            console.print(f"[bold yellow]{status_message}[/bold yellow]")
-        time.sleep(1)
-
-    console.print(
-        f"[bold green]Files uploaded successfully to vector store '{vector_store_id}'.[/bold green]"
-    )
-
-
-def load_markdown_files(book_path: str) -> list:
-    """
-    Load all Markdown files from the book's directory.
-
-    Args:
-        book_path (str): Path to the book directory.
-
-    Returns:
-        list: A list of valid Markdown file paths.
-    """
-    console.print(
-        f"[bold blue]Loading all Markdown files from '{book_path}'...[/bold blue]"
-    )
-    md_files = glob.glob(os.path.join(book_path, "**", "*.md"), recursive=True)
-
-    # Filter files with more than 3 lines
-    valid_md_files = []
-    for file_path in md_files:
         try:
-            with open(file_path, "r", encoding="utf-8") as file:
-                if sum(1 for _ in file) > 3:
-                    valid_md_files.append(file_path)
-        except UnicodeDecodeError:
-            console.print(f"[bold red]Error reading file: {file_path}[/bold red]")
+            needs_refresh = (
+                force or not persist_dir.exists() or not any(persist_dir.iterdir())
+            )
+        except OSError:
+            needs_refresh = True
 
-    console.print(
-        f"[bold green]Loaded {len(valid_md_files)} Markdown files with more than 3 lines.[/bold green]"
-    )
-    return valid_md_files
-
-
-def delete_assistant(book_path: str):
-    """
-    Delete an assistant if it exists.
-
-    Args:
-        book_path (str): Path to the book directory.
-
-    Returns:
-        None
-    """
-    client = initialize_openai_client(book_path)
-    name = os.path.basename(book_path)
-    console.print(
-        f"[bold blue]Checking if assistant '{name}' exists for deletion...[/bold blue]"
-    )
-
-    try:
-        assistants = client.assistants.list()
-        for assistant in assistants.data:
-            if assistant.name == name:
-                console.print(f"Deleting assistant {name}...")
-                client.assistants.delete(assistant_id=assistant.id)
+        if needs_refresh:
+            documents = load_markdown_documents(self.book_path)
+            if not documents:
                 console.print(
-                    f"[bold green]Assistant {name} deleted successfully.[/bold green]"
+                    f"[yellow]No Markdown documents found for {self.book_path}. Vector store left empty.[/yellow]"
                 )
-                break
-    except AttributeError:
-        console.print(
-            f"[bold red]Error: The OpenAI API version being used does not support assistants. Please ensure you are using a compatible version.[/bold red]"
+            else:
+                splitter = RecursiveCharacterTextSplitter(
+                    chunk_size=1000, chunk_overlap=150
+                )
+                chunks = splitter.split_documents(documents)
+                try:
+                    self.vector_store.add_documents(chunks)
+                except Exception as exc:
+                    console.print(
+                        f"[yellow]Warning: Failed to populate vector store ({exc}). Retrieval will be disabled.[/yellow]"
+                    )
+                    self.vector_store = None
+                    self.retriever = None
+                    return
+
+        try:
+            self.retriever = self.vector_store.as_retriever(search_kwargs={"k": 6})
+        except Exception as exc:
+            console.print(
+                f"[yellow]Warning: Could not create retriever from vector store ({exc}). Retrieval disabled.[/yellow]"
+            )
+            self.vector_store = None
+            self.retriever = None
+
+    @property
+    def system_prompt(self) -> str:
+        format_prompt = FORMAT_OUTPUT.format(
+            reference_author=getattr(self.config, "reference_author", ""),
+            language=getattr(self.config, "primary_language", "en"),
         )
+        meta = (
+            f"Project: {Path(self.book_path).name}\n"
+            f"Primary language: {getattr(self.config, 'primary_language', 'en')}\n"
+        )
+        return f"{self.behavior.strip()}\n\n{meta}{format_prompt}"
 
 
-def create_or_get_assistant(book_path: str):
+_ASSISTANT_CACHE: Dict[str, LangChainAssistant] = {}
+_THREADS: Dict[str, ConversationThread] = {}
+
+
+def load_markdown_documents(book_path: str) -> List[Document]:
     """
-    Create or get an existing assistant for the book.
-
-    Args:
-        book_path (str): Path to the book directory.
+    Load Markdown files from the project for indexing.
     """
+
+    patterns = [
+        os.path.join(book_path, "**", "*.md"),
+    ]
+    documents: List[Document] = []
+
+    for pattern in patterns:
+        for file_path in glob.glob(pattern, recursive=True):
+            if "/vector_store/" in file_path.replace("\\", "/"):
+                continue
+            try:
+                with open(file_path, "r", encoding="utf-8") as handle:
+                    lines = handle.readlines()
+                if len(lines) <= 3:
+                    continue
+                relative = str(Path(file_path).relative_to(book_path))
+                documents.append(
+                    Document(
+                        page_content="".join(lines),
+                        metadata={"source": relative},
+                    )
+                )
+            except (UnicodeDecodeError, FileNotFoundError):
+                console.print(
+                    f"[yellow]Skipping unreadable file for embeddings: {file_path}[/yellow]"
+                )
+
+    return documents
+
+
+def create_or_get_assistant(book_path: str) -> LangChainAssistant:
+    """
+    Initialize (or fetch) the LangChain-powered assistant for a project.
+    """
+
+    if not book_path:
+        raise ValueError("book_path is required to create an assistant.")
+
+    book_path = str(Path(book_path).resolve())
+    if book_path in _ASSISTANT_CACHE:
+        return _ASSISTANT_CACHE[book_path]
+
     config = load_book_config(book_path)
-    client = initialize_openai_client(book_path)
+    if not config:
+        raise RuntimeError("Unable to load project configuration.")
 
-    # Usar valores por defecto si config es None o no tiene los atributos
-    openai_model = (
-        "gpt-4" if config is None else getattr(config, "openai_model", "gpt-4")
-    )
-
-    # Obtener el contenido del behavior file
-    behavior_file = Path(book_path) / "behaviors" / "default.txt"
-    if behavior_file.exists():
-        behavior_content = behavior_file.read_text(encoding="utf-8")
+    behavior_path = Path(book_path) / "behaviors" / "default.txt"
+    if behavior_path.exists():
+        behavior_text = behavior_path.read_text(encoding="utf-8")
     else:
-        console.print("[red]Behavior file not found.[/red]")
-        return None
+        behavior_text = (
+            "You are the StoryCraftr creative writing assistant. "
+            "Respond in markdown, keep outputs structured, and respect the requested tone."
+        )
 
-    # Usar la API de Assistants
-    assistants = client.beta.assistants.list(
-        order="desc",
-        limit=100,
+    llm_settings = llm_settings_from_config(config)
+    embedding_settings = embedding_settings_from_config(config)
+
+    llm = build_chat_model(llm_settings)
+    embeddings = build_embedding_model(embedding_settings)
+    vector_store = build_chroma_store(book_path, embeddings)
+
+    assistant = LangChainAssistant(
+        id=f"assistant:{Path(book_path).name}",
+        book_path=book_path,
+        config=config,
+        llm=llm,
+        vector_store=vector_store,
+        behavior=behavior_text,
     )
-    assistants_api = client.beta.assistants
-    vector_stores_api = client.vector_stores
+    assistant.ensure_vector_store()
 
-    name = Path(book_path).name
-    for assistant in assistants.data:
-        if assistant.name == name:
-            console.print(
-                f"[bold yellow]Assistant {name} already exists.[/bold yellow]"
-            )
-            return assistant
+    _ASSISTANT_CACHE[book_path] = assistant
+    return assistant
 
-    try:
-        # Crear vector store para file_search
-        console.print(f"[bold blue]Creating vector store for {name}...[/bold blue]")
-        vector_store = vector_stores_api.create(name=f"{name} Docs")
 
-        # Cargar archivos de documentación desde la carpeta storycraftr dentro del book_path
-        docs_path = Path(book_path) / "storycraftr"
-        if docs_path.exists():
-            console.print(
-                f"[bold blue]Loading documentation from {docs_path}...[/bold blue]"
-            )
-            upload_markdown_files_to_vector_store(
-                vector_store.id, str(docs_path), client
-            )
-        else:
-            console.print(
-                f"[bold yellow]Documentation folder not found at {docs_path}[/bold yellow]"
-            )
+def get_thread(book_path: str) -> ConversationThread:
+    """
+    Create a new in-memory conversation thread for the project.
+    """
 
-        # Cargar archivos del libro
-        console.print(f"[bold blue]Loading book files from {book_path}...[/bold blue]")
-        upload_markdown_files_to_vector_store(vector_store.id, book_path, client)
+    thread_id = f"thread:{Path(book_path).name}:{uuid4().hex}"
+    thread = ConversationThread(id=thread_id, book_path=book_path)
+    _THREADS[thread_id] = thread
+    return thread
 
-        # Esperar a que los archivos se carguen completamente
-        console.print("[bold blue]Waiting for files to be processed...[/bold blue]")
-        time.sleep(5)  # Dar tiempo para que los archivos se procesen
 
-        # Si no existe, crear uno nuevo con las herramientas soportadas
-        console.print(f"[bold blue]Creating assistant {name}...[/bold blue]")
-        assistant = assistants_api.create(
-            name=name,
-            instructions=behavior_content,
-            model=openai_model,
-            tools=[{"type": "code_interpreter"}, {"type": "file_search"}],
-            temperature=0.7,  # Nivel de creatividad balanceado
-            top_p=1.0,  # Considerar todas las opciones
+def _resolve_thread(thread_id: str, book_path: str) -> ConversationThread:
+    thread = _THREADS.get(thread_id)
+    if thread is None:
+        thread = ConversationThread(
+            id=thread_id or f"thread:{uuid4().hex}", book_path=book_path
         )
-
-        # Asociar el vector store con el asistente
-        console.print(
-            f"[bold blue]Associating vector store with assistant {name}...[/bold blue]"
-        )
-        assistants_api.update(
-            assistant_id=assistant.id,
-            tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
-        )
-
-        return assistant
-    except Exception as e:
-        console.print(f"[bold red]Error creating assistant: {str(e)}[/bold red]")
-        raise
+        _THREADS[thread.id] = thread
+    return thread
 
 
 def create_message(
     book_path: str,
     thread_id: str,
     content: str,
-    assistant,
-    file_path: str = None,
-    progress: Progress = None,
+    assistant: LangChainAssistant,
+    file_path: Optional[str] = None,
+    progress: Optional[Progress] = None,
     task_id=None,
     force_single_answer: bool = False,
 ) -> str:
     """
-    Create a message in the thread and process it asynchronously. If config.multiple_answer is true,
-    the assistant response will be requested in parts, iterating until the response is complete.
-
-    Args:
-        book_path (str): Path to the book directory.
-        thread_id (str): ID of the thread where the message will be created.
-        content (str): The content of the message.
-        assistant (object): The assistant object with an ID.
-        file_path (str, optional): The path to a file to attach as an attachment. Defaults to None.
-        progress (Progress, optional): Progress object for tracking. Defaults to None.
-        task_id (int, optional): Task ID for the progress bar.
-        force_single_answer (bool, optional): If true, forces a single response regardless of config.multiple_answer. Defaults to False.
-
-    Returns:
-        str: The generated response text from the assistant, post-processed if multiple_answer is true.
+    Generate a response from the assistant using the shared LangChain pipeline.
     """
-    client = initialize_openai_client(book_path)
-    config = load_book_config(book_path)
-    should_print = progress is None
 
-    internal_progress = False
-    if progress is None:
-        progress = Progress()
-        task_id = progress.add_task("[cyan]Waiting for assistant response...", total=50)
-        internal_progress = True
-
-    if should_print:
-        console.print(
-            f"[bold blue]Creating message in thread {thread_id}...[/bold blue]"
-        )
+    assistant = assistant or create_or_get_assistant(book_path)
+    thread = _resolve_thread(thread_id, book_path)
+    config = assistant.config
 
     if file_path and os.path.exists(file_path):
-        if should_print:
-            console.print(
-                f"[bold blue]Reading content from {file_path} for improvement...[/bold blue]"
-            )
-        with open(file_path, "r", encoding="utf-8") as f:
-            file_content = f.read()
-            content = (
-                f"{content}\n\nHere is the existing content to improve:\n{file_content}"
-            )
-    else:
-        if should_print:
-            console.print(
-                f"[bold blue]Using provided prompt to generate new content...[/bold blue]"
-            )
+        file_text = Path(file_path).read_text(encoding="utf-8")
+        content = f"{content}\n\nHere is the existing content to adjust:\n{file_text}"
 
-    # Add instructions for multiple answers if the flag is true and force_single_answer is false
     if config.multiple_answer and not force_single_answer:
-        console.print(
-            "[bold blue]Adding multi-part response generation instructions (3 parts total)...[/bold blue]"
-        )
         content = (
-            "Please provide the response in exactly 3 parts to avoid output token limitations. "
-            "ONLY in the final (third) part, indicate 'END_OF_RESPONSE' when the response is complete. "
-            "Continue providing the next part of the response when you receive the prompt 'next'.\n\n"
-            + content
+            "Divide the answer into three titled sections (Part 1, Part 2, Part 3). "
+            "Conclude the final section with the token END_OF_RESPONSE. " + content
         )
 
-    # Generar el prompt con hash
+    prompt_body = FORMAT_OUTPUT.format(
+        reference_author=getattr(config, "reference_author", ""),
+        language=getattr(config, "primary_language", "en"),
+    )
+    prompt_text = f"{prompt_body}\n\n{content}"
+
     prompt_with_hash = generate_prompt_with_hash(
-        f"{FORMAT_OUTPUT.format(reference_author=config.reference_author, language=config.primary_language)}\n\n{content}",
+        prompt_text,
         datetime.now().strftime("%B %d, %Y"),
         book_path=book_path,
     )
 
-    try:
-        if config.multiple_answer and not force_single_answer:
-            console.print(
-                "[bold blue]Starting multi-part response generation (3 parts total)...[/bold blue]"
-            )
-
-        client.beta.threads.messages.create(
-            thread_id=thread_id, role="user", content=prompt_with_hash
-        )
-
-        run = client.beta.threads.runs.create(
-            thread_id=thread_id, assistant_id=assistant.id
-        )
-
-        if internal_progress:
-            progress.start()
-
-        response_text = ""
-        done_flag = "END_OF_RESPONSE"
-
-        # Initial run to get the first part of the response
-        while run.status in ["queued", "in_progress"]:
-            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
-            progress.update(task_id, advance=1)
-            time.sleep(0.5)
-
-        messages = client.beta.threads.messages.list(thread_id=thread_id)
-        response_text = messages.data[0].content[0].text.value
-
-        if config.multiple_answer and not force_single_answer:
-            console.print(
-                "[bold green]✓ First part of the response received[/bold green]"
-            )
-
-        # Continue iterating if the response is incomplete or if multiple_answer is true
-        iter = 0
-        while (
-            not force_single_answer and (done_flag not in response_text) and iter < 2
-        ):  # Changed to 2 to limit to 3 parts total
-            iter += 1
-            if should_print:
-                console.print(
-                    f"[bold blue]Requesting part {iter + 1} of 3...[/bold blue]"
-                )
-
-            # Add reminder for last part
-            next_prompt = "next"
-            if iter == 2:  # This is the third and final part
-                next_prompt = "THIS IS THE FINAL PART. PLEASE COMPLETE YOUR RESPONSE AND END WITH 'END_OF_RESPONSE'."
-                console.print(
-                    "[bold yellow]⚠ This is the final part. The response should be completed and include END_OF_RESPONSE.[/bold yellow]"
-                )
-
-            client.beta.threads.messages.create(
-                thread_id=thread_id, role="user", content=next_prompt
-            )
-            run = client.beta.threads.runs.create(
-                thread_id=thread_id, assistant_id=assistant.id
-            )
-
-            while run.status in ["queued", "in_progress"]:
-                run = client.beta.threads.runs.retrieve(
-                    thread_id=thread_id, run_id=run.id
-                )
-                progress.update(task_id, advance=1)
-                time.sleep(0.5)
-
-            messages = client.beta.threads.messages.list(thread_id=thread_id)
-            new_response = messages.data[0].content[0].text.value
-
-            if config.multiple_answer and not force_single_answer:
-                console.print(
-                    f"[bold green]✓ Part {iter + 1} of 3 received[/bold green]"
-                )
-
-            # Append the new response to the existing one
-            response_text += "\n" + new_response
-
-        if internal_progress:
-            progress.stop()
-
-        # Remove the done flag if it exists
-        if done_flag in response_text:
-            response_text = response_text.replace(done_flag, "")
-            if config.multiple_answer and not force_single_answer:
-                console.print(
-                    "[bold green]✓ END_OF_RESPONSE detected - Response completed successfully with all 3 parts[/bold green]"
-                )
-
-        return response_text
-
-    except Exception as e:
-        console.print(f"[bold red]Error creating message: {str(e)}[/bold red]")
-        raise
-
-
-def get_thread(book_path: str):
-    """
-    Retrieve or create a new thread.
-
-    Args:
-        book_path (str): Path to the book directory.
-
-    Returns:
-        object: The thread object.
-    """
-    client = initialize_openai_client(book_path)
-    try:
-        # Intentar con la API beta primero
-        thread = client.beta.threads.create()
-        return thread
-    except AttributeError:
-        # Si falla, intentar con la API más reciente
+    retrieved_context = ""
+    if assistant.retriever:
+        documents = []
         try:
-            thread = client.threads.create()
-            return thread
-        except Exception as e:
-            console.print(
-                f"[bold red]Error creating thread: {str(e)}. Please ensure you are using a compatible version of the OpenAI API.[/bold red]"
+            documents = assistant.retriever.invoke(content)
+        except AttributeError:
+            documents = assistant.retriever.get_relevant_documents(content)
+        if documents:
+            serialized_docs = []
+            for doc in documents:
+                source = doc.metadata.get("source", "context")
+                serialized_docs.append(f"Source: {source}\n{doc.page_content.strip()}")
+            retrieved_context = "\n\n".join(serialized_docs)
+
+    system_messages: List[SystemMessage] = [
+        SystemMessage(content=assistant.system_prompt)
+    ]
+    if retrieved_context:
+        system_messages.append(
+            SystemMessage(
+                content=f"Relevant project context:\n{retrieved_context}",
             )
-
-            # Crear un thread dummy para evitar errores
-            class DummyThread:
-                def __init__(self):
-                    self.id = "dummy_thread_id"
-
-            return DummyThread()
-
-
-def delete_file(vector_stores_api, vector_store_id, file_id):
-    """Delete a single file from the vector store."""
-    try:
-        vector_stores_api.files.delete(vector_store_id=vector_store_id, file_id=file_id)
-    except Exception as e:
-        console.print(f"[bold red]Error deleting file {file_id}: {str(e)}[/bold red]")
-
-
-def delete_files_in_parallel(vector_stores_api, vector_store_id, files):
-    """Delete multiple files from the vector store in parallel using ThreadPoolExecutor."""
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [
-            executor.submit(delete_file, vector_stores_api, vector_store_id, file.id)
-            for file in files.data
-        ]
-        # Wait for all tasks to complete
-        for future in futures:
-            future.result()
-
-
-def update_agent_files(book_path: str, assistant):
-    """
-    Update the assistant's knowledge with new files from the book path.
-
-    Args:
-        book_path (str): Path to the book directory.
-        assistant (object): The assistant object.
-    """
-    client = initialize_openai_client(book_path)
-    assistant_name = assistant.name
-    vector_store_id = get_vector_store_id_by_name(assistant_name, client)
-
-    if not vector_store_id:
-        console.print(
-            f"[bold red]Error: Could not find vector store for assistant '{assistant_name}'.[/bold red]"
         )
-        return
 
-    try:
-        # Obtener los archivos actuales del vector store
-        vector_stores_api = client.vector_stores
-        files = vector_stores_api.files.list(vector_store_id=vector_store_id)
+    user_message = HumanMessage(content=prompt_with_hash)
+    history: Iterable[HumanMessage | AIMessage] = thread.messages
 
-        # Eliminar archivos en paralelo
-        if files.data:
-            console.print(
-                f"[bold blue]Deleting {len(files.data)} old files...[/bold blue]"
-            )
-            delete_files_in_parallel(vector_stores_api, vector_store_id, files)
+    response: AIMessage = assistant.llm.invoke(
+        [*system_messages, *history, user_message]
+    )
 
-        # Cargar archivos de documentación
-        docs_path = Path(book_path) / "storycraftr"
-        if docs_path.exists():
-            console.print(
-                f"[bold blue]Loading documentation from {docs_path}...[/bold blue]"
-            )
-            upload_markdown_files_to_vector_store(
-                vector_store_id, str(docs_path), client
-            )
-        else:
-            console.print(
-                f"[bold yellow]Documentation folder not found at {docs_path}[/bold yellow]"
-            )
+    thread.messages.extend([user_message, response])
 
-        # Cargar archivos del libro
-        console.print(f"[bold blue]Loading book files from {book_path}...[/bold blue]")
-        upload_markdown_files_to_vector_store(vector_store_id, book_path, client)
+    if progress and task_id is not None:
+        try:
+            progress.update(task_id, completed=1)
+        except Exception as exc:
+            console.print(f"[yellow]Warning: progress update failed ({exc}).[/yellow]")
 
-        console.print(
-            f"[bold green]Files updated successfully in assistant '{assistant.name}'.[/bold green]"
-        )
-    except Exception as e:
-        console.print(f"[bold red]Error updating files: {str(e)}[/bold red]")
-        raise
+    text = (
+        response.content if isinstance(response.content, str) else str(response.content)
+    )
+    return text.replace("END_OF_RESPONSE", "").strip()
+
+
+def update_agent_files(book_path: str, assistant: Optional[LangChainAssistant] = None):
+    """
+    Rebuild the embedded knowledge base for the assistant.
+    """
+
+    assistant = assistant or _ASSISTANT_CACHE.get(str(Path(book_path).resolve()))
+    if not assistant:
+        assistant = create_or_get_assistant(book_path)
+    assistant.ensure_vector_store(force=True)
+
+    # Reset active threads for this project to avoid stale context.
+    stale_ids = [
+        thread_id
+        for thread_id, thread in _THREADS.items()
+        if thread.book_path == book_path
+    ]
+    for thread_id in stale_ids:
+        _THREADS.pop(thread_id, None)
 
 
 def process_chapters(
@@ -572,71 +337,57 @@ def process_chapters(
     **prompt_kwargs,
 ):
     """
-    Process each chapter of the book with the given prompt template and generate output.
-
-    Args:
-        save_to_markdown (function): Function to save the output to a markdown file.
-        book_path (str): Path to the book directory.
-        prompt_template (str): The template for the prompt.
-        task_description (str): Description of the task for progress display.
-        file_suffix (str): Suffix for the output file.
-        **prompt_kwargs: Additional arguments for the prompt template.
+    Process chapter files by generating refinements from the assistant.
     """
-    # Directories to process
+
     chapters_dir = os.path.join(book_path, "chapters")
     outline_dir = os.path.join(book_path, "outline")
     worldbuilding_dir = os.path.join(book_path, "worldbuilding")
 
-    # Check if directories exist
     for dir_path in [chapters_dir, outline_dir, worldbuilding_dir]:
         if not os.path.exists(dir_path):
             raise FileNotFoundError(f"The directory '{dir_path}' does not exist.")
 
-    # Files to exclude
-    excluded_files = ["cover.md", "back-cover.md"]
-
-    # Get Markdown files from each directory, excluding the unwanted files
-    files_to_process = []
+    excluded_files = {"cover.md", "back-cover.md"}
+    files_to_process: List[str] = []
     for dir_path in [chapters_dir, outline_dir, worldbuilding_dir]:
-        files = [
-            f
-            for f in os.listdir(dir_path)
-            if f.endswith(".md") and f not in excluded_files
-        ]
-        files_to_process.extend([os.path.join(dir_path, f) for f in files])
+        for filename in os.listdir(dir_path):
+            if filename.endswith(".md") and filename not in excluded_files:
+                files_to_process.append(os.path.join(dir_path, filename))
 
     if not files_to_process:
         raise FileNotFoundError(
             "No Markdown (.md) files were found in the chapter directory."
         )
 
+    assistant = create_or_get_assistant(book_path)
+
     with Progress() as progress:
         task_chapters = progress.add_task(
-            f"[cyan]{task_description}", total=len(files_to_process)
+            f"[cyan]{task_description}",
+            total=len(files_to_process),
         )
-        task_openai = progress.add_task("[green]Calling OpenAI...", total=1)
+        task_llm = progress.add_task("[green]Calling language model...", total=1)
 
         for chapter_file in files_to_process:
-            chapter_path = os.path.join(chapters_dir, chapter_file)
             prompt = prompt_template.format(**prompt_kwargs)
-
-            assistant = create_or_get_assistant(book_path)
             thread = get_thread(book_path)
 
-            progress.reset(task_openai)
+            progress.reset(task_llm)
             refined_text = create_message(
                 book_path,
                 thread_id=thread.id,
                 content=prompt,
                 assistant=assistant,
                 progress=progress,
-                task_id=task_openai,
-                file_path=chapter_path,
+                task_id=task_llm,
+                file_path=chapter_file,
             )
 
+            relative_path = os.path.relpath(chapter_file, book_path)
             save_to_markdown(
                 book_path,
-                os.path.join("chapters", chapter_file),
+                relative_path,
                 file_suffix,
                 refined_text,
                 progress=progress,
