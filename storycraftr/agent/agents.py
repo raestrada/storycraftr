@@ -6,12 +6,12 @@ import shutil
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, List, Optional
 from uuid import uuid4
 
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_community.vectorstores import Chroma
 from rich.console import Console
@@ -19,6 +19,7 @@ from rich.progress import Progress
 
 from storycraftr.llm import build_chat_model, build_embedding_model
 from storycraftr.prompts.story.core import FORMAT_OUTPUT
+from storycraftr.graph import build_assistant_graph
 from storycraftr.utils.core import (
     generate_prompt_with_hash,
     load_book_config,
@@ -47,6 +48,7 @@ class LangChainAssistant:
     vector_store: Optional[Chroma]
     behavior: str
     retriever: Optional[object] = None
+    graph: Optional[object] = None
 
     def ensure_vector_store(self, force: bool = False) -> None:
         """
@@ -116,6 +118,8 @@ class LangChainAssistant:
             raise RuntimeError(
                 f"Unable to construct retriever from vector store: {exc}"
             ) from exc
+
+        self.graph = build_assistant_graph(self)
 
     @property
     def system_prompt(self) -> str:
@@ -276,44 +280,14 @@ def create_message(
         book_path=book_path,
     )
 
-    retrieved_context = ""
-    if not assistant.retriever:
-        raise RuntimeError("Assistant retriever was not initialised.")
+    if not assistant.graph:
+        raise RuntimeError("Assistant graph is not initialised.")
 
-    try:
-        documents = assistant.retriever.invoke(content)
-    except TypeError:
-        documents = assistant.retriever.invoke({"query": content})
-    except Exception as exc:
-        raise RuntimeError(f"Retriever invocation failed: {exc}") from exc
-
-    if documents:
-        if not isinstance(documents, list):
-            documents = [documents]
-        serialized_docs = []
-        for doc in documents:
-            source = doc.metadata.get("source", "context")
-            serialized_docs.append(f"Source: {source}\n{doc.page_content.strip()}")
-        retrieved_context = "\n\n".join(serialized_docs)
-
-    system_messages: List[SystemMessage] = [
-        SystemMessage(content=assistant.system_prompt)
-    ]
-    if retrieved_context:
-        system_messages.append(
-            SystemMessage(
-                content=f"Relevant project context:\n{retrieved_context}",
-            )
-        )
+    response_text = assistant.graph.invoke(prompt_with_hash)
 
     user_message = HumanMessage(content=prompt_with_hash)
-    history: Iterable[HumanMessage | AIMessage] = thread.messages
-
-    response: AIMessage = assistant.llm.invoke(
-        [*system_messages, *history, user_message]
-    )
-
-    thread.messages.extend([user_message, response])
+    assistant_message = AIMessage(content=response_text)
+    thread.messages.extend([user_message, assistant_message])
 
     if progress and task_id is not None:
         try:
@@ -321,10 +295,7 @@ def create_message(
         except Exception as exc:
             console.print(f"[yellow]Warning: progress update failed ({exc}).[/yellow]")
 
-    text = (
-        response.content if isinstance(response.content, str) else str(response.content)
-    )
-    return text.replace("END_OF_RESPONSE", "").strip()
+    return response_text.replace("END_OF_RESPONSE", "").strip()
 
 
 def update_agent_files(book_path: str, assistant: Optional[LangChainAssistant] = None):

@@ -1,2 +1,2 @@
 generate_behavior
-poetry run storycraftr init "The Purge of the gods" --primary-language "en" --alternate-languages "es" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt" --reference-author="Brandon Sanderson" --openai-model "gpt-4o-mini"
+poetry run storycraftr init "The Purge of the gods" --primary-language "en" --alternate-languages "es" --author "Rodrigo Estrada" --genre "science fiction" --behavior "behavior.txt" --reference-author="Brandon Sanderson" --llm-provider "openrouter" --llm-model "deepseek/deepseek-chat" --embed-model "BAAI/bge-large-en-v1.5"
