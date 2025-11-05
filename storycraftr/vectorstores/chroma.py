@@ -23,7 +23,7 @@ def build_chroma_store(
     store_path = Path(project_path) / persist_subdir
     store_path.mkdir(parents=True, exist_ok=True)
 
-    settings = Settings(anonymized_telemetry=False)
+    settings = Settings(anonymized_telemetry=False, allow_reset=True)
 
     try:
         client = PersistentClient(path=str(store_path), settings=settings)

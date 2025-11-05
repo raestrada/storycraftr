@@ -43,6 +43,7 @@ class LangChainAssistant:
     book_path: str
     config: object
     llm: BaseChatModel
+    embeddings: object
     vector_store: Optional[Chroma]
     behavior: str
     retriever: Optional[object] = None
@@ -63,8 +64,26 @@ class LangChainAssistant:
             str(Path(self.book_path) / "vector_store"),
         )
         persist_dir = Path(persist_dir_str)
-        if force and persist_dir.exists():
-            shutil.rmtree(persist_dir, ignore_errors=True)
+        if force:
+            reset_succeeded = False
+            try:
+                client = getattr(self.vector_store, "_client", None)
+                if client is not None and hasattr(client, "reset"):
+                    client.reset()
+                    reset_succeeded = True
+            except Exception:
+                reset_succeeded = False
+
+            if not reset_succeeded:
+                shutil.rmtree(persist_dir, ignore_errors=True)
+
+            self.vector_store = build_chroma_store(self.book_path, self.embeddings)
+            persist_dir_str = getattr(
+                self.vector_store,
+                "_persist_directory",
+                str(Path(self.book_path) / "vector_store"),
+            )
+            persist_dir = Path(persist_dir_str)
 
         try:
             needs_refresh = (
@@ -186,6 +205,7 @@ def create_or_get_assistant(book_path: str) -> LangChainAssistant:
         book_path=book_path,
         config=config,
         llm=llm,
+        embeddings=embeddings,
         vector_store=vector_store,
         behavior=behavior_text,
     )
@@ -257,20 +277,15 @@ def create_message(
     )
 
     retrieved_context = ""
-    documents = []
-    if assistant.retriever:
-        try:
-            documents = assistant.retriever.invoke({"query": content})
-        except TypeError:
-            documents = assistant.retriever.invoke(content)
-        except AttributeError:
-            documents = []
+    if not assistant.retriever:
+        raise RuntimeError("Assistant retriever was not initialised.")
 
-    if not documents and assistant.vector_store is not None:
-        try:
-            documents = assistant.vector_store.similarity_search(content, k=6)
-        except Exception as exc:
-            raise RuntimeError(f"Vector store similarity search failed: {exc}") from exc
+    try:
+        documents = assistant.retriever.invoke(content)
+    except TypeError:
+        documents = assistant.retriever.invoke({"query": content})
+    except Exception as exc:
+        raise RuntimeError(f"Retriever invocation failed: {exc}") from exc
 
     if documents:
         if not isinstance(documents, list):
