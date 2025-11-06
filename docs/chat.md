@@ -222,9 +222,9 @@ While a job runs, the chat shows `[Role ⏳ …]` badges and drops a completion 
 
 ## VS Code Event Stream
 
-Launching `storycraftr chat` inside the VS Code terminal now enables a JSONL event feed under `.storycraftr/vscode-events.jsonl`. The upcoming VS Code extension will tail this file to mirror chat turns, background jobs, and command output directly in the editor. Remove the file if you want to reset or disable the stream.
+Launching `storycraftr chat` inside the VS Code terminal enables a JSONL event feed under `.storycraftr/vscode-events.jsonl`. The StoryCraftr companion extension tails this file to mirror chat turns, background jobs, and command output in the editor (Status Bar counts, output channel, and log prompts). Remove the file if you want to reset or disable the stream.
 
-When VS Code is detected, the CLI also offers to install/update the `storycraftr.storycraftr` extension automatically (it shells out to `code --install-extension`). Decline the prompt to skip the installation and run the command manually later once the extension is published.
+When VS Code is detected, the CLI also offers to install/update the `storycraftr.storycraftr` extension automatically (it shells out to `code --install-extension`). Decline the prompt to skip the installation and run the command manually later.
 
 ## Conclusion
 
