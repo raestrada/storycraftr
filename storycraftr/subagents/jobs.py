@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import shlex
 import threading
 import uuid
@@ -12,7 +13,7 @@ from importlib import import_module
 from io import StringIO
 from pathlib import Path
 from queue import Queue
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 
 from rich.console import Console
 
@@ -21,6 +22,9 @@ from storycraftr.utils.core import load_book_config
 
 from .models import SubAgentRole
 from .storage import LOGS_DIRNAME, ensure_storage_dirs, load_roles, seed_default_roles
+
+
+logger = logging.getLogger(__name__)
 
 
 def _utcnow() -> datetime:
@@ -67,6 +71,7 @@ class SubAgentJobManager:
         console: Console,
         *,
         event_queue: Optional[Queue] = None,
+        event_callback: Optional[Callable[[str, dict], None]] = None,
     ):
         self.book_path = Path(book_path)
         self.console = console
@@ -77,6 +82,7 @@ class SubAgentJobManager:
         self.executor = ThreadPoolExecutor(max_workers=3, thread_name_prefix="subagent")
         self.roles = self._ensure_roles()
         self.jobs: Dict[str, SubAgentJob] = {}
+        self.event_callback = event_callback
 
     def shutdown(self) -> None:
         self.executor.shutdown(wait=False, cancel_futures=True)
@@ -239,13 +245,17 @@ class SubAgentJobManager:
     # Internal helpers -------------------------------------------------------
 
     def _emit_event(self, event_type: str, job: SubAgentJob) -> None:
-        if not self.event_queue:
-            return
         payload = {
             "type": event_type,
             "job": job.to_dict(),
         }
-        self.event_queue.put(payload)
+        if self.event_queue:
+            self.event_queue.put(payload)
+        if self.event_callback:
+            try:
+                self.event_callback(event_type, payload["job"])
+            except Exception as exc:  # pragma: no cover - defensive
+                logger.debug("Sub-agent event callback failed: %s", exc)
 
 
 _CONSOLE_MODULES = [

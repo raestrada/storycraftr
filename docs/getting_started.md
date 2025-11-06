@@ -68,6 +68,7 @@ system_prompt: >
 
 - Re-run `storycraftr sub-agents seed --language en --force` at any time to regenerate the defaults (replace `en` with your locale).
 - Logs for each background run are written to `.storycraftr/subagents/logs/<role>/timestamp.md`, making it easy to review results even when the CLI is installed through `pipx`.
+- When the CLI detects a VS Code terminal, it also streams structured chat/job events to `.storycraftr/vscode-events.jsonl` so the editor can mirror them without scraping terminal output.
 
 ## Step 2: Create the Behavior File
 

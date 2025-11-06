@@ -10,6 +10,7 @@ from rich.table import Table
 from . import render
 from .render import render_subagent_event
 from .session import SessionManager
+from storycraftr.integrations import VSCodeEventEmitter
 from storycraftr.subagents import SubAgentJobManager, seed_default_roles
 
 
@@ -21,6 +22,7 @@ class CommandContext:
     assistant: object
     book_path: str
     job_manager: Optional[SubAgentJobManager] = None
+    event_emitter: Optional[VSCodeEventEmitter] = None
 
 
 def handle_command(raw: str, context: CommandContext) -> Optional[List[dict]]:
@@ -129,9 +131,17 @@ def _handle_sub_agent(args: List[str], context: CommandContext) -> None:
         )
         return
 
+    emitter = context.event_emitter
     action = args[0]
     if action == "!list":
-        _render_roles(manager, context.console)
+        roles = _render_roles(manager, context.console)
+        if emitter:
+            emitter.emit(
+                "sub_agent.roles",
+                {
+                    "roles": [role.to_dict() for role in roles],
+                },
+            )
         return
     if action == "!describe":
         if len(args) < 2:
@@ -142,20 +152,41 @@ def _handle_sub_agent(args: List[str], context: CommandContext) -> None:
             context.console.print(f"[red]Role '{args[1]}' not found.[/red]")
             return
         _render_role_details(role, context.console)
+        if emitter:
+            emitter.emit("sub_agent.role.describe", role.to_dict())
         return
     if action == "!status":
-        _render_job_status(manager, context.console)
+        jobs = _render_job_status(manager, context.console)
+        if emitter:
+            emitter.emit(
+                "sub_agent.status",
+                {
+                    "jobs": [job.to_dict() for job in jobs],
+                },
+            )
         return
     if action == "!logs":
         if len(args) < 2:
             context.console.print("[yellow]Usage: :sub-agent !logs <role>[/yellow]")
             return
-        _render_logs(args[1], manager, context.console)
+        logs = _render_logs(args[1], manager, context.console)
+        if emitter:
+            emitter.emit(
+                "sub_agent.logs",
+                {
+                    "role": args[1],
+                    "files": [str(path) for path in logs],
+                },
+            )
         return
     if action == "!seed":
-        _handle_seed(args[1:], context)
+        seed_info = _handle_seed(args[1:], context)
         manager.reload_roles()
-        _render_roles(manager, context.console)
+        roles = _render_roles(manager, context.console)
+        if emitter:
+            payload = seed_info or {}
+            payload["roles"] = [role.to_dict() for role in roles]
+            emitter.emit("sub_agent.seed", payload)
         return
 
     if not action.startswith("!"):
@@ -176,15 +207,25 @@ def _handle_sub_agent(args: List[str], context: CommandContext) -> None:
         )
         event = {"type": "queued", "job": job.to_dict()}
         render_subagent_event(context.console, event)
+        if context.event_emitter:
+            context.event_emitter.emit("sub_agent.queued", event["job"])
     except ValueError as exc:
         context.console.print(f"[red]{exc}[/red]")
+        if context.event_emitter:
+            context.event_emitter.emit(
+                "sub_agent.error",
+                {
+                    "input": action,
+                    "error": str(exc),
+                },
+            )
 
 
-def _render_roles(manager: SubAgentJobManager, console: Console) -> None:
+def _render_roles(manager: SubAgentJobManager, console: Console):
     roles = manager.list_roles()
     if not roles:
         console.print("[yellow]No roles configured. Run :sub-agent !seed.[/yellow]")
-        return
+        return []
     table = Table(title="Sub-Agent Roles")
     table.add_column("Role", style="cyan", no_wrap=True)
     table.add_column("Description", style="white")
@@ -196,6 +237,7 @@ def _render_roles(manager: SubAgentJobManager, console: Console) -> None:
             ", ".join(role.command_whitelist),
         )
     console.print(table)
+    return roles
 
 
 def _render_role_details(role, console: Console) -> None:
@@ -207,11 +249,11 @@ def _render_role_details(role, console: Console) -> None:
     )
 
 
-def _render_job_status(manager: SubAgentJobManager, console: Console) -> None:
+def _render_job_status(manager: SubAgentJobManager, console: Console):
     jobs = manager.list_jobs()
     if not jobs:
         console.print("[italic]No background jobs yet.[/italic]")
-        return
+        return []
     table = Table(title="Sub-Agent Jobs", show_lines=True)
     table.add_column("Job", no_wrap=True)
     table.add_column("Role", style="cyan", no_wrap=True)
@@ -225,16 +267,18 @@ def _render_job_status(manager: SubAgentJobManager, console: Console) -> None:
             job.status,
         )
     console.print(table)
+    return jobs
 
 
-def _render_logs(role_slug: str, manager: SubAgentJobManager, console: Console) -> None:
+def _render_logs(role_slug: str, manager: SubAgentJobManager, console: Console):
     files = manager.role_logs(role_slug, limit=5)
     if not files:
         console.print(f"[yellow]No logs for role '{role_slug}'.[/yellow]")
-        return
+        return []
     console.print(f"[bold]Recent logs for {role_slug}:[/bold]")
     for path in files:
         console.print(f"- {path.name}")
+    return files
 
 
 def _handle_seed(args: List[str], context: CommandContext) -> None:
@@ -262,3 +306,8 @@ def _handle_seed(args: List[str], context: CommandContext) -> None:
         context.console.print(
             f"[yellow]Roles already exist. Use --force to overwrite (language '{language}').[/yellow]"
         )
+    return {
+        "language": language,
+        "force": force,
+        "written": [str(path) for path in written],
+    }

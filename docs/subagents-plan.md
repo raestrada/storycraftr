@@ -50,6 +50,7 @@
 - Job structure: `id`, `role`, `command`, `args`, `state`, `started_at`, `ended_at`, `log_path`, `stdout`, `stderr`.
 - Persist job metadata inside `.storycraftr/subagents/logs/<role>/<timestamp>.json` and append markdown outputs for human review.
 - Allow `:sub-agent !status` to stream queue state and `:sub-agent !logs continuity` to tail the most recent files.
+- Emit structured events (JSONL) alongside job transitions so VS Code and other IDEs can mirror progress without scraping stdout.
 
 ### 4. LangChain Graph Alignment
 - Each role instantiates a LangChain Runnable graph:

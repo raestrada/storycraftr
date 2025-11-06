@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from queue import Empty, Queue
-from typing import List
+from typing import Dict, List, Optional
 
 import click
 import os
@@ -22,6 +22,7 @@ from storycraftr.chat.render import (
 )
 from storycraftr.chat.session import SessionManager
 from storycraftr.chat.module_runner import ModuleCommandError, run_module_command
+from storycraftr.integrations import create_vscode_event_emitter
 from storycraftr.subagents import SubAgentJobManager
 from storycraftr.agent.agents import (
     create_message,
@@ -142,6 +143,8 @@ def chat(book_path=None, prompt=None, session_name=None):
     if not config:
         return None
 
+    vscode_emitter = create_vscode_event_emitter(book_path=book_path, console=console)
+
     assistant = create_or_get_assistant(book_path)
     thread = get_thread(book_path)
 
@@ -154,11 +157,31 @@ def chat(book_path=None, prompt=None, session_name=None):
     }
 
     subagent_events: Queue = Queue()
-    job_manager = SubAgentJobManager(book_path, console, event_queue=subagent_events)
+
+    def _forward_job_event(event_type: str, job_payload: dict) -> None:
+        if vscode_emitter:
+            vscode_emitter.emit(f"sub_agent.{event_type}", job_payload)
+
+    job_manager = SubAgentJobManager(
+        book_path,
+        console,
+        event_queue=subagent_events,
+        event_callback=_forward_job_event,
+    )
     session_manager = SessionManager(book_path)
     if session_name:
         session_manager.autosave_name = session_name
     transcript: List[Dict] = []
+
+    if vscode_emitter:
+        vscode_emitter.emit(
+            "session.started",
+            {
+                "book_path": str(book_path),
+                "metadata": footer_meta,
+                "session": session_name,
+            },
+        )
 
     if session_name:
         try:
@@ -174,6 +197,16 @@ def chat(book_path=None, prompt=None, session_name=None):
     if prompt is not None:
         turn = _run_turn(book_path, assistant, thread, prompt)
         render_turn(console, turn, len(transcript) + 1)
+        if vscode_emitter:
+            vscode_emitter.emit(
+                "chat.turn",
+                {
+                    "user": prompt,
+                    "answer": turn.get("answer"),
+                    "documents": turn.get("documents"),
+                    "duration": turn.get("duration"),
+                },
+            )
         _drain_subagent_events(subagent_events, job_manager, footer_meta)
         _render_session_footer(job_manager, footer_meta)
         job_manager.shutdown()
@@ -206,6 +239,14 @@ def chat(book_path=None, prompt=None, session_name=None):
                 continue
 
             if user_input.startswith(":"):
+                if vscode_emitter:
+                    vscode_emitter.emit(
+                        "chat.command",
+                        {
+                            "input": user_input,
+                            "session": session_name,
+                        },
+                    )
                 ctx = CommandContext(
                     console=console,
                     session_manager=session_manager,
@@ -213,6 +254,7 @@ def chat(book_path=None, prompt=None, session_name=None):
                     assistant=assistant,
                     book_path=book_path,
                     job_manager=job_manager,
+                    event_emitter=vscode_emitter,
                 )
 
                 command_result: List[dict] | None = None
@@ -232,6 +274,14 @@ def chat(book_path=None, prompt=None, session_name=None):
                 continue
 
             if user_input.startswith("!"):
+                if vscode_emitter:
+                    vscode_emitter.emit(
+                        "chat.command",
+                        {
+                            "input": user_input,
+                            "session": session_name,
+                        },
+                    )
                 with patch_stdout(raw=True):
                     _execute_module_command(user_input[1:], book_path=book_path)
                 _drain_subagent_events(subagent_events, job_manager, footer_meta)
@@ -242,6 +292,16 @@ def chat(book_path=None, prompt=None, session_name=None):
             transcript.append(turn)
             render_turn(console, turn, len(transcript))
             session_manager.autosave(transcript)
+            if vscode_emitter:
+                vscode_emitter.emit(
+                    "chat.turn",
+                    {
+                        "user": user_input,
+                        "answer": turn.get("answer"),
+                        "documents": turn.get("documents"),
+                        "duration": turn.get("duration"),
+                    },
+                )
             _drain_subagent_events(subagent_events, job_manager, footer_meta)
             _render_session_footer(job_manager, footer_meta)
 
@@ -251,3 +311,11 @@ def chat(book_path=None, prompt=None, session_name=None):
         except Exception as exc:
             console.print(f"[bold red]Error: {exc}[/bold red]")
     job_manager.shutdown()
+    if vscode_emitter:
+        vscode_emitter.emit(
+            "session.ended",
+            {
+                "book_path": str(book_path),
+                "session": session_name,
+            },
+        )

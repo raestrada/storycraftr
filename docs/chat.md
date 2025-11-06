@@ -220,6 +220,10 @@ While command shortcuts are great for quick edits, some operations (large outlin
 
 While a job runs, the chat shows `[Role ⏳ …]` badges and drops a completion panel in-line when the task finishes. Raw logs are stored in `.storycraftr/subagents/logs/<role>/timestamp.md`, so pipx users can still review them outside the chat.
 
+## VS Code Event Stream
+
+Launching `storycraftr chat` inside the VS Code terminal now enables a JSONL event feed under `.storycraftr/vscode-events.jsonl`. The upcoming VS Code extension will tail this file to mirror chat turns, background jobs, and command output directly in the editor. Remove the file if you want to reset or disable the stream.
+
 ## Conclusion
 
 The **StoryCraftr Chat** feature, combined with powerful commands like **Iterate**, **Outline**, **Worldbuilding**, and **Chapters**, provides you with everything you need to write your book efficiently. Whether you are refining existing content or generating new chapters, this feature allows you to enhance your creative process with ease.
