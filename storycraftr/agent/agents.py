@@ -49,6 +49,8 @@ class LangChainAssistant:
     behavior: str
     retriever: Optional[object] = None
     graph: Optional[object] = None
+    last_documents: List[Document] = field(default_factory=list)
+    graph: Optional[object] = None
 
     def ensure_vector_store(self, force: bool = False) -> None:
         """
@@ -120,6 +122,7 @@ class LangChainAssistant:
             ) from exc
 
         self.graph = build_assistant_graph(self)
+        self.last_documents = []
 
     @property
     def system_prompt(self) -> str:
@@ -283,7 +286,15 @@ def create_message(
     if not assistant.graph:
         raise RuntimeError("Assistant graph is not initialised.")
 
-    response_text = assistant.graph.invoke(prompt_with_hash)
+    result = assistant.graph.invoke({"question": prompt_with_hash})
+    if isinstance(result, dict):
+        response_text = result.get("answer", "")
+        documents = result.get("documents") or []
+    else:
+        response_text = str(result)
+        documents = []
+
+    assistant.last_documents = documents
 
     user_message = HumanMessage(content=prompt_with_hash)
     assistant_message = AIMessage(content=response_text)

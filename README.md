@@ -13,9 +13,9 @@ Welcome to [**StoryCraftr**](https://storycraftr.app), the open-source project d
 
 ---
 
-## Release Notes v0.11.2-beta7
+## Release Notes v0.11.3-beta8
 
-You can find the release notes for version `v0.11.2-beta7` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.11.2-beta7).
+You can find the release notes for version `v0.11.3-beta8` [here](https://github.com/raestrada/storycraftr/releases/tag/v0.11.3-beta8).
 
 ## Step 1: Install StoryCraftr
 
@@ -24,13 +24,13 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.11.2-beta7
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.11.3-beta8
 ```
 
 Alternatively, if you have `uv` and `uvx` installed on your system, you can run storycraftr without installing it first:
 
 ```bash
-uvx --from git+https://github.com/raestrada/storycraftr.git@v0.11.2-beta7 storycraftr
+uvx --from git+https://github.com/raestrada/storycraftr.git@v0.11.3-beta8 storycraftr
 ```
 
 ### Configure Provider Credentials

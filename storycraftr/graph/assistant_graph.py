@@ -26,6 +26,9 @@ def _format_context(documents: List[Document]) -> str:
 def build_assistant_graph(assistant):
     """Create a LangChain runnable graph for the assistant."""
 
+    if not assistant.retriever:
+        raise RuntimeError("Assistant retriever is not initialised.")
+
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", "{system_prompt}"),
@@ -33,32 +36,51 @@ def build_assistant_graph(assistant):
         ]
     )
 
-    def retrieve(question: str):
-        return assistant.retriever.invoke(question)
+    prompt_chain = prompt | assistant.llm | StrOutputParser()
 
-    def prepare_inputs(inputs):
-        question = inputs["question"]
-        documents = inputs.get("documents") or []
+    def ensure_inputs(payload):
+        if isinstance(payload, str):
+            payload = {"question": payload}
+        elif not isinstance(payload, dict):
+            raise ValueError("Graph input must be a question string or a dict payload.")
+
+        question = payload.get("question")
+        if not question:
+            raise ValueError("Missing 'question' in graph payload.")
+
+        documents = payload.get("documents")
+        if not documents:
+            documents = assistant.retriever.invoke(question)
+
         if not isinstance(documents, list):
             documents = [documents]
+
+        payload["question"] = question
+        payload["documents"] = documents
+        return payload
+
+    def prepare_prompt_inputs(payload):
+        documents = payload["documents"]
         context = _format_context(documents)
         system_prompt = assistant.system_prompt
         if context:
             system_prompt = f"{system_prompt}\n\nContext:\n{context}"
         return {
-            "system_prompt": system_prompt,
-            "question": question,
+            "prompt_inputs": {
+                "system_prompt": system_prompt,
+                "question": payload["question"],
+            },
+            "documents": documents,
         }
 
     graph = (
-        RunnableParallel(
-            question=RunnablePassthrough(),
-            documents=RunnableLambda(retrieve),
+        RunnablePassthrough()
+        | RunnableLambda(ensure_inputs)
+        | RunnableLambda(prepare_prompt_inputs)
+        | RunnableParallel(
+            answer=RunnableLambda(lambda x: x["prompt_inputs"]) | prompt_chain,
+            documents=RunnableLambda(lambda x: x["documents"]),
         )
-        | RunnableLambda(prepare_inputs)
-        | prompt
-        | assistant.llm
-        | StrOutputParser()
     )
 
     return graph
