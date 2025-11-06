@@ -4,6 +4,7 @@ import json
 from storycraftr.integrations.vscode import (
     VSCodeEventEmitter,
     create_vscode_event_emitter,
+    install_vscode_extension,
     is_running_in_vscode,
 )
 
@@ -45,3 +46,55 @@ def test_create_vscode_event_emitter_respects_environment(monkeypatch, tmp_path)
         console=Console(file=io.StringIO(), force_terminal=False),
     )
     assert emitter is not None
+
+
+def test_install_vscode_extension_handles_missing_binary(monkeypatch):
+    from rich.console import Console
+
+    monkeypatch.setattr(
+        "storycraftr.integrations.vscode._find_vscode_binary", lambda: None
+    )
+    console = Console(file=io.StringIO(), force_terminal=False)
+    assert install_vscode_extension(console) is False
+
+
+def test_install_vscode_extension_success(monkeypatch):
+    from rich.console import Console
+
+    monkeypatch.setattr(
+        "storycraftr.integrations.vscode._find_vscode_binary",
+        lambda: "/usr/bin/code",
+    )
+
+    class Result:
+        returncode = 0
+        stdout = "installed"
+        stderr = ""
+
+    monkeypatch.setattr(
+        "subprocess.run",
+        lambda *args, **kwargs: Result(),
+    )
+    console = Console(file=io.StringIO(), force_terminal=False)
+    assert install_vscode_extension(console) is True
+
+
+def test_install_vscode_extension_failure(monkeypatch):
+    from rich.console import Console
+
+    monkeypatch.setattr(
+        "storycraftr.integrations.vscode._find_vscode_binary",
+        lambda: "/usr/bin/code",
+    )
+
+    class Result:
+        returncode = 1
+        stdout = ""
+        stderr = "error"
+
+    monkeypatch.setattr(
+        "subprocess.run",
+        lambda *args, **kwargs: Result(),
+    )
+    console = Console(file=io.StringIO(), force_terminal=False)
+    assert install_vscode_extension(console) is False

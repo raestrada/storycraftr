@@ -22,7 +22,11 @@ from storycraftr.chat.render import (
 )
 from storycraftr.chat.session import SessionManager
 from storycraftr.chat.module_runner import ModuleCommandError, run_module_command
-from storycraftr.integrations import create_vscode_event_emitter
+from storycraftr.integrations import (
+    VS_CODE_EXTENSION_ID,
+    create_vscode_event_emitter,
+    install_vscode_extension,
+)
 from storycraftr.subagents import SubAgentJobManager
 from storycraftr.agent.agents import (
     create_message,
@@ -144,6 +148,22 @@ def chat(book_path=None, prompt=None, session_name=None):
         return None
 
     vscode_emitter = create_vscode_event_emitter(book_path=book_path, console=console)
+    if vscode_emitter:
+        console.print(
+            "[cyan]StoryCraftr ships a companion VS Code extension that mirrors chat "
+            "output and sub-agent jobs in the editor.[/cyan]"
+        )
+        if click.confirm(
+            f"Install/update the VS Code extension '{VS_CODE_EXTENSION_ID}' now?",
+            default=True,
+        ):
+            install_vscode_extension(console)
+        else:
+            console.print(
+                "[dim]Skip installation for now. "
+                "Run 'code --install-extension "
+                f"{VS_CODE_EXTENSION_ID}' later to enable editor integration.[/dim]"
+            )
 
     assistant = create_or_get_assistant(book_path)
     thread = get_thread(book_path)

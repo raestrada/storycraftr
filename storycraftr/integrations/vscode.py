@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import subprocess  # nosec B404
 import threading
 from pathlib import Path
 from typing import Optional
@@ -80,3 +82,64 @@ def create_vscode_event_emitter(
         "[dim]Tip: delete the JSONL file if you want to reset the integration.[/dim]"
     )
     return emitter
+
+
+VS_CODE_EXTENSION_ID = "storycraftr.storycraftr"
+
+
+def _find_vscode_binary() -> Optional[str]:
+    for candidate in ("code", "code-insiders"):
+        path = shutil.which(candidate)
+        if path:
+            return path
+    return None
+
+
+def install_vscode_extension(console: Console, *, force: bool = False) -> bool:
+    """
+    Attempt to install/update the StoryCraftr VS Code extension.
+    """
+    binary = _find_vscode_binary()
+    if not binary:
+        console.print(
+            "[yellow]VS Code CLI ('code' or 'code-insiders') not found. "
+            "Install VS Code or add the CLI to PATH to enable automatic setup.[/yellow]"
+        )
+        return False
+
+    args = [binary, "--install-extension", VS_CODE_EXTENSION_ID]
+    if force:
+        args.append("--force")
+
+    try:
+        result = subprocess.run(  # nosec B603
+            args,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except Exception as exc:  # pragma: no cover - defensive
+        console.print(f"[red]Failed to run '{binary}': {exc}[/red]")
+        return False
+
+    stdout = result.stdout.strip() if result.stdout else ""
+    stderr = result.stderr.strip() if result.stderr else ""
+
+    if result.returncode == 0:
+        if stdout:
+            console.print(stdout)
+        console.print(
+            "[green]StoryCraftr VS Code extension installed. "
+            "Reload VS Code to activate it.[/green]"
+        )
+        return True
+
+    console.print(
+        "[red]VS Code extension installation failed. "
+        "Run the 'code --install-extension' command manually to retry.[/red]"
+    )
+    if stdout:
+        console.print(f"[dim]{stdout}[/dim]")
+    if stderr:
+        console.print(f"[red]{stderr}[/red]")
+    return False
