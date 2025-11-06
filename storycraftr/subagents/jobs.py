@@ -264,19 +264,37 @@ _CONSOLE_MODULES = [
     "storycraftr.cmd.story.outline",
     "storycraftr.cmd.story.worldbuilding",
     "storycraftr.cmd.story.publish",
+    "storycraftr.cmd.paper.organize_lit",
+    "storycraftr.cmd.paper.outline_sections",
+    "storycraftr.cmd.paper.generate_section",
+    "storycraftr.cmd.paper.references",
+    "storycraftr.cmd.paper.iterate",
+    "storycraftr.cmd.paper.publish",
+    "storycraftr.cmd.paper.abstract",
+    "storycraftr.agent.agents",
+    "storycraftr.agent.retrieval",
     "storycraftr.agent.story.chapters",
     "storycraftr.agent.story.iterate",
     "storycraftr.agent.story.outline",
     "storycraftr.agent.story.worldbuilding",
+    "storycraftr.agent.paper.generate_section",
+    "storycraftr.agent.paper.generate_pdf",
+    "storycraftr.agent.paper.organize_lit",
+    "storycraftr.agent.paper.outline_sections",
+    "storycraftr.agent.paper.references",
+    "storycraftr.agent.paper.iterate",
 ]
 
 
 def _swap_storycraftr_consoles(replacement: Console):
     swaps = []
     for module_name in _CONSOLE_MODULES:
+        module = None
         try:
             module = import_module(module_name)
-        except ModuleNotFoundError:
+        except Exception as exc:
+            logger.debug("Skipping console swap for %s: %s", module_name, exc)
+        if module is None:
             continue
         console_obj = getattr(module, "console", None)
         if isinstance(console_obj, Console):
