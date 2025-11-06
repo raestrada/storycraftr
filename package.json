@@ -1,0 +1,46 @@
+{
+  "name": "storycraftr",
+  "displayName": "StoryCraftr Companion",
+  "description": "Companion extension that mirrors StoryCraftr CLI chats and sub-agent activity inside VS Code.",
+  "publisher": "StoryCraftr",
+  "version": "0.12.0-beta1",
+  "engines": {
+    "vscode": "^1.94.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "storycraftr.showEventLog",
+        "title": "StoryCraftr: Show Event Log"
+      }
+    ],
+    "configuration": {
+      "title": "StoryCraftr",
+      "properties": {
+        "storycraftr.eventStream.autoOpenLogs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically prompt to open sub-agent log files when jobs finish."
+        }
+      }
+    }
+  },
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -w -p .",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "20.x",
+    "@types/vscode": "^1.94.0",
+    "typescript": "^5.6.3",
+    "vsce": "^2.15.0"
+  }
+}
