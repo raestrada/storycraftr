@@ -114,7 +114,12 @@ def read_from_markdown(book_path, folder_name, file_name) -> str:
 
 
 def consolidate_book_md(
-    book_path: str, primary_language: str, translate: str = None
+    book_path: str,
+    primary_language: str,
+    translate: str | None = None,
+    *,
+    include_cover: bool = True,
+    include_back_matter: bool = True,
 ) -> str:
     """
     Consolidate all chapters of a book into a single markdown file.
@@ -123,6 +128,8 @@ def consolidate_book_md(
         book_path (str): The path to the book's directory.
         primary_language (str): The primary language of the book.
         translate (str, optional): If provided, translates the content to the specified language.
+        include_cover (bool): When True, prepend cover/front-matter markdown.
+        include_back_matter (bool): When True, append back-cover or other closing sections.
 
     Returns:
         str: The path to the consolidated markdown file.
@@ -143,11 +150,11 @@ def consolidate_book_md(
     # Collect chapters to process
     files_to_process = []
 
-    # Add cover and back-cover if they exist
-    for section in ["cover.md", "back-cover.md"]:
-        section_path = chapters_dir / section
-        if section_path.exists():
-            files_to_process.append(section_path)
+    # Add cover if requested
+    if include_cover:
+        cover_path = chapters_dir / "cover.md"
+        if cover_path.exists():
+            files_to_process.append(cover_path)
 
     # Add chapters in order
     chapter_files = sorted(
@@ -160,6 +167,12 @@ def consolidate_book_md(
     epilogue_path = chapters_dir / "epilogue.md"
     if epilogue_path.exists():
         files_to_process.append(epilogue_path)
+
+    # Add back cover if requested
+    if include_back_matter:
+        back_path = chapters_dir / "back-cover.md"
+        if back_path.exists():
+            files_to_process.append(back_path)
 
     # Log start of consolidation
     if translate:

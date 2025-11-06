@@ -1,0 +1,82 @@
+@page {
+  size: 6in 9in;
+  margin: 0.8in 0.7in 0.8in 0.7in;
+}
+
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #222;
+  line-height: 1.55;
+  font-size: 12pt;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Merriweather', 'Georgia', serif;
+  color: #111;
+  margin: 18pt 0 8pt;
+}
+
+h1 {
+  font-size: 26pt;
+  text-align: center;
+  margin-top: 40pt;
+}
+
+h2 {
+  font-size: 20pt;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 6pt;
+}
+
+h3 {
+  font-size: 16pt;
+}
+
+p {
+  orphans: 3;
+  widows: 3;
+  margin: 0 0 12pt;
+}
+
+blockquote {
+  border-left: 3px solid #bbb;
+  margin: 0 0 12pt;
+  padding: 0 12pt;
+  color: #555;
+  font-style: italic;
+}
+
+code, pre {
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  background: #f4f4f4;
+  border-radius: 4px;
+}
+
+code {
+  padding: 2px 4px;
+}
+
+pre {
+  padding: 10px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12pt 0;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background: #f4f4f4;
+}
+
+a {
+  color: #1f6feb;
+}

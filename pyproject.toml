@@ -29,6 +29,7 @@ langchain-huggingface = ">=0.3.1"
 langchain-chroma = ">=0.2.6"
 chromadb = ">=0.5.4"
 huggingface-hub = ">=0.23.0"
+markdown-pdf = "^1.10"
 
 [tool.poetry.scripts]
 storycraftr = "storycraftr.cli:cli"

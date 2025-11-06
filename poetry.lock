@@ -2159,6 +2159,25 @@ rtd = ["jupyter_sphinx", "mdit-py-plugins", "myst-parser", "pyyaml", "sphinx", "
 testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions"]
 
 [[package]]
+name = "markdown-pdf"
+version = "1.10"
+description = "Markdown to pdf renderer"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "markdown_pdf-1.10-py3-none-any.whl", hash = "sha256:1863e78454e5aa9bcb34c125f385d4ff045c727660c5172877e82e69d06fae6d"},
+    {file = "markdown_pdf-1.10.tar.gz", hash = "sha256:bcf23d816baa56aec3a60f940681652c4e46ee048c6335835cddf86d1ff20a8e"},
+]
+
+[package.dependencies]
+markdown-it-py = {version = "3.0.0", markers = "python_version >= \"3.8\""}
+PyMuPDF = {version = ">=1.25.3", markers = "python_version > \"3.8\""}
+
+[package.extras]
+dev = ["codacy-coverage", "flake8", "pydocstyle", "pylint", "pytest", "pytest-cov"]
+
+[[package]]
 name = "markupsafe"
 version = "3.0.2"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -4497,6 +4516,23 @@ files = [
 
 [package.extras]
 windows-terminal = ["colorama (>=0.4.6)"]
+
+[[package]]
+name = "pymupdf"
+version = "1.26.6"
+description = "A high performance Python library for data extraction, analysis, conversion & manipulation of PDF (and other) documents."
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "pymupdf-1.26.6-cp310-abi3-macosx_10_9_x86_64.whl", hash = "sha256:e46f320a136ad55e5219e8f0f4061bdf3e4c12b126d2740d5a49f73fae7ea176"},
+    {file = "pymupdf-1.26.6-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:6844cd2396553c0fa06de4869d5d5ecb1260e6fc3b9d85abe8fa35f14dd9d688"},
+    {file = "pymupdf-1.26.6-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:617ba69e02c44f0da1c0e039ea4a26cf630849fd570e169c71daeb8ac52a81d6"},
+    {file = "pymupdf-1.26.6-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:7777d0b7124c2ebc94849536b6a1fb85d158df3b9d873935e63036559391534c"},
+    {file = "pymupdf-1.26.6-cp310-abi3-win32.whl", hash = "sha256:8f3ef05befc90ca6bb0f12983200a7048d5bff3e1c1edef1bb3de60b32cb5274"},
+    {file = "pymupdf-1.26.6-cp310-abi3-win_amd64.whl", hash = "sha256:ce02ca96ed0d1acfd00331a4d41a34c98584d034155b06fd4ec0f051718de7ba"},
+    {file = "pymupdf-1.26.6.tar.gz", hash = "sha256:a2b4531cd4ab36d6f1f794bb6d3c33b49bda22f36d58bb1f3e81cbc10183bd2b"},
+]
 
 [[package]]
 name = "pypika"
@@ -6861,4 +6897,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "5242da751b4d0cb948cbaacdbc886862ccb050c3c9ac69f3515e43cc0bb5e98f"
+content-hash = "d6da1313c49cd4e73ff925b0872fcd725aab8d2dfd152e192e8cb0251d06450b"

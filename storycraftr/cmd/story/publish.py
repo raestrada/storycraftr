@@ -27,7 +27,18 @@ def publish():
     help="Translate the book to this language before publishing.",
 )
 @click.option("--book-path", type=click.Path(), help="Path to the book directory")
-def pdf(primary_language: str, translate: str = None, book_path: str = None):
+@click.option(
+    "--theme",
+    type=str,
+    default=None,
+    help="Name of the bundled PDF theme (defaults to 'classic').",
+)
+def pdf(
+    primary_language: str,
+    translate: str | None = None,
+    book_path: str | None = None,
+    theme: str | None = None,
+):
     """
     Publish the book as a PDF.
 
@@ -48,7 +59,7 @@ def pdf(primary_language: str, translate: str = None, book_path: str = None):
     console.print(f"Generating PDF for the book in [bold]{primary_language}[/bold]...")
 
     try:
-        output_pdf_path = to_pdf(book_path, primary_language, translate)
+        output_pdf_path = to_pdf(book_path, primary_language, translate, theme)
         # Success log
         console.print(
             f"[green bold]Success![/green bold] PDF generated at: [bold]{output_pdf_path}[/bold]"
