@@ -11,7 +11,7 @@ First, install **StoryCraftr** using [pipx](https://pypa.github.io/pipx/), a too
 To install **StoryCraftr**, run the following command:
 
 ```bash
-pipx install git+https://github.com/raestrada/storycraftr.git@v0.11.4-beta9
+pipx install git+https://github.com/raestrada/storycraftr.git@v0.12.0-beta10
 ```
 
 ### Configure credentials
@@ -51,6 +51,23 @@ When you run `storycraftr init`, the generated `storycraftr.json` includes the n
 - `llm_provider` can be `openai`, `openrouter`, or `ollama`.
 - `llm_endpoint` lets you point at custom-compatible bases.
 - `embed_model` defaults to `BAAI/bge-large-en-v1.5` for OpenAI-quality local embeddings; switch to a smaller model if resources are limited.
+
+### Background sub-agents
+
+The init command now scaffolds `.storycraftr/subagents/` with YAML files describing the default roles (editor, continuity, worldbuilding, marketing). Each YAML file declares:
+
+```yaml
+slug: editor
+command_whitelist:
+  - "!chapters"
+  - "!outline"
+  - "!iterate"
+system_prompt: >
+  You are the project's line editor…
+```
+
+- Re-run `storycraftr sub-agents seed --language en --force` at any time to regenerate the defaults (replace `en` with your locale).
+- Logs for each background run are written to `.storycraftr/subagents/logs/<role>/timestamp.md`, making it easy to review results even when the CLI is installed through `pipx`.
 
 ## Step 2: Create the Behavior File
 

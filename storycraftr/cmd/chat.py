@@ -1,39 +1,36 @@
 from __future__ import annotations
 
+from pathlib import Path
+from queue import Empty, Queue
+from typing import List
+
+import click
 import os
 import time
-import click
-from pathlib import Path
-from typing import Dict, List
-
-from prompt_toolkit import PromptSession
-from prompt_toolkit.history import InMemoryHistory
 from rich.console import Console
 from rich.markdown import Markdown
+from prompt_toolkit import PromptSession
+from prompt_toolkit.history import InMemoryHistory
+from prompt_toolkit.patch_stdout import patch_stdout
 
-import storycraftr.cmd.story as story_cmd
-from storycraftr.chat import (
-    CommandContext,
-    SessionManager,
-    handle_command,
+from storycraftr.chat.commands import CommandContext, handle_command
+from storycraftr.chat.render import (
+    render_footer,
     render_session_loaded,
+    render_subagent_event,
     render_turn,
 )
-from storycraftr.utils.core import load_book_config
+from storycraftr.chat.session import SessionManager
+from storycraftr.chat.module_runner import ModuleCommandError, run_module_command
+from storycraftr.subagents import SubAgentJobManager
 from storycraftr.agent.agents import (
     create_message,
     create_or_get_assistant,
     get_thread,
 )
+from storycraftr.utils.core import load_book_config
 
 console = Console()
-
-command_modules = {
-    "iterate": story_cmd.iterate,
-    "outline": story_cmd.outline,
-    "worldbuilding": story_cmd.worldbuilding,
-    "chapters": story_cmd.chapters,
-}
 
 
 def _format_user_prompt(message: str) -> str:
@@ -76,31 +73,11 @@ def _run_turn(
     }
 
 
-def _execute_module_command(raw: str) -> None:
+def _execute_module_command(raw: str, *, book_path: str) -> None:
     try:
-        parts = raw.split()
-        if len(parts) < 2:
-            console.print("[yellow]Usage: !<module> <command> [args][/yellow]")
-            return
-        module_name = parts[0]
-        command_name = parts[1].replace("-", "_")
-        command_args = parts[2:]
-        module = command_modules.get(module_name)
-        if not module:
-            console.print(f"[yellow]Unknown module '{module_name}'.[/yellow]")
-            return
-        func = getattr(module, command_name, None)
-        if hasattr(func, "callback"):
-            func = func.callback
-        if not callable(func):
-            console.print(
-                f"[yellow]Command '{command_name}' not found in module '{module_name}'.[/yellow]"
-            )
-            return
-        console.print(f"[cyan]Running {module_name}.{command_name}…[/cyan]")
-        func(*command_args)
-    except Exception as exc:
-        console.print(f"[red]Error executing module command:[/red] {exc}")
+        run_module_command(raw, console=console, book_path=book_path)
+    except ModuleCommandError as exc:
+        console.print(f"[red]{exc}[/red]")
 
 
 def _print_inline_help() -> None:
@@ -114,6 +91,33 @@ def _print_inline_help() -> None:
             """
         )
     )
+
+
+def _render_session_footer(job_manager: SubAgentJobManager, footer_meta: dict) -> None:
+    if not job_manager:
+        return
+    render_footer(
+        console,
+        job_stats=job_manager.job_stats(),
+        **footer_meta,
+    )
+
+
+def _drain_subagent_events(
+    event_queue: Queue,
+    job_manager: SubAgentJobManager,
+    footer_meta: dict,
+) -> None:
+    flushed = False
+    while True:
+        try:
+            event = event_queue.get_nowait()
+        except Empty:
+            break
+        render_subagent_event(console, event)
+        flushed = True
+    if flushed:
+        _render_session_footer(job_manager, footer_meta)
 
 
 @click.command()
@@ -141,6 +145,16 @@ def chat(book_path=None, prompt=None, session_name=None):
     assistant = create_or_get_assistant(book_path)
     thread = get_thread(book_path)
 
+    footer_meta = {
+        "book_name": getattr(config, "book_name", Path(book_path).name),
+        "language": getattr(config, "primary_language", "en"),
+        "llm_provider": getattr(config, "llm_provider", "unknown"),
+        "llm_model": getattr(config, "llm_model", "unknown"),
+        "embed_model": getattr(config, "embed_model", "unknown"),
+    }
+
+    subagent_events: Queue = Queue()
+    job_manager = SubAgentJobManager(book_path, console, event_queue=subagent_events)
     session_manager = SessionManager(book_path)
     if session_name:
         session_manager.autosave_name = session_name
@@ -160,16 +174,21 @@ def chat(book_path=None, prompt=None, session_name=None):
     if prompt is not None:
         turn = _run_turn(book_path, assistant, thread, prompt)
         render_turn(console, turn, len(transcript) + 1)
+        _drain_subagent_events(subagent_events, job_manager, footer_meta)
+        _render_session_footer(job_manager, footer_meta)
+        job_manager.shutdown()
         return
 
     console.print(
         f"Starting chat for [bold]{book_path}[/bold]. Type [bold green]exit()[/bold green] to quit."
     )
     _print_inline_help()
+    _render_session_footer(job_manager, footer_meta)
 
     session = PromptSession(history=InMemoryHistory())
 
     while True:
+        _drain_subagent_events(subagent_events, job_manager, footer_meta)
         try:
             user_input = session.prompt("You: ").strip()
 
@@ -182,6 +201,8 @@ def chat(book_path=None, prompt=None, session_name=None):
 
             if user_input.lower() == "help()":
                 _print_inline_help()
+                _drain_subagent_events(subagent_events, job_manager, footer_meta)
+                _render_session_footer(job_manager, footer_meta)
                 continue
 
             if user_input.startswith(":"):
@@ -190,23 +211,43 @@ def chat(book_path=None, prompt=None, session_name=None):
                     session_manager=session_manager,
                     transcript=transcript,
                     assistant=assistant,
+                    book_path=book_path,
+                    job_manager=job_manager,
                 )
-                result = handle_command(user_input, ctx)
-                if isinstance(result, list):
-                    transcript[:] = result
+
+                command_result: List[dict] | None = None
+
+                def _run_command():
+                    nonlocal command_result
+                    result = handle_command(user_input, ctx)
+                    if isinstance(result, list):
+                        command_result = result
+
+                with patch_stdout(raw=True):
+                    _run_command()
+                if command_result is not None:
+                    transcript[:] = command_result
+                _drain_subagent_events(subagent_events, job_manager, footer_meta)
+                _render_session_footer(job_manager, footer_meta)
                 continue
 
             if user_input.startswith("!"):
-                _execute_module_command(user_input[1:])
+                with patch_stdout(raw=True):
+                    _execute_module_command(user_input[1:], book_path=book_path)
+                _drain_subagent_events(subagent_events, job_manager, footer_meta)
+                _render_session_footer(job_manager, footer_meta)
                 continue
 
             turn = _run_turn(book_path, assistant, thread, user_input)
             transcript.append(turn)
             render_turn(console, turn, len(transcript))
             session_manager.autosave(transcript)
+            _drain_subagent_events(subagent_events, job_manager, footer_meta)
+            _render_session_footer(job_manager, footer_meta)
 
         except KeyboardInterrupt:
             console.print("[bold red]Exiting chat...[/bold red]")
             break
         except Exception as exc:
             console.print(f"[bold red]Error: {exc}[/bold red]")
+    job_manager.shutdown()

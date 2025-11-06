@@ -182,6 +182,44 @@ exit()
 
 This will end the chat session and return you to the terminal.
 
+## Sub-Agent Background Jobs
+
+While command shortcuts are great for quick edits, some operations (large outlines, full chapter rewrites, PDF builds) take time. Prefix those with `:sub-agent` to run them in the background via role-specific prompts that live under `.storycraftr/subagents/`.
+
+- Inspect roles and their whitelisted commands:
+
+  ```bash
+  :sub-agent !list
+  :sub-agent !describe editor
+  ```
+
+- Queue a command with an explicit role:
+
+  ```bash
+  :sub-agent !outline editor general-outline "Tighten the pacing for Act II"
+  ```
+
+- Let StoryCraftr auto-select a role (it matches the `!command` against each role’s whitelist):
+
+  ```bash
+  :sub-agent !chapters chapter 5 "Reframe the midpoint twist"
+  ```
+
+- Monitor background work or inspect past outputs:
+
+  ```bash
+  :sub-agent !status
+  :sub-agent !logs continuity
+  ```
+
+- Reseed the role YAML files (useful after changing languages):
+
+  ```bash
+  :sub-agent !seed --language es --force
+  ```
+
+While a job runs, the chat shows `[Role ⏳ …]` badges and drops a completion panel in-line when the task finishes. Raw logs are stored in `.storycraftr/subagents/logs/<role>/timestamp.md`, so pipx users can still review them outside the chat.
+
 ## Conclusion
 
 The **StoryCraftr Chat** feature, combined with powerful commands like **Iterate**, **Outline**, **Worldbuilding**, and **Chapters**, provides you with everything you need to write your book efficiently. Whether you are refining existing content or generating new chapters, this feature allows you to enhance your creative process with ease.

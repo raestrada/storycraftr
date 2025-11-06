@@ -4,6 +4,7 @@ from rich.console import Console
 from pathlib import Path
 import storycraftr.templates.folder_story
 from storycraftr.agent.agents import create_or_get_assistant
+from storycraftr.subagents import seed_default_roles
 from storycraftr.templates.tex import TEMPLATE_TEX
 from storycraftr.templates.paper_tex import TEMPLATE_PAPER_TEX
 from storycraftr.templates.ieee_tex import TEMPLATE_IEEE_TEX
@@ -126,6 +127,7 @@ def init_structure_story(
     filenames = ["getting_started.md", "iterate.md", "chat.md"]
     ensure_local_docs(book_path, filenames)
 
+    seed_default_roles(book_path, language=primary_language, force=False)
     create_or_get_assistant(book_path)
 
 

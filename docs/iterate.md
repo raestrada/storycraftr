@@ -86,6 +86,18 @@ The power of **StoryCraftr** lies in its ability to help you **iterate** without
 
 The iterative process in **StoryCraftr** aligns with the principles outlined by **Brandon Sanderson** in his approach to writing. Sanderson emphasizes the importance of consistency, depth, and thematic clarity—principles that StoryCraftr can help you apply throughout your story development.
 
+## Running Iterations in the Background
+
+Need to keep chatting while a heavy `!iterate` command runs? Use a sub-agent:
+
+```bash
+:sub-agent !iterate editor check-consistency "Audit the revenge subplot"
+```
+
+- Roles live under `.storycraftr/subagents/` and each lists the commands it is allowed to execute.
+- Use `:sub-agent !status` to watch progress and `:sub-agent !logs editor` to open the markdown transcript of the run.
+- Regenerate or localize the role definitions at any time with `storycraftr sub-agents seed --language <code> [--force]`.
+
 ---
 
 Happy refining and iterating with **StoryCraftr**! ✍️

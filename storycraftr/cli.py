@@ -34,6 +34,7 @@ from storycraftr.cmd.paper.publish import publish as paper_publish
 from storycraftr.cmd.paper.abstract import abstract as paper_abstract
 
 from storycraftr.init import init_structure_story, init_structure_paper
+from storycraftr.subagents import seed_default_roles
 
 
 # Detect CLI (storycraftr or papercraftr)
@@ -364,12 +365,46 @@ def cleanup(book_path, force):
         project_not_initialized_error(book_path)
 
 
+@cli.group(name="sub-agents")
+def sub_agents():
+    """Manage sub-agent role definitions."""
+    pass
+
+
+@sub_agents.command("seed")
+@click.option("--book-path", type=click.Path(), required=False, help="Book path.")
+@click.option(
+    "--language",
+    default="en",
+    show_default=True,
+    help="Language used to seed default prompts.",
+)
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Overwrite existing role files.",
+)
+def sub_agents_seed(book_path, language, force):
+    """Seed or overwrite the default sub-agent roles."""
+    book_path = verify_book_path(book_path)
+    written = seed_default_roles(book_path, language=language, force=force)
+    if written:
+        console.print(
+            f"[green]Seeded {len(written)} role definition(s) in {book_path}.[/green]"
+        )
+    else:
+        console.print(
+            f"[yellow]Roles already exist in {book_path}. Use --force to overwrite.[/yellow]"
+        )
+
+
 # Add common commands to CLI
 cli.add_command(init, name="init")
 cli.add_command(reload_files)
 cli.add_command(chat)
 cli.add_command(publish)
 cli.add_command(cleanup)
+cli.add_command(sub_agents)
 
 # CLI-specific group configuration
 if cli_name == "storycraftr":
