@@ -27,6 +27,16 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically prompt to open sub-agent log files when jobs finish."
+        },
+        "storycraftr.files.autoOpenMarkdown": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically open chapter/story Markdown files when StoryCraftr updates them."
+        },
+        "storycraftr.transcript.autoShow": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically show the StoryCraftr transcript document when a chat session starts."
         }
       }
     }

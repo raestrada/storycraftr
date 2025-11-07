@@ -4,6 +4,7 @@ import { TextDecoder } from "util";
 import * as vscode from "vscode";
 
 const decoder = new TextDecoder();
+const TRANSCRIPT_SCHEME = "storycraftr-transcript";
 
 interface StoryCraftrEvent {
   event: string;
@@ -17,14 +18,36 @@ interface JobSummary {
   failed: number;
 }
 
+class TranscriptProvider implements vscode.TextDocumentContentProvider {
+  private buffer = "";
+  private emitter = new vscode.EventEmitter<vscode.Uri>();
+  readonly uri = vscode.Uri.parse(`${TRANSCRIPT_SCHEME}:/active`);
+  readonly onDidChange = this.emitter.event;
+
+  reset() {
+    this.buffer = "";
+    this.emitter.fire(this.uri);
+  }
+
+  append(block: string) {
+    this.buffer += block;
+    this.emitter.fire(this.uri);
+  }
+
+  provideTextDocumentContent(): string {
+    return this.buffer || "StoryCraftr transcript will appear here.";
+  }
+}
+
 class EventStreamWatcher {
   private previousContent = "";
+
   constructor(
     private readonly uri: vscode.Uri,
     private readonly onEvent: (
       event: string,
       payload: Record<string, any>,
-      raw: string
+      raw: string,
     ) => void,
   ) {}
 
@@ -42,7 +65,6 @@ class EventStreamWatcher {
       }
 
       if (text.length < this.previousContent.length) {
-        // File truncated, start fresh
         this.previousContent = "";
       }
 
@@ -69,13 +91,14 @@ class EventStreamWatcher {
   }
 
   dispose() {
-    // nothing to dispose yet
+    // nothing yet
   }
 }
 
 let outputChannel: vscode.OutputChannel;
 let statusItem: vscode.StatusBarItem;
 const watchers = new Map<string, EventStreamWatcher>();
+const disposables: vscode.Disposable[] = [];
 const jobStates = new Map<string, string>();
 const jobSummary: JobSummary = {
   pending: 0,
@@ -83,8 +106,14 @@ const jobSummary: JobSummary = {
   succeeded: 0,
   failed: 0,
 };
-const disposables: vscode.Disposable[] = [];
 let extensionContext: vscode.ExtensionContext | undefined;
+let transcriptProvider: TranscriptProvider;
+
+function getConfig<T>(key: string, fallback: T): T {
+  return (
+    vscode.workspace.getConfiguration("storycraftr").get<T>(key) ?? fallback
+  );
+}
 
 function updateStatusBar() {
   statusItem.text = `StoryCraftr: $(rocket) ${jobSummary.running} running · ${jobSummary.pending} pending`;
@@ -92,41 +121,35 @@ function updateStatusBar() {
   statusItem.show();
 }
 
-function resetStatusCounts() {
+function resetJobSummary() {
   jobSummary.pending = 0;
   jobSummary.running = 0;
   jobSummary.succeeded = 0;
   jobSummary.failed = 0;
-}
-
-function applyJobState(jobId: string, state: string | undefined) {
-  if (!state || !(state in jobSummary)) {
-    const previous = jobStates.get(jobId);
-    if (previous && previous in jobSummary) {
-      jobSummary[previous as keyof JobSummary] =
-        Math.max(0, jobSummary[previous as keyof JobSummary] - 1);
-    }
-    jobStates.delete(jobId);
-    updateStatusBar();
-    return;
-  }
-
-  const previous = jobStates.get(jobId);
-  if (previous === state) {
-    return;
-  }
-  if (previous) {
-    jobSummary[previous as keyof JobSummary] =
-      Math.max(0, jobSummary[previous as keyof JobSummary] - 1);
-  }
-
-  jobSummary[state as keyof JobSummary] =
-    (jobSummary[state as keyof JobSummary] ?? 0) + 1;
-  jobStates.set(jobId, state);
+  jobStates.clear();
   updateStatusBar();
 }
 
-async function handleOpenLog(logPath: string | undefined) {
+function applyJobState(jobId: string, state: string | undefined) {
+  const previous = jobStates.get(jobId);
+  if (previous && previous in jobSummary) {
+    jobSummary[previous as keyof JobSummary] = Math.max(
+      0,
+      jobSummary[previous as keyof JobSummary] - 1,
+    );
+  }
+
+  if (state && state in jobSummary) {
+    jobSummary[state as keyof JobSummary] =
+      (jobSummary[state as keyof JobSummary] ?? 0) + 1;
+    jobStates.set(jobId, state);
+  } else {
+    jobStates.delete(jobId);
+  }
+  updateStatusBar();
+}
+
+async function openLog(logPath: string | undefined) {
   if (!logPath) {
     return;
   }
@@ -149,13 +172,11 @@ async function handleEvent(
   switch (event) {
     case "session.started": {
       outputChannel.appendLine("=== StoryCraftr session started ===");
-      const book = payload.book_path ?? "";
-      if (book) {
-        outputChannel.appendLine(`Workspace: ${book}`);
+      resetJobSummary();
+      transcriptProvider.reset();
+      if (getConfig("transcript.autoShow", true)) {
+        await showTranscriptDocument();
       }
-      resetStatusCounts();
-      jobStates.clear();
-      updateStatusBar();
       break;
     }
     case "session.ended": {
@@ -172,6 +193,9 @@ async function handleEvent(
       const answer = payload.answer ?? "";
       outputChannel.appendLine(`You: ${user}`);
       outputChannel.appendLine(`StoryCraftr:\n${answer}\n`);
+      transcriptProvider.append(
+        `You: ${user}\nStoryCraftr:\n${answer}\n\n`,
+      );
       break;
     }
     case "sub_agent.queued":
@@ -193,17 +217,15 @@ async function handleEvent(
         const message = `[${role}] ${command} ${status}`;
         const logPath = payload.log_path as string | undefined;
         const autoOpen =
-          vscode.workspace
-            .getConfiguration("storycraftr")
-            .get<boolean>("eventStream.autoOpenLogs", true) ?? true;
-        if (autoOpen && logPath) {
+          getConfig("eventStream.autoOpenLogs", true) && Boolean(logPath);
+        if (autoOpen) {
           const choice = await vscode.window.showInformationMessage(
             message,
             "Open log",
             "Dismiss",
           );
           if (choice === "Open log") {
-            await handleOpenLog(logPath);
+            await openLog(logPath);
           }
         } else {
           vscode.window.showInformationMessage(message);
@@ -228,14 +250,13 @@ async function handleEvent(
         placeHolder: "Select a StoryCraftr log to open",
       });
       if (choice) {
-        await handleOpenLog(choice.file);
+        await openLog(choice.file);
       }
       break;
     }
     case "sub_agent.status": {
       const jobs = (payload.jobs as Record<string, any>[]) ?? [];
-      resetStatusCounts();
-      jobStates.clear();
+      resetJobSummary();
       for (const job of jobs) {
         const jobId = job.job_id;
         const status = job.status;
@@ -246,24 +267,19 @@ async function handleEvent(
       break;
     }
     default: {
-      // Unknown event -> write raw entry for visibility
-      outputChannel.appendLine(
-        `[event:${event}] ${JSON.stringify(payload, null, 2)}`,
-      );
+      outputChannel.appendLine(`[event:${event}] ${JSON.stringify(payload)}`);
       break;
     }
   }
 }
 
 async function discoverEventStreams(
-  context: vscode.ExtensionContext,
   dispatch: (
     event: string,
     payload: Record<string, any>,
     raw: string,
   ) => void,
 ) {
-  // find across workspace
   const uris = await vscode.workspace.findFiles(
     "**/.storycraftr/vscode-events.jsonl",
   );
@@ -274,13 +290,9 @@ async function discoverEventStreams(
   const watcher = vscode.workspace.createFileSystemWatcher(
     "**/.storycraftr/vscode-events.jsonl",
   );
-  context.subscriptions.push(watcher);
+  extensionContext?.subscriptions.push(watcher);
   watcher.onDidCreate((uri) => attachWatcher(uri, dispatch));
-  watcher.onDidChange((uri) => {
-    const key = uri.fsPath;
-    const existing = watchers.get(key);
-    existing?.refresh();
-  });
+  watcher.onDidChange((uri) => watchers.get(uri.fsPath)?.refresh());
 }
 
 function attachWatcher(
@@ -296,23 +308,75 @@ function attachWatcher(
   watchers.set(key, watcher);
   watcher.initialise(true);
 
+  let fsWatcher: fs.FSWatcher | undefined;
   try {
-    const fsWatcher = fs.watch(uri.fsPath, { persistent: false }, () => {
+    fsWatcher = fs.watch(uri.fsPath, { persistent: false }, () => {
       watcher.refresh();
     });
-
-    const disposer = new vscode.Disposable(() => {
-      fsWatcher.close();
-      watcher.dispose();
-      watchers.delete(key);
-    });
-    // store disposer for cleanup
-    disposables.push(disposer);
-    extensionContext?.subscriptions.push(disposer);
   } catch (err) {
     console.warn("Failed to watch StoryCraftr event stream:", err);
     watcher.dispose();
     watchers.delete(key);
+    return;
+  }
+
+  const disposer = new vscode.Disposable(() => {
+    fsWatcher?.close();
+    watcher.dispose();
+    watchers.delete(key);
+  });
+  disposables.push(disposer);
+  extensionContext?.subscriptions.push(disposer);
+}
+
+async function showTranscriptDocument() {
+  const doc = await vscode.workspace.openTextDocument(transcriptProvider.uri);
+  await vscode.window.showTextDocument(doc, { preview: true });
+}
+
+function setupMarkdownWatcher() {
+  const watcher = vscode.workspace.createFileSystemWatcher("**/*.md");
+  const handle = (uri: vscode.Uri) => {
+    void maybeOpenMarkdown(uri);
+  };
+  watcher.onDidCreate(handle);
+  watcher.onDidChange(handle);
+  extensionContext?.subscriptions.push(watcher);
+}
+
+async function maybeOpenMarkdown(uri: vscode.Uri) {
+  if (uri.scheme !== "file") {
+    return;
+  }
+  if (!getConfig("files.autoOpenMarkdown", true)) {
+    return;
+  }
+
+  const fsPath = uri.fsPath;
+  if (fsPath.includes(`${path.sep}.git${path.sep}`)) {
+    return;
+  }
+  const normalized = fsPath.replace(/\\/g, "/");
+  const looksInteresting =
+    normalized.includes("/chapters/") ||
+    normalized.includes("/storycraftr/") ||
+    normalized.includes("/behaviors/");
+  if (!looksInteresting) {
+    return;
+  }
+
+  const alreadyVisible = vscode.window.visibleTextEditors.some(
+    (editor) => editor.document.uri.fsPath === fsPath,
+  );
+  if (alreadyVisible) {
+    return;
+  }
+
+  try {
+    const doc = await vscode.workspace.openTextDocument(uri);
+    await vscode.window.showTextDocument(doc, { preview: false });
+  } catch (err) {
+    console.warn("Unable to open markdown file:", err);
   }
 }
 
@@ -323,23 +387,33 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.StatusBarAlignment.Left,
     10,
   );
-  updateStatusBar();
-
-  context.subscriptions.push(outputChannel, statusItem);
+  transcriptProvider = new TranscriptProvider();
 
   context.subscriptions.push(
+    outputChannel,
+    statusItem,
+    vscode.workspace.registerTextDocumentContentProvider(
+      TRANSCRIPT_SCHEME,
+      transcriptProvider,
+    ),
     vscode.commands.registerCommand("storycraftr.showEventLog", () => {
       outputChannel.show();
     }),
   );
 
-  discoverEventStreams(context, (event, payload, raw) =>
+  updateStatusBar();
+  setupMarkdownWatcher();
+
+  void discoverEventStreams((event, payload, raw) =>
     handleEvent(event, payload, raw),
   );
 
   const configListener = vscode.workspace.onDidChangeConfiguration((e) => {
-    if (e.affectsConfiguration("storycraftr.eventStream.autoOpenLogs")) {
-      // Value is read lazily when needed.
+    if (
+      e.affectsConfiguration("storycraftr.files.autoOpenMarkdown") ||
+      e.affectsConfiguration("storycraftr.transcript.autoShow")
+    ) {
+      // values are read lazily; nothing to do
     }
   });
   context.subscriptions.push(configListener);
